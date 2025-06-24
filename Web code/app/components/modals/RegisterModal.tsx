@@ -94,7 +94,7 @@ const RegisterModal = () => {
           outline
           label="Continue with Facebook"
           icon={AiFillFacebook}
-          onClick={() => {}}
+          onClick={() => signIn("facebook")}
         />
         <div className="text-neutral-500 text-center mt-4 font-light">
           <div>
@@ -135,7 +135,7 @@ const RegisterModal = () => {
       title="Create account"
       actionLabel="Continue"
       onClose={registerModal.onClose}
-      onSubmit={handleSubmit(onSubmit)} // استخدم onSubmit بدلاً من onsubmit
+      onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
     />

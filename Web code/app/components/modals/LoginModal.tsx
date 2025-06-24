@@ -91,7 +91,7 @@ const LoginModal = () => {
           outline
           label="Continue with Facebook"
           icon={AiFillFacebook}
-          onClick={() => {}}
+          onClick={() => signIn("facebook")}
         />
         <div className="text-neutral-500 text-center mt-4 font-light">
           <div>
@@ -106,7 +106,7 @@ const LoginModal = () => {
           <div>
             By continuing, you agree to Cozy
             <span
-              onClick={() => {}}
+              onClick={() => loginModal.isOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Terms of Service
