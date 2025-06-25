@@ -13,11 +13,6 @@ export const authOptions: AuthOptions = {
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-      authorization: {
-        params: {
-          scope: "email",
-        },
-      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -28,7 +23,7 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: {
           label: "Email",
-          type: "email",
+          type: "text",
           placeholder: "Enter your email",
         },
         password: {
@@ -49,13 +44,13 @@ export const authOptions: AuthOptions = {
           },
         });
 
-        if (!user || !user?.hasPassword) {
+        if (!user || !user?.hashedPassword) {
           throw new Error("Invalid email or password");
         }
 
         const isValidPassword = await bcrypt.compare(
           credentials.password,
-          user.hasPassword
+          user.hashedPassword
         );
         if (!isValidPassword) {
           throw new Error("Invalid email or password");
@@ -71,6 +66,6 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NextAuth_SECRET,
 };
 export default NextAuth(authOptions);

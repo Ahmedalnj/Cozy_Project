@@ -1,20 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   experimental: {
+    // يمكنك إضافة خيارات تجريبية هنا إذا كنت تستخدم ميزات تجريبية
   },
   images: {
-    domains: [
-      "lh3.googleusercontent.com",
-      "platform-lookaside.fbsbx.com",
-      "scontent.fblr1-1.fna.fbcdn.net",
-      "scontent.fblr1-2.fna.fbcdn.net",
-      "scontent.fblr1-3.fna.fbcdn.net",
-      "scontent.fblr1-4.fna.fbcdn.net",
-      "scontent.fblr1-5.fna.fbcdn.net", 
-    ]
-  }
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**', // يمكن استخدام * للحصول على جميع المسارات
+      },
+      {
+        protocol: 'https',
+        hostname: 'platform-lookaside.fbsbx.com',
+        pathname: '/**', // يمكن استخدام * للحصول على جميع المسارات
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

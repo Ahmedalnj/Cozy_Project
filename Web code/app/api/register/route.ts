@@ -4,38 +4,19 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { email, name, password } = body;
+  const { email, name, password} = body; // إضافة provider لتحديد نوع الحساب
 
-  console.log('Received data:', body);  // طباعة البيانات الواردة
-
-  // تحقق إذا كان البريد الإلكتروني موجودًا بالفعل
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    // إذا كان الحساب موجودًا بالفعل، نرجع استجابة تحتوي على رسالة خطأ
-    return NextResponse.json(
-      { error: "Account with this email already exists!" },
-      { status: 400 }
-    );
-  }
-
-  // تشفير كلمة المرور
+  // في حالة عدم وجود المستخدم، نقوم بإنشاء حساب جديد
   const hashedPassword = await bcrypt.hash(password, 12);
-  console.log('Hashed password:', hashedPassword);  // طباعة كلمة المرور المشفرة
 
-  // إنشاء المستخدم في قاعدة البيانات
   const user = await prisma.user.create({
     data: {
       email,
       name,
-      hasPassword: hashedPassword, // استخدام hasPassword بدلاً من hashedPassword
+      hashedPassword,
     },
   });
 
-  console.log('User created:', user);  // طباعة المستخدم الذي تم إنشاؤه
+    return NextResponse.json(user);
+  }
 
-  // إرجاع المستخدم بعد إنشائه
-  return NextResponse.json(user, { status: 201 });
-}

@@ -9,15 +9,15 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid()) @map("_id") @db.Uuid
-  email         String?   @unique
-  name          String?
-  emailVerified DateTime?
-  image         String?
-  hasPassword   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  favoriteIds   String[]  @db.Uuid
+  id             String    @id @default(uuid()) @map("_id") @db.Uuid
+  email          String?   @unique
+  name           String?
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  favoriteIds    String[]  @db.Uuid
 
   accounts     Account[] // علاقة مع Account
   listings     Listing[] // علاقة مع Listing
@@ -26,7 +26,7 @@ model User {
 
 model Account {
   id                String  @id @default(uuid()) @map("_id") @db.Uuid
-  userId            String  @map("user_id") @db.Uuid // تأكد من أن النوع هنا هو UUID
+  userId            String  @db.Uuid // تأكد من أن النوع هنا هو UUID
   type              String
   provider          String
   providerAccountId String

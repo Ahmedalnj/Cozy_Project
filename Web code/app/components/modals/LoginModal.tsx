@@ -14,9 +14,10 @@ import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useRouter } from "next/navigation";
 
 const LoginModal = () => {
+  const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
-  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -43,8 +44,11 @@ const LoginModal = () => {
       }
       if (callback?.ok && !callback?.error) {
         toast.success("Logged in successfully");
+
         router.refresh();
+
         loginModal.onClose();
+        // إعادة التوجيه إلى الصفحة الرئيسية بعد تسجيل الدخول
       }
       if (callback?.error) {
         toast.error("Invalid credentials");
@@ -95,18 +99,21 @@ const LoginModal = () => {
         />
         <div className="text-neutral-500 text-center mt-4 font-light">
           <div>
-            Already have an account?
+            Do not have an account?
             <span
-              onClick={registerModal.onClose}
+              onClick={() => {
+                registerModal.onOpen();
+                loginModal.onClose();
+              }}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Log in
+              Sign Up
             </span>
           </div>
           <div>
             By continuing, you agree to Cozy
             <span
-              onClick={() => loginModal.isOpen}
+              onClick={registerModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Terms of Service

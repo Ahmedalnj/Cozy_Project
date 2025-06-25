@@ -11,9 +11,13 @@ import Input from "../inputs/Input";
 import toast from "react-hot-toast";
 import Button from "../Button";
 import { signIn } from "next-auth/react";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import { useRouter } from "next/navigation";
 
 const RegisterModal = () => {
   const registerModal = useRegisterModal();
+  const router = useRouter();
+  const LoginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -36,12 +40,23 @@ const RegisterModal = () => {
       .post("/api/register", data)
       .then(() => {
         toast.success("Account created successfully!");
+        router.refresh();
         registerModal.onClose();
       })
       .catch((error) => {
         console.error("Error creating account:", error);
-        toast.error("Something went wrong!");
-        // يمكنك إضافة معالجة أخطاء أكثر تفصيلاً هنا إذا لزم الأمر
+
+        // تحقق من إذا كان الخطأ هو "Email already exists"
+        if (
+          error.response &&
+          error.response.data.error === "Email already exists"
+        ) {
+          toast.error(
+            "This email is already registered. Please use a different one."
+          );
+        } else {
+          toast.error("An error occurred while creating your account.");
+        }
       })
       .finally(() => {
         setIsLoading(false);
@@ -100,7 +115,10 @@ const RegisterModal = () => {
           <div>
             Already have an account?
             <span
-              onClick={registerModal.onClose}
+              onClick={() => {
+                LoginModal.onOpen();
+                registerModal.onClose();
+              }}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Log in
