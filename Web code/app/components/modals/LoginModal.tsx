@@ -102,12 +102,12 @@ const LoginModal = () => {
             Do not have an account?
             <span
               onClick={() => {
-                registerModal.onOpen();
                 loginModal.onClose();
+                registerModal.onOpen();
               }}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Sign Up
+              Create an Account
             </span>
           </div>
           <div>

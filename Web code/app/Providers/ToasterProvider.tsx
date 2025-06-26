@@ -11,14 +11,14 @@ const ToasterProvider = () => {
         },
         success: {
           style: {
-            background: "#4caf50",
-            color: "#fff",
+            background: "#fff",
+            color: "#000a03",
           },
         },
         error: {
           style: {
-            background: "#f44336",
-            color: "#fff",
+            background: "#fff",
+            color: "#f44336",
           },
         },
       }}
