@@ -1,3 +1,4 @@
+"use client";
 import bcrypt from 'bcrypt';
 import prisma from "@/app/libs/prismadb"; // تأكد من المسار الصحيح
 import { NextResponse } from 'next/server';
