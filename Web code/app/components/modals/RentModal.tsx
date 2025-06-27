@@ -8,7 +8,6 @@ import CategoryInput from "../inputs/CategoryInput";
 import { FieldValues, useForm } from "react-hook-form";
 import CountrySelect from "../inputs/CountrySelect";
 import dynamic from "next/dynamic";
-import Counter from "../inputs/Counter";
 
 enum STEPS {
   CATEGORY = 0,
@@ -22,6 +21,8 @@ const RentModal = () => {
   const rentmodal = useRentModal();
 
   const [step, setStep] = useState(STEPS.CATEGORY);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const {
     register,
@@ -129,18 +130,56 @@ const RentModal = () => {
       </div>
     );
   }
-  if (step === STEPS.INFO) {
+
+
+ if (step == STEPS.DESCRIPTION) {
+  bodyContent = (
+    <div className="flex flex-col gap-8">
+      <Heading
+        title="How would you describe your place?"
+        subtitle="Short and sweet works best!"
+      />
+      <input 
+        id ="title" 
+        lable ="Title"
+        disabled={isLoading}
+        registor={register}
+        errors={errors}
+        required
+      /> 
+      <hr />
+
+       <input 
+        id ="description" 
+        lable ="Description"
+        disabled={isLoading}
+        registor={register}
+        errors={errors}
+        required
+      />
+  )
+ }
+
+  if (strp == STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Share some basic about your place"
-          subtitle="What amenities do you have ? "
-        />
-        <Counter />
-      </div>
-    );
-  }
+       <Heading
+       title="Now, set your price"
+       subtitle="How much do tou charge per night?"
+       />
+       <Input 
+        id="price"
+        label="Price"
+        formatPrice
+        type="number"
+        disabled={isLoading}
+        required
+       />
+       </div>
 
+    )
+  }
+ 
   return (
     <Modal
       isOpen={rentmodal.isOpen}
