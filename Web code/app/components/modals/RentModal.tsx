@@ -129,28 +129,17 @@ const RentModal = () => {
       </div>
     );
   }
-  if (step == STEPS.INFO) {
+  if (step === STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="Share some basics about your place "
-          subtitle="What amenities do"
+          title="Share some basic about your place"
+          subtitle="What amenities do you have ? "
         />
         <Counter />
       </div>
     );
   }
-
-if(step === STEPS.INFO){
-   bodyContent = (
-    <div className="flex flex-col gap-8">
-         <Heading 
-         title="Share some basic about your place"
-         subtitle="What amenities do you have ? "
-         />  
-     </div>
-   )
-}  
 
   return (
     <Modal
