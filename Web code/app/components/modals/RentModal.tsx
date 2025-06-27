@@ -160,10 +160,11 @@ const RentModal = () => {
         errors={errors}
         required
       />
+      </div>
   )
  }
 
-  if (strp == STEPS.PRICE) {
+  if (step == STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
