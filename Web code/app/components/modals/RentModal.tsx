@@ -47,6 +47,9 @@ const RentModal = () => {
 
   const category = watch("category");
   const location = watch("location");
+  const guestCount = watch("guestCount");
+  const roomCount = watch("roomCount");
+  const bathroomCount = watch("bathroomCount");
 
   const Map = useMemo(
     () =>
@@ -163,21 +166,13 @@ const RentModal = () => {
   if (strp == STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-       <Heading
-       title="Now, set your price"
-       subtitle="How much do tou charge per night?"
-       />
-       <Input 
-        id="price"
-        label="Price"
-        formatPrice
-        type="number"
-        disabled={isLoading}
-        required
-       />
-       </div>
-
-    )
+        <Heading
+          title="Share some basic about your place"
+          subtitle="What amenities do you have ? "
+        />
+        <Counter />
+      </div>
+    );
   }
  
   return (
