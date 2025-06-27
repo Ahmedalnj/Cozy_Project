@@ -1,3 +1,4 @@
+"use client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { AuthOptions } from "next-auth";
 import FacebookProvider from "next-auth/providers/facebook";
