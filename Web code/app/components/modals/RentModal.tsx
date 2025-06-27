@@ -141,6 +141,17 @@ const RentModal = () => {
     );
   }
 
+if(step === STEPS.INFO){
+   bodyContent = (
+    <div className="flex flex-col gap-8">
+         <Heading 
+         title="Share some basic about your place"
+         subtitle="What amenities do you have ? "
+         />  
+     </div>
+   )
+}  
+
   return (
     <Modal
       isOpen={rentmodal.isOpen}
