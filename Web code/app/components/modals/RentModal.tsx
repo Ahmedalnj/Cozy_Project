@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
+import Input from "../inputs/Input";
 
 enum STEPS {
   CATEGORY = 0,
@@ -172,16 +173,7 @@ const RentModal = () => {
           title="Share some basic about your place"
           subtitle="What amenities do you have ? "
         />
-        <input 
-        id ="price" 
-        lable ="Price"
-        formatPrice
-        type="number"
-        disabled={isLoading}
-        registor={register}
-        errors={errors}
-        required
-      />
+  
         <Counter
           title="Guests"
           subtitle="How many guests do you allow?"
@@ -238,7 +230,7 @@ if (step === STEPS.IMAGE) {
           required
         />
         <hr />
-        <input
+        <Input
           id="description"
           label="Description"
           disabled={isLoading}

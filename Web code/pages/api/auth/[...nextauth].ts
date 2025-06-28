@@ -34,30 +34,32 @@ export const authOptions: AuthOptions = {
         },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required");
-        }
+  if (!credentials?.email || !credentials?.password) {
+    return null; // ترجع null بدلاً من رمي استثناء
+  }
 
-        // Here you would typically validate the credentials against your database
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
+  const user = await prisma.user.findUnique({
+    where: {
+      email: credentials.email,
+    },
+  });
 
-        if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid email or password");
-        }
+  if (!user || !user?.hashedPassword) {
+    return null;
+  }
 
-        const isValidPassword = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-        if (!isValidPassword) {
-          throw new Error("Invalid email or password");
-        }
-        return user;
-      },
+  const isValidPassword = await bcrypt.compare(
+    credentials.password,
+    user.hashedPassword
+  );
+
+  if (!isValidPassword) {
+    return null;
+  }
+
+  return user;
+}
+,
     }),
   ],
   pages: {
