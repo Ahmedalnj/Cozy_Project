@@ -48,6 +48,9 @@ const RentModal = () => {
   const category = watch("category");
   const location = watch("location");
   const imageSrc = watch("imageSrc");
+  const roomCount = watch("roomCount");
+  const bathroomCount = watch("bathroomCount");
+  const guestCount = watch("guestCount");
 
   const Map = useMemo(
     () =>
