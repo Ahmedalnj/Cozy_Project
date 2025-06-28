@@ -5,9 +5,13 @@ import { useMemo, useState } from "react";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
-import { FieldValues, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import CountrySelect from "../inputs/CountrySelect";
 import dynamic from "next/dynamic";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
 
@@ -20,6 +24,7 @@ enum STEPS {
   PRICE = 5,
 }
 const RentModal = () => {
+  const router = useRouter();
   const rentmodal = useRentModal();
 
   const [step, setStep] = useState(STEPS.CATEGORY);
@@ -29,7 +34,9 @@ const RentModal = () => {
     handelSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { 
+      errors 
+    },
     reset,
   } = useForm<FieldValues>({
     defaultValues: {
@@ -73,6 +80,29 @@ const RentModal = () => {
   const onNext = () => {
     setStep((value) => value + 1);
   };
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    if (step !== STEPS.PRICE){
+      return onNext();
+    }
+
+    setIsLoading(true);
+    
+    axios.post('/api/listings', data)
+    .then(() => {
+      toast.success('Listing Created');
+      router.refresh();
+      reset();
+      setStep(STEPS.CATEGORY);
+      rentmodal.onClose();
+    })
+    .catch(() => {
+      toast.error('Something went wrong.');
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
 
   const actionLabel = useMemo(() => {
     if (step == STEPS.PRICE) {
@@ -141,6 +171,16 @@ const RentModal = () => {
           title="Share some basic about your place"
           subtitle="What amenities do you have ? "
         />
+        <input 
+        id ="price" 
+        lable ="Price"
+        formatPrice
+        type="number"
+        disabled={isLoading}
+        registor={register}
+        errors={errors}
+        required
+      />
         <Counter
           title="Guests"
           subtitle="How many guests do you allow?"
@@ -162,7 +202,7 @@ const RentModal = () => {
           onChange={(value) => setCustomValue("bathroomCount", value)}
         />
       </div>
-    );
+    )
   }
 
 
@@ -183,7 +223,7 @@ if (step === STEPS.IMAGE) {
     <Modal
       isOpen={rentmodal.isOpen}
       onClose={rentmodal.onClose}
-      onSubmit={onNext}
+      onSubmit={handelSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
