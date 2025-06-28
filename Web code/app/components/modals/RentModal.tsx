@@ -31,7 +31,7 @@ const RentModal = () => {
 
   const {
     register,
-    handelSubmit,
+    handleSubmit,
     setValue,
     watch,
     formState: { 
@@ -223,7 +223,7 @@ if (step === STEPS.IMAGE) {
     <Modal
       isOpen={rentmodal.isOpen}
       onClose={rentmodal.onClose}
-      onSubmit={handelSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
