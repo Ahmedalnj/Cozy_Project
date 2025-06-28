@@ -1,4 +1,3 @@
-"use client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { AuthOptions } from "next-auth";
 import FacebookProvider from "next-auth/providers/facebook";
@@ -34,32 +33,30 @@ export const authOptions: AuthOptions = {
         },
       },
       async authorize(credentials) {
-  if (!credentials?.email || !credentials?.password) {
-    return null; // ترجع null بدلاً من رمي استثناء
-  }
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email: credentials.email,
-    },
-  });
+        // Here you would typically validate the credentials against your database
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        });
 
-  if (!user || !user?.hashedPassword) {
-    return null;
-  }
+        if (!user || !user?.hashedPassword) {
+          throw new Error("Invalid email or password");
+        }
 
-  const isValidPassword = await bcrypt.compare(
-    credentials.password,
-    user.hashedPassword
-  );
-
-  if (!isValidPassword) {
-    return null;
-  }
-
-  return user;
-}
-,
+        const isValidPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+        if (!isValidPassword) {
+          throw new Error("Invalid email or password");
+        }
+        return user;
+      },
     }),
   ],
   pages: {
