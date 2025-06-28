@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
+  
     // يمكنك إضافة خيارات تجريبية هنا إذا كنت تستخدم ميزات تجريبية
   },
   images: {
@@ -14,6 +15,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'platform-lookaside.fbsbx.com',
+        pathname: '/**', // يمكن استخدام * للحصول على جميع المسارات
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
         pathname: '/**', // يمكن استخدام * للحصول على جميع المسارات
       },
     ],
