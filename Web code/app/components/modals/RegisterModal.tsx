@@ -13,16 +13,19 @@ import Button from "../Button";
 import { signIn } from "next-auth/react";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
+import zxcvbn from "zxcvbn";
 
 const RegisterModal = () => {
   const registerModal = useRegisterModal();
   const router = useRouter();
   const LoginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<number | null>(null);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
@@ -30,6 +33,7 @@ const RegisterModal = () => {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   // دالة إرسال البيانات
@@ -62,6 +66,12 @@ const RegisterModal = () => {
         setIsLoading(false);
       });
   };
+
+  const handlePasswordValidation = (password: string): boolean | string => {
+    const result = zxcvbn(password);
+    setPasswordStrength(result.score); // تخزين درجة القوة (من 0 إلى 4)
+    return result.score >= 3 || "Password is too weak"; // إرجاع true إذا كانت كلمة المرور قوية أو رسالة خطأ
+  };
   // محتوى جسم المودال
   const bodyContent = (
     <div className="flex flex-col gap-4">
@@ -73,6 +83,12 @@ const RegisterModal = () => {
         register={register}
         errors={errors}
         required
+        validation={{
+          pattern: {
+            value: /^[A-Za-z\s]+$/, // فقط حروف ومسافات
+            message: "Name must not contain symbols or numbers",
+          },
+        }}
       />
       <Input
         id="email"
@@ -81,15 +97,53 @@ const RegisterModal = () => {
         register={register}
         errors={errors}
         required
+        validation={{
+          pattern: {
+            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, // نمط إيميل صحيح
+            message: "Please enter a valid email address",
+          },
+        }}
       />
+
+      <div>
+        <Input
+          id="password"
+          label="Password"
+          type="password"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            validate: handlePasswordValidation,
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters",
+            },
+          }}
+        />
+        {passwordStrength !== null && (
+          <div>
+            <p>
+              Password Strength:{" "}
+              {["Weak", "Fair", "Good", "Strong"][passwordStrength]}
+            </p>
+            <progress value={passwordStrength} max={4}></progress>
+          </div>
+        )}
+      </div>
       <Input
-        id="password"
-        label="Password"
+        id="confirmPassword"
+        label="Confirm Password"
         type="password"
         disabled={isLoading}
         register={register}
         errors={errors}
         required
+        validation={{
+          validate: (value) =>
+            value === getValues("password") || "Passwords do not match",
+        }}
       />
     </div>
   );

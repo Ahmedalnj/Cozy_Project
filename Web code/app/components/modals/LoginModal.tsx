@@ -67,6 +67,12 @@ const LoginModal = () => {
         register={register}
         errors={errors}
         required
+        validation={{
+          pattern: {
+            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, // نمط إيميل صحيح
+            message: "Please enter a valid email address",
+          },
+        }}
       />
       <Input
         id="password"

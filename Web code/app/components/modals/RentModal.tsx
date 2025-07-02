@@ -36,9 +36,7 @@ const RentModal = () => {
     handleSubmit,
     setValue,
     watch,
-    formState: { 
-      errors 
-    },
+    formState: { errors },
     reset,
   } = useForm<FieldValues>({
     defaultValues: {
@@ -84,27 +82,28 @@ const RentModal = () => {
   };
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    if (step !== STEPS.PRICE){
+    if (step !== STEPS.PRICE) {
       return onNext();
     }
 
     setIsLoading(true);
-    
-    axios.post('/api/listings', data)
-    .then(() => {
-      toast.success('Listing Created');
-      router.refresh();
-      reset();
-      setStep(STEPS.CATEGORY);
-      rentmodal.onClose();
-    })
-    .catch(() => {
-      toast.error('Something went wrong.');
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }
 
+    axios
+      .post("/api/listings", data)
+      .then(() => {
+        toast.success("Listing Created");
+        router.refresh();
+        reset();
+        setStep(STEPS.CATEGORY);
+        rentmodal.onClose();
+      })
+      .catch(() => {
+        toast.error("Something went wrong.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const actionLabel = useMemo(() => {
     if (step == STEPS.PRICE) {
@@ -173,7 +172,7 @@ const RentModal = () => {
           title="Share some basic about your place"
           subtitle="What amenities do you have ? "
         />
-  
+
         <Counter
           title="Guests"
           subtitle="How many guests do you allow?"
@@ -195,11 +194,10 @@ const RentModal = () => {
           onChange={(value) => setCustomValue("bathroomCount", value)}
         />
       </div>
-    )
+    );
   }
 
-
-if (step === STEPS.IMAGE) { 
+  if (step === STEPS.IMAGE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
@@ -207,15 +205,15 @@ if (step === STEPS.IMAGE) {
           subtitle="Show guests what your place looks like"
         />
         <ImageUpload
-        value={imageSrc}
-        onChange={(value) => setCustomValue("imageSrc", value)} />
+          value={imageSrc}
+          onChange={(value) => setCustomValue("imageSrc", value)}
+        />
       </div>
     );
-  } 
+  }
 
   if (step === STEPS.DESCRIPTION) {
-    bodyContent = ( 
-
+    bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
           title="How would you describe your place?"
@@ -239,7 +237,7 @@ if (step === STEPS.IMAGE) {
           required
         />
       </div>
-    )
+    );
   }
 
   if (step === STEPS.PRICE) {
@@ -258,6 +256,12 @@ if (step === STEPS.IMAGE) {
           register={register}
           errors={errors}
           required
+          validation={{
+            min: {
+              value: 1,
+              message: "Price must be at least 1",
+            },
+          }}
         />
       </div>
     );

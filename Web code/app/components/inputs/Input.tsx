@@ -2,9 +2,9 @@
 
 import {
   FieldErrors,
-  FieldValue,
   FieldValues,
   UseFormRegister,
+  RegisterOptions,
 } from "react-hook-form";
 import { BiDollar } from "react-icons/bi";
 
@@ -17,6 +17,8 @@ interface InputProps {
   formatPrice?: boolean;
   register: UseFormRegister<FieldValues>;
   errors: FieldErrors;
+  validation?: RegisterOptions;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 const Input: React.FC<InputProps> = ({
   id,
@@ -27,6 +29,7 @@ const Input: React.FC<InputProps> = ({
   formatPrice,
   register,
   errors,
+  validation,
 }) => {
   return (
     <div className="w-full relative">
@@ -43,7 +46,7 @@ const Input: React.FC<InputProps> = ({
       <input
         id={id}
         disabled={disabled}
-        {...register(id, { required })}
+        {...register(id, { required, ...validation })}
         placeholder=" "
         type={type}
         className={`
@@ -64,6 +67,11 @@ const Input: React.FC<InputProps> = ({
           ${errors[id] ? "focus:border-rose-500" : "focus:border-black"}
         `}
       />
+      {errors[id] && (
+        <p className="text-rose-500 text-sm mt-1">
+          {errors[id]?.message as string}
+        </p>
+      )}
       <label
         className={`
           absolute
