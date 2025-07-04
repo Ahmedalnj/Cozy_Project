@@ -78,7 +78,23 @@ const RentModal = () => {
     setStep((value) => value - 1);
   };
   const onNext = () => {
-    setStep((value) => value + 1);
+    // تحقق من أن كل الحقول المطلوبة تم تعبئتها
+    if (step === STEPS.CATEGORY && !category) {
+      toast.error("Category is required");
+      return; // لا تتابع إذا لم يتم تحديد الفئة
+    }
+
+    if (step === STEPS.IMAGE && !imageSrc) {
+      toast.error("Image is required");
+      return; // لا تتابع إذا لم يتم تحميل صورة
+    }
+
+    if (step === STEPS.LOCATION && !location) {
+      toast.error("Location is required");
+      return; // لا تتابع إذا لم يتم تحديد الموقع
+    }
+
+    setStep((value) => value + 1); // الانتقال للخطوة التالية
   };
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -161,7 +177,7 @@ const RentModal = () => {
           value={location}
           onChange={(value) => setCustomValue("location", value)}
         />
-        <Map center={location?.latlng} />
+        <Map center={location?.latlng || [32.8872, 13.191]} />
       </div>
     );
   }

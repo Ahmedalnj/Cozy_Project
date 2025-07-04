@@ -1,7 +1,6 @@
-"use client";
-
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { SafeUser } from "../types";
+import useFavorite from "../hooks/useFavorite";
 
 interface HeartButtonProps {
   listingId: string;
@@ -12,24 +11,10 @@ const HeartButton: React.FC<HeartButtonProps> = ({
   listingId,
   currentUser,
 }) => {
-  // Use currentUser to determine if the listing is a favorite
-  const hasFavorite = currentUser?.favoriteIds?.includes(listingId) ?? false;
-
-  // Use listingId and currentUser in the toggle function
-  const toggleFavorite = () => {
-    if (!currentUser) {
-      // Optionally, show a login prompt here
-      return;
-    }
-    // Here you would add/remove the favorite using listingId and currentUser
-    // For now, just log them to show usage
-    console.log(
-      "Toggling favorite for listing:",
-      listingId,
-      "User:",
-      currentUser.id
-    );
-  };
+  const { hasFavorited, toggleFavorite } = useFavorite({
+    listingId,
+    currentUser,
+  });
 
   return (
     <div
@@ -52,7 +37,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
       />
       <AiFillHeart
         size={24}
-        className={hasFavorite ? "fill-rose-500" : "fill-neutral-500/70"}
+        className={hasFavorited ? "fill-rose-500" : "fill-neutral-500/70"}
       />
     </div>
   );

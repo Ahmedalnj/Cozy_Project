@@ -36,5 +36,7 @@ export default async function getCurrentUser() {
             console.error("An unknown error occurred while fetching current user.");
         }
         return null;
+    } finally {
+        await prisma.$disconnect(); // تأكد من إغلاق الاتصال بعد العملية
     }
 }

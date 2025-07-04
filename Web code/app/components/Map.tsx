@@ -18,21 +18,37 @@ L.Icon.Default.mergeOptions({
 });
 
 interface MapProps {
-  center?: number[];
+  center?: [number, number];
 }
+import { useMap } from "react-leaflet";
+import { useEffect } from "react";
+
+const Recenter: React.FC<{ center: [number, number] }> = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center as L.LatLngTuple);
+  }, [center, map]);
+  return null;
+};
+
 const Map: React.FC<MapProps> = ({ center }) => {
   return (
     <MapContainer
       center={(center as L.LatLngExpression) || [51, -0.09]}
       zoom={center ? 4 : 2}
       scrollWheelZoom={false}
-      className="h-[35vh] rounded-lg"
+      className="h-[450px] rounded-lg"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {center && <Marker position={center as L.LatLngExpression} />}
+      {center && (
+        <>
+          <Marker position={center as L.LatLngTuple} />
+          <Recenter center={center as [number, number]} />
+        </>
+      )}
     </MapContainer>
   );
 };

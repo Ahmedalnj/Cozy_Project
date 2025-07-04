@@ -19,11 +19,13 @@ interface ListingCardProps {
   actionLabel?: string;
   actionId?: string;
   currentUser?: SafeUser | null;
+  description?: string;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
   data,
   reservation,
+  description,
   onAction,
   disabled,
   actionLabel,
@@ -81,7 +83,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 w-full
                 relative
                 overflow-hidden
-                rounded-xl
+                rounded-lg
                 "
         >
           <Image
@@ -106,6 +108,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
           {location?.region}, {location?.label}
         </div>
 
+        <div className="font-light text-neutral-500">{description}</div>
+
         <div className="font-light text-neutral-500">
           {reservationDate || data.category}
         </div>
@@ -113,7 +117,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
         <div className="flex flex-row items-center gap-1">
           <div className="font-semibold">${price}</div>
 
-          {!reservation && <div className="font-light">night</div>}
+          {!reservation && <div className="font-light">per night</div>}
         </div>
 
         {onAction && actionLabel && (
