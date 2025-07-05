@@ -9,7 +9,13 @@ export default async function getListing() {
             }
         });
 
-        return listings;
+        const safelistedListings = listings.map((listing) => ({
+            ...listing,
+            createdAt: listing.createdAt.toISOString(), // تحويل التاريخ إلى سلسلة نصية
+        }))
+
+        return safelistedListings; // إرجاع القوائم بأمان
+        
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error('حدث خطأ أثناء جلب القوائم:', error.message); // تسجيل الخطأ للتتبع

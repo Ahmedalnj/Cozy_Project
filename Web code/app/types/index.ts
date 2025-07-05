@@ -1,4 +1,12 @@
-import type { User } from "@prisma/client";
+import type { Listing, User } from "@prisma/client";
+
+export type SafeListing = Omit<
+  Listing,
+  "createdAt"
+
+> & {
+  crearedAt: string; // تحويل تاريخ الإنشاء إلى string
+}
 
 // تعريف نوع SafeUser مع الحقول المناسبة
 export type SafeUser = Omit<
