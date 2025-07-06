@@ -11,17 +11,26 @@ interface IParams {
 }
 
 const ListingPage = async ({ params }: { params: IParams }) => {
-const listing = await getListingById(params);
-const currentUser = await getCurrentUser();
+    // تحقق من وجود listingId في params
+    if (!params.listingId) {
+        return (
+            <ClientOnly>
+                <EmptyState />
+            </ClientOnly>
+        );
+    }
 
+    const listing = await getListingById(params);
+    const currentUser = await getCurrentUser();
 
-if (!listing){
-    return (
-        <ClientOnly>
-            <EmptyState />
-        </ClientOnly>
-    )
-}
+    if (!listing) {
+        return (
+            <ClientOnly>
+                <EmptyState />
+            </ClientOnly>
+        );
+    }
+
     return (
         <ClientOnly>
             <ListingClient 

@@ -21,7 +21,7 @@ import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
 
 
-const initialDateRang = {
+const initialDateRange = {
     startDate: new Date(),
     endDate: new Date(),
     key: 'selection'
@@ -60,7 +60,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
     const [isLoading, setIsLoading] = useState(false);
     const [totalPrice, setTotlalPrice] = useState(listing.price);
-    const [dateRange, setDateRange] = useState<Range>(initialDateRang);
+    const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
     const onCreateReservation = useCallback(() => {
         if(!currentUser) {
@@ -77,7 +77,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
         })
         .then(() => {
             toast.success('Listing reserved!');
-            setDateRange(initialDateRang);
+            setDateRange(initialDateRange);
             // Redirect to /trips
             router.refresh();
         })
