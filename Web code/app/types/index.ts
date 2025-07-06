@@ -5,7 +5,7 @@ export type SafeListing = Omit<
   "createdAt"
 
 > & {
-  crearedAt: string; // تحويل تاريخ الإنشاء إلى string
+  createdAt: string; // تحويل تاريخ الإنشاء إلى string
 }
 
 // تعريف نوع SafeUser مع الحقول المناسبة
