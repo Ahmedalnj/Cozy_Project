@@ -1,4 +1,4 @@
-import type { Listing, User } from "@prisma/client";
+import type { Listing, Reservation, User } from "@prisma/client";
 
 export type SafeListing = Omit<
   Listing,
@@ -6,6 +6,16 @@ export type SafeListing = Omit<
 
 > & {
   createdAt: string; // تحويل تاريخ الإنشاء إلى string
+}
+
+export type SaveReservation =Omit<
+Reservation,
+"createdAt" | "startDate" | "endDate" |"listing" 
+>&{
+  createdAt :string;
+  startDate :string;
+  endDate:string;
+  listing:SafeListing;
 }
 
 // تعريف نوع SafeUser مع الحقول المناسبة

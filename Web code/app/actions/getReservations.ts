@@ -13,13 +13,15 @@ export default async function getReservations(
 
         const {listingId, userId, authorId } = params;
 
-        const query: {
-            userId?: string;
-            listing?: { userId: string };
-        } = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const query: any ={};
 
         if (listingId) {
-            query.userId = userId;
+            query.listingId = listingId;
+        }
+
+        if(userId){
+            query.userId=userId;
         }
 
         if (authorId) {

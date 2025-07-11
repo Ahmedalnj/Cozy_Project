@@ -29,12 +29,8 @@ export default async function getCurrentUser() {
             updatedAt: currentUser.updatedAt.toISOString(),
             emailVerified: currentUser.emailVerified?.toISOString() || null
         };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Error fetching current user:", error.message);
-        } else {
-            console.error("An unknown error occurred while fetching current user.");
-        }
         return null;
     } finally {
         await prisma.$disconnect(); // تأكد من إغلاق الاتصال بعد العملية
