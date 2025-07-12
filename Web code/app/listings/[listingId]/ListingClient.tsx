@@ -42,6 +42,10 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const LoginModal = useLoginModal();
   const router = useRouter();
 
+  const isOwner = useMemo(() => {
+    return currentUser?.id === listing.user.id;
+  }, [currentUser?.id, listing.user.id]);
+
   const disabledDate = useMemo(() => {
     let dates: Date[] = [];
 
@@ -58,12 +62,16 @@ const ListingClient: React.FC<ListingClientProps> = ({
   }, [reservations]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [totalPrice, setTotlalPrice] = useState(listing.price);
+  const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
   const onCreateReservation = useCallback(() => {
     if (!currentUser) {
       return LoginModal.onOpen();
+    }
+    if (isOwner) {
+      toast.error("You cannot reserve your own listing.");
+      return;
     }
 
     setIsLoading(true);
@@ -87,7 +95,15 @@ const ListingClient: React.FC<ListingClientProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [totalPrice, dateRange, listing?.id, router, currentUser, LoginModal]);
+  }, [
+    totalPrice,
+    dateRange,
+    listing?.id,
+    router,
+    currentUser,
+    LoginModal,
+    isOwner,
+  ]);
 
   useEffect(() => {
     if (dateRange.startDate && dateRange.endDate) {
@@ -97,9 +113,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
       );
 
       if (dayCount && listing.price) {
-        setTotlalPrice(dayCount * listing.price);
+        setTotalPrice(dayCount * listing.price);
       } else {
-        setTotlalPrice(listing.price);
+        setTotalPrice(listing.price);
       }
     }
   }, [dateRange, listing.price]);
@@ -150,9 +166,17 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
                 onSubmit={onCreateReservation}
-                disabled={isLoading}
+                disabled={isLoading || isOwner}
                 disabledDates={disabledDate}
               />
+              {isOwner && (
+                <div className="mt-4 rounded-xl border-l-4 border-rose-700 bg-rose-100 p-4 shadow-sm">
+                  <p className="text-sm text-red-600 font-medium">
+                    ⚠️ لا يمكنك حجز إعلانك الخاص. إذا كنت صاحب هذا العقار، فلست
+                    بحاجة إلى إجراء حجز.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

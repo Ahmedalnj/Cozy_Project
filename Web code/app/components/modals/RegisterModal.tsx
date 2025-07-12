@@ -46,6 +46,7 @@ const RegisterModal = () => {
         toast.success("Account created successfully!");
         router.refresh();
         registerModal.onClose();
+        LoginModal.onOpen();
       })
       .catch((error) => {
         console.error("Error creating account:", error);
