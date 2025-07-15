@@ -69,10 +69,10 @@ const ListingClient: React.FC<ListingClientProps> = ({
     if (!currentUser) {
       return LoginModal.onOpen();
     }
-    if (isOwner) {
-      toast.error("You cannot reserve your own listing.");
-      return;
-    }
+    // if (isOwner) {
+    //   toast.error("You cannot reserve your own listing.");
+    //   return;
+    // }
 
     setIsLoading(true);
 
@@ -166,7 +166,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
                 onSubmit={onCreateReservation}
-                disabled={isLoading || isOwner}
+                disabled={isLoading}
                 disabledDates={disabledDate}
               />
               {isOwner && (

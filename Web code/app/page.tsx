@@ -15,6 +15,7 @@ const Home = async (props: HomeProps) => {
   if (listings.length === 0) {
     return <EmptyState showReset />;
   }
+
   return (
     <Container>
       <div

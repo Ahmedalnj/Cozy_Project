@@ -1,5 +1,5 @@
 import prisma from "@/app/libs/prismadb";
-import { gte } from "lodash";
+import { gte, lte } from "lodash";
 
 export interface IListingsParams {
   userId?: string;
@@ -21,7 +21,7 @@ export default async function getListing(params: IListingsParams) {
       startDate,
       endDate,
       locationValue,
-      category
+      category,
     } = params;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
@@ -31,50 +31,50 @@ export default async function getListing(params: IListingsParams) {
       query.userId = userId;
     }
 
-    if(category){
-        query.category=category;
+    if (category) {
+      query.category = category;
     }
 
-    if(roomCount){
-        query.roomCount={
-            gte : +roomCount
-        }
+    if (roomCount) {
+      query.roomCount = {
+        gte: +roomCount,
+      };
     }
 
-    if(bathroomCount){
-        query.bathroomCount={
-            gte : +bathroomCount
-        }
+    if (bathroomCount) {
+      query.bathroomCount = {
+        gte: +bathroomCount,
+      };
     }
 
-    if(guestCount){
-        query.guestCount={
-            gte : +guestCount
-        }
+    if (guestCount) {
+      query.guestCount = {
+        gte: +guestCount,
+      };
     }
 
-    if(locationValue){
-        query.locationValue = locationValue;
+    if (locationValue) {
+      query.locationValue = locationValue;
     }
 
     if (startDate && endDate) {
-  query.reservations = {
-    none: {
-      AND: [
-        {
-          startDate: {
-            lte: new Date(endDate),
+      query.NOT = {
+        reservations: {
+          some: {
+            OR: [
+              {
+                endDate: { gte: startDate },
+                startDate: { lte: startDate },
+              },
+              {
+                startDate: { lte: endDate },
+                endDate: { gte: endDate },
+              },
+            ],
           },
         },
-        {
-          endDate: {
-            gte: new Date(startDate),
-          },
-        },
-      ],
-    },
-  };
-}
+      };
+    }
 
     const listings = await prisma.listing.findMany({
       where: query,
@@ -89,7 +89,7 @@ export default async function getListing(params: IListingsParams) {
     }));
 
     return safeListings;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     throw new Error(error);
   }
