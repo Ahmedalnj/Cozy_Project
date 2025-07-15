@@ -5,9 +5,10 @@ import EmptyState from "./components/EmptyState";
 import ListingCard from "./components/listings/ListingCard";
 
 interface HomeProps {
-  searchParams: IListingsParams;
+  searchParams: Promise<IListingsParams>;
 }
-const Home = async ({ searchParams }: HomeProps) => {
+const Home = async (props: HomeProps) => {
+  const searchParams = await props.searchParams;
   const listings = await getListings(searchParams);
   const currentUser = await getCurrentUser();
 
