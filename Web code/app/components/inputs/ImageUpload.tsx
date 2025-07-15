@@ -3,8 +3,17 @@ import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import { useCallback } from "react";
 import { TbPhotoPlus } from "react-icons/tb";
+
+type CloudinaryResult = {
+  event: string;
+  info: {
+    secure_url: string;
+    [key: string]: any;
+  };
+};
+
 declare global {
-  var cloudinary: any;
+  var cloudinary: CloudinaryResult;
 }
 interface ImageUploadProps {
   onChange: (value: string) => void;
