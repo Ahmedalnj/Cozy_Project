@@ -12,11 +12,15 @@ import Button from "../Button";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useRouter } from "next/navigation";
+import useTermsModal from "@/app/hooks/useTerms";
+import usePolicy from "@/app/hooks/usePolicy";
 
 const LoginModal = () => {
   const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
+  const TermsModal = useTermsModal();
+  const PolicyModal = usePolicy();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -119,14 +123,14 @@ const LoginModal = () => {
           <div>
             By continuing, you agree to Cozy
             <span
-              onClick={registerModal.onOpen}
+              onClick={TermsModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Terms of Service
             </span>
             and
             <span
-              onClick={() => {}}
+              onClick={PolicyModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Privacy Policy
