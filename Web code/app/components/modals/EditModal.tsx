@@ -17,6 +17,7 @@ import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
 import { SafeListing } from "@/app/types";
+import countries from "world-countries";
 
 enum STEPS {
   CATEGORY = 0,
@@ -34,6 +35,14 @@ const EditModal = () => {
 
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
+  const getCountryByValue = (value: string) => {
+    return countries.find(
+      (country) =>
+        country.name.common === value ||
+        country.cca2 === value ||
+        country.cca3 === value
+    );
+  };
 
   const {
     register,
@@ -62,10 +71,7 @@ const EditModal = () => {
       reset({
         category: listing.category || "",
         location: listing.locationValue
-          ? {
-              value: listing.locationValue,
-              label: listing.locationValue,
-            }
+          ? getCountryByValue(listing.locationValue)
           : null,
         guestCount: listing.guestCount || 1,
         roomCount: listing.roomCount || 1,
