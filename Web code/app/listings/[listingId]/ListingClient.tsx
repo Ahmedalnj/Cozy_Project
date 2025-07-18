@@ -19,8 +19,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
+import useCountries from "@/app/hooks/useCountry";
 
-const initialDateRange = {
+const initialDateRange: Range = {
   startDate: new Date(),
   endDate: new Date(),
   key: "selection",
@@ -41,6 +42,10 @@ const ListingClient: React.FC<ListingClientProps> = ({
 }) => {
   const LoginModal = useLoginModal();
   const router = useRouter();
+
+  const { getByValue } = useCountries();
+
+  const location = getByValue(listing.locationValue);
 
   const isOwner = useMemo(() => {
     return currentUser?.id === listing.user.id;
@@ -71,6 +76,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
     }
     if (isOwner) {
       toast.error("You cannot reserve your own listing.");
+      return;
+    }
+
+    if (!dateRange.startDate || !dateRange.endDate) {
+      toast.error("Please select valid check-in and checkout dates.");
       return;
     }
 
@@ -105,20 +115,20 @@ const ListingClient: React.FC<ListingClientProps> = ({
     isOwner,
   ]);
 
-  useEffect(() => {
+  const dayCount = useMemo(() => {
     if (dateRange.startDate && dateRange.endDate) {
-      const dayCount = differenceInCalendarDays(
-        dateRange.endDate,
-        dateRange.startDate
-      );
-
-      if (dayCount && listing.price) {
-        setTotalPrice(dayCount * listing.price);
-      } else {
-        setTotalPrice(listing.price);
-      }
+      return differenceInCalendarDays(dateRange.endDate, dateRange.startDate);
     }
-  }, [dateRange, listing.price]);
+    return 0;
+  }, [dateRange]);
+
+  useEffect(() => {
+    if (dayCount && listing.price) {
+      setTotalPrice(dayCount * listing.price);
+    } else {
+      setTotalPrice(listing.price);
+    }
+  }, [dayCount, listing.price]);
 
   const category = useMemo(() => {
     return categories.find((item) => item.label === listing.category);
@@ -150,7 +160,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
               guestCount={listing.guestCount}
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
-              // price={listing.price}
             />
             <div
               className="
@@ -168,6 +177,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onSubmit={onCreateReservation}
                 disabled={isLoading || isOwner}
                 disabledDates={disabledDate}
+                days={dayCount}
+                locationLabel={location?.label || ""}
               />
               {isOwner && (
                 <div className="mt-4 rounded-xl border-l-4 border-rose-700 bg-rose-100 p-4 shadow-sm">

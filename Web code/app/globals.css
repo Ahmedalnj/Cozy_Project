@@ -40,7 +40,16 @@ body,
   padding: 4px 8px !important;
 }
 
-/* Hide date display bar above the calendar */
-.rdrDateDisplayWrapper {
-  display: none !important;
+/* ✅ Hide default background for selected day */
+.rdrDay.rdrDaySelected {
+  background-color: transparent !important;
+  color: inherit !important; /* 👈 تم تصحيحها */
+  box-shadow: none !important;
+}
+
+/* ✅ فقط بداية ونهاية التحديد */
+.rdrStartEdge,
+.rdrEndEdge {
+  background-color: #f43f5e !important; /* rose-500 */
+  color: white !important;
 }
