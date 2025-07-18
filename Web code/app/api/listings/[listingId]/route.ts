@@ -6,10 +6,8 @@ interface IParams {
   listingId?: string;
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: IParams }
-) {
+export async function DELETE(request: Request, props: { params: Promise<IParams> }) {
+  const params = await props.params;
   const currentUser = await getCurrentUser();
   if (!currentUser) {
     return NextResponse.error();
@@ -29,10 +27,8 @@ export async function DELETE(
   return NextResponse.json({ message: "Deleted successfully" });
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: IParams }
-) {
+export async function PUT(request: Request, props: { params: Promise<IParams> }) {
+  const params = await props.params;
   const currentUser = await getCurrentUser();
   if (!currentUser) {
     return NextResponse.error();
