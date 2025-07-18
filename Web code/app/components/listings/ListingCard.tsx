@@ -19,6 +19,11 @@ interface ListingCardProps {
   actionId?: string;
   currentUser?: SafeUser | null;
   description?: string;
+
+  // الإضافة هنا:
+  secondaryAction?: (id: string) => void;
+  secondaryActionLabel?: string;
+  secondaryActionId?: string;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
@@ -30,6 +35,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionLabel,
   actionId = "",
   currentUser,
+
+  secondaryAction,
+  secondaryActionLabel,
+  secondaryActionId = "",
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
@@ -47,6 +56,19 @@ const ListingCard: React.FC<ListingCardProps> = ({
       onAction?.(actionId);
     },
     [onAction, actionId, disabled]
+  );
+
+  const handleSecondaryAction = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+
+      if (disabled) {
+        return;
+      }
+
+      secondaryAction?.(secondaryActionId);
+    },
+    [secondaryAction, secondaryActionId, disabled]
   );
 
   const price = useMemo(() => {
@@ -119,14 +141,26 @@ const ListingCard: React.FC<ListingCardProps> = ({
           {!reservation && <div className="font-light">per night</div>}
         </div>
 
-        {onAction && actionLabel && (
-          <Button
-            disabled={disabled}
-            small
-            label={actionLabel}
-            onClick={handleCancel}
-          />
-        )}
+        <div className="flex flex-row gap-2">
+          {onAction && actionLabel && (
+            <Button
+              disabled={disabled}
+              small
+              label={actionLabel}
+              onClick={handleCancel}
+            />
+          )}
+
+          {secondaryAction && secondaryActionLabel && (
+            <Button
+              disabled={disabled}
+              small
+              outline // إضافة لتوضيح الفرق إذا تحب (اختياري)
+              label={secondaryActionLabel}
+              onClick={handleSecondaryAction}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
