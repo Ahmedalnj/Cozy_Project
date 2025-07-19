@@ -3,6 +3,8 @@
 import { Range } from "react-date-range";
 import Calendar from "../inputs/Calender";
 import Button from "../Button";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
 
 interface ListingReservationProps {
   price: number;
@@ -17,7 +19,7 @@ interface ListingReservationProps {
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
-  // price,
+  price,
   dateRange,
   totalPrice,
   onChangeDate,
@@ -27,68 +29,89 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
   days,
   locationLabel,
 }) => {
-  const renderDateMessage = () => {
-    if (!dateRange.startDate) {
-      return (
-        <div className="p-4 text-center text-neutral-600">
-          Select check-in date
-        </div>
-      );
+  const [showDayCountHint, setShowDayCountHint] = useState(false);
+
+  useEffect(() => {
+    if (days === 0) {
+      setShowDayCountHint(true);
+    } else {
+      setShowDayCountHint(false);
     }
-    if (!dateRange.endDate || dateRange.endDate <= dateRange.startDate) {
-      return (
-        <div className="p-4 text-center text-neutral-600">
-          Select checkout date
-        </div>
-      );
-    }
-    return (
-      <div className="p-4 text-center font-semibold">
-        {days} night{days && days > 1 ? "s" : ""} in {locationLabel}
-      </div>
-    );
-  };
+  }, [days]);
 
   return (
-    <div
-      className="
-        bg-white
-        rounded-xl
-        border-[1px]
-        border-neutral-200
-        overflow-hidden
-        "
-    >
-      <div
-        className="
-            flex flex-row items-center gap-1 p-4
-            "
-      >
-        <div className="text-sxl font-semibold">{renderDateMessage()}</div>
+    <div className="bg-white rounded-xl border border-neutral-200 p-6 shadow-sm">
+      {/* Header with nights and location */}
+      {dateRange.startDate && dateRange.endDate && (
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold">
+            {days} night{days && days > 1 ? "s" : ""} in {locationLabel}
+          </h3>
+          {/* <p className="text-gray-600">
+            {format(dateRange.startDate, "MMM d, yyyy")} -{" "}
+            {format(dateRange.endDate, "MMM d, yyyy")}
+          </p> */}
+        </div>
+      )}
+
+      {/* Date and Guest Inputs */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="border rounded-lg p-3">
+          <div className="text-xs font-medium text-gray-500">CHECK IN</div>
+          <div className="text-sm">
+            {dateRange.startDate
+              ? format(dateRange.startDate, "yyyy-MM-dd")
+              : "Add date"}
+          </div>
+        </div>
+        <div className="border rounded-lg p-3">
+          <div className="text-xs font-medium text-gray-500">CHECKOUT</div>
+          <div className="text-sm">
+            {dateRange.endDate
+              ? format(dateRange.endDate, "yyyy-MM-dd")
+              : "Add date"}
+          </div>
+        </div>
       </div>
-      <hr />
-      <Calendar
-        value={dateRange}
-        disabledDates={disabledDates}
-        onChange={(value) => onChangeDate(value.selection)}
-      />
-      <hr />
-      <div className="p-4">
+
+      {/* Calendar Component */}
+      <div className="mb-4">
+        <Calendar
+          value={dateRange}
+          disabledDates={disabledDates}
+          onChange={(value) => onChangeDate(value.selection)}
+        />
+      </div>
+      {/* Price Summary */}
+      <div className="mb-4 p-4 border rounded-lg">
+        <div className="flex justify-between font-semibold">
+          <span>
+            ${price} × {days} nights
+          </span>
+          <span>Total $ {totalPrice}</span>
+        </div>
+      </div>
+
+      {/* Day Count Hint */}
+      {showDayCountHint && days === 0 && (
+        <div className="mb-2 text-sm text-rose-500 text-center">
+          Please select at least 1 night stay
+        </div>
+      )}
+
+      {/* Reserve Button */}
+      <div className="mb-2">
         <Button disabled={disabled} label="Reserve" onClick={onSubmit} />
       </div>
-      <div
-        className="
-                p-4
-                flex
-                flex-row
-                item-center
-                justify-between
-                font-semibold
-                text-lg
-            "
-      >
-        <div>Total</div>
-        <div>$ {totalPrice}</div>
+
+      <p className="text-center text-sm text-gray-500 mb-4">
+        You won't be charged yet
+      </p>
+
+      <div className="text-center">
+        <button className="text-sm underline text-gray-500">
+          Report this listing
+        </button>
       </div>
     </div>
   );

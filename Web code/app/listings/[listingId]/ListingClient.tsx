@@ -2,20 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { categories } from "@/app/components/navbar/Categories";
-
 import { SafeListing, SafeUser, SaveReservation } from "@/app/types";
-
 import Container from "@/app/components/Container";
-
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
-
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
-
 import { differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import axios from "axios";
-
 import toast from "react-hot-toast";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
@@ -42,9 +36,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
 }) => {
   const LoginModal = useLoginModal();
   const router = useRouter();
-
   const { getByValue } = useCountries();
-
   const location = getByValue(listing.locationValue);
 
   const isOwner = useMemo(() => {
@@ -53,16 +45,13 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
   const disabledDate = useMemo(() => {
     let dates: Date[] = [];
-
     reservations.forEach((reservation) => {
       const range = eachDayOfInterval({
         start: new Date(reservation.startDate),
         end: new Date(reservation.endDate),
       });
-
       dates = [...dates, ...range];
     });
-
     return dates;
   }, [reservations]);
 
@@ -84,8 +73,16 @@ const ListingClient: React.FC<ListingClientProps> = ({
       return;
     }
 
-    setIsLoading(true);
+    const days = differenceInCalendarDays(
+      dateRange.endDate,
+      dateRange.startDate
+    );
+    if (days <= 0) {
+      toast.error("Minimum 1 night stay required");
+      return;
+    }
 
+    setIsLoading(true);
     axios
       .post("/api/reservations", {
         totalPrice,
@@ -96,7 +93,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
       .then(() => {
         toast.success("Listing reserved!");
         setDateRange(initialDateRange);
-        // Redirect to /trips
         router.push("/trips");
       })
       .catch(() => {
@@ -125,14 +121,23 @@ const ListingClient: React.FC<ListingClientProps> = ({
   useEffect(() => {
     if (dayCount && listing.price) {
       setTotalPrice(dayCount * listing.price);
+      setIsLoading(false);
     } else {
       setTotalPrice(listing.price);
+      // Show hint if user has interacted with dates but has 0 days
+      if (
+        dateRange.startDate !== initialDateRange.startDate ||
+        dateRange.endDate !== initialDateRange.endDate
+      ) {
+        setIsLoading(true);
+      }
     }
-  }, [dayCount, listing.price]);
+  }, [dayCount, listing.price, dateRange.startDate, dateRange.endDate]);
 
   const category = useMemo(() => {
     return categories.find((item) => item.label === listing.category);
   }, [listing.category]);
+
   return (
     <Container>
       <div className="max-w-screen-lg mx-auto">
@@ -144,14 +149,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
             id={listing.id}
             currentUser={currentUser}
           />
-          <div
-            className="
-                grid
-                grid-cols-1
-                md:grid-cols-7
-                md:gap-10
-                mt-6 "
-          >
+          <div className="grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6">
             <ListingInfo
               user={listing.user}
               category={category}
@@ -161,14 +159,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
             />
-            <div
-              className="
-                        order-first
-                        mb-10
-                        md:order-last
-                        md:col-span-3
-                    "
-            >
+            <div className="order-first mb-10 md:order-last md:col-span-3">
               <ListingReservation
                 price={listing.price}
                 totalPrice={totalPrice}

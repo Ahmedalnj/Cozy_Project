@@ -1,13 +1,6 @@
 @import "tailwindcss";
 
-/* Ensure full height for layout */
-html,
-body,
-:root {
-  height: 100%;
-}
-
-/* Fix Leaflet z-index issue */
+/* تثبيت مشكلة z-index لـ Leaflet */
 .leaflet-bottom,
 .leaflet-control,
 .leaflet-pane,
@@ -15,41 +8,81 @@ body,
   z-index: 0 !important;
 }
 
-/* Airbnb-style Calendar Styling */
+/* تحسينات عامة للتقويم */
 .rdrCalendarWrapper {
   font-size: 16px !important;
   width: 100% !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
 }
 
 .rdrMonth {
   width: 100% !important;
+  padding: 0 12px !important;
 }
 
-/* Remove blue "today" dot */
+/* إزالة النقطة الزرقاء لليوم الحالي */
 .rdrDayToday .rdrDayNumber span::after {
   display: none !important;
 }
 
-/* Navigation buttons (centered + smaller) */
+/* تحسين أزرار التنقل */
 .rdrMonthAndYearWrapper {
-  justify-content: center;
-  gap: 8px;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 8px 0 !important;
 }
 
 .rdrNextPrevButton {
   padding: 4px 8px !important;
+  border-radius: 4px !important;
 }
 
-/* ✅ Hide default background for selected day */
-.rdrDay.rdrDaySelected {
-  background-color: transparent !important;
-  color: inherit !important; /* 👈 تم تصحيحها */
-  box-shadow: none !important;
+/* تخصيص أيام النطاق */
+.rdrDayInRange {
+  background: #fda4af !important; /* لون النطاق */
+  color: white !important;
 }
 
-/* ✅ فقط بداية ونهاية التحديد */
+/* تخصيص أيام البداية والنهاية */
 .rdrStartEdge,
 .rdrEndEdge {
-  background-color: #f43f5e !important; /* rose-500 */
+  background: #f43f5e !important; /* لون أغمق للنهايات */
   color: white !important;
+}
+
+/* إصلاح مشكلة عدم ظهور النطاق */
+.rdrInRange {
+  background: #fecdd3 !important; /* لون أفتح للنطاق */
+}
+
+/* تحسين ظهور التواريخ المحددة */
+.rdrDaySelected {
+  background: #f43f5e !important;
+  color: white !important;
+}
+
+/* تحسين مظهر الأيام عند التمرير */
+.rdrDay {
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* تحسين مظهر أرقام الأيام */
+.rdrDayNumber {
+  font-weight: 500 !important;
+}
+
+.rdrDay:not(.rdrDayPassive):hover .rdrDayNumber span {
+  background: #f43f5e !important;
+  color: white !important;
+  border-radius: 40px !important;
+  transform: scaleX(1.1) scaleY(1.3); /* تكبير أفقي + تصغير عمودي */
+  transition: all 0.2s ease-out;
+  padding: 0 12px !important;         /* توسيع أفقي */
+  height: 24px !important;            /* تصغير ارتفاع */
+  line-height: 24px !important;       /* محاذاة النص */
+  box-shadow: none !important;
 }
