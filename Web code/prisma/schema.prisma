@@ -9,69 +9,65 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(uuid()) @map("_id") @db.Uuid
-  email          String?   @unique
+  id             String        @id @default(uuid()) @map("_id") @db.Uuid
+  email          String?       @unique
   name           String?
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  favoriteIds    String[]  @db.Uuid
-
-  accounts     Account[] // علاقة مع Account
-  listings     Listing[] // علاقة مع Listing
-  reservations Reservation[] // علاقة مع Reservation
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  favoriteIds    String[]      @db.Uuid
+  role           String?       @default("USER")
+  accounts       Account[]
+  listings       Listing[]
+  reservations   Reservation[]
 }
 
 model Account {
   id                String  @id @default(uuid()) @map("_id") @db.Uuid
-  userId            String  @db.Uuid // تأكد من أن النوع هنا هو UUID
+  userId            String  @db.Uuid
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Listing {
-  id            String   @id @default(uuid()) @map("_id") @db.Uuid
+  id            String        @id @default(uuid()) @map("_id") @db.Uuid
   title         String
   description   String
   imageSrc      String
-  createdAt     DateTime @default(now())
+  createdAt     DateTime      @default(now())
   category      String
   roomCount     Int
   bathroomCount Int
   guestCount    Int
   locationValue String
   price         Int
-  userId        String   @map("user_id") @db.Uuid // تأكد من أن النوع هنا هو UUID
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  reservations Reservation[] // علاقة مع Reservation
+  userId        String        @map("user_id") @db.Uuid
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations  Reservation[]
 }
 
 model Reservation {
   id         String   @id @default(uuid()) @map("_id") @db.Uuid
-  listingId  String   @map("listing_id") @db.Uuid // تأكد من أن النوع هنا هو UUID
-  userId     String   @map("user_id") @db.Uuid // تأكد من أن النوع هنا هو UUID
+  listingId  String   @map("listing_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
   startDate  DateTime
   endDate    DateTime
-  totalPrice Int
+  totalPrice Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

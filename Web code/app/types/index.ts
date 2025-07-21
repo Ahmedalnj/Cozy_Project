@@ -12,6 +12,11 @@ export type SaveReservation =Omit<
 Reservation,
 "createdAt" | "startDate" | "endDate" |"listing" 
 >&{
+  id: string;
+  user: {
+    name: string | null;
+    email: string | null;
+  };
   createdAt :string;
   startDate :string;
   endDate:string;
@@ -27,3 +32,18 @@ export type SafeUser = Omit<
   updatedAt: string; // تحويل تاريخ التحديث إلى string
   emailVerified: string | null; // الحفاظ على نوع البريد الإلكتروني المؤكد كـ string أو null
 };
+
+export type PublicUser = Pick<
+  User,
+  "id" | "name" | "email" | "role" | "image"
+> & {
+  createdAt: string;
+  image?: string | null;
+};
+
+
+export const formatCurrency = (amount: number): string =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
