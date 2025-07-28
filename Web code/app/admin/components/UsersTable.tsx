@@ -12,10 +12,13 @@ interface UsersTableProps {
   users: PublicUser[];
 }
 
+const USERS_PER_PAGE = 10;
+
 const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
   const [localUsers, setLocalUsers] = useState(users);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
@@ -57,16 +60,26 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
       );
   }, [search, sortAsc, localUsers]);
 
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * USERS_PER_PAGE;
+    return filteredUsers.slice(start, start + USERS_PER_PAGE);
+  }, [filteredUsers, currentPage]);
+
   return (
     <div className="mt-10">
       {/* Search and Sort Bar */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-row-reverse items-center justify-between mb-4">
         <input
           type="text"
           placeholder="🔍 بحث باسم أو بريد المستخدم..."
           className="border px-3 py-2 rounded-md w-full max-w-xs text-sm focus:outline-none"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1); // إعادة الصفحة الأولى عند البحث
+          }}
         />
         <button
           onClick={() => setSortAsc(!sortAsc)}
@@ -89,7 +102,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {paginatedUsers.map((user) => (
               <tr
                 key={user.id}
                 className="border-t hover:bg-gray-50 transition"
@@ -131,7 +144,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                 </td>
               </tr>
             ))}
-            {filteredUsers.length === 0 && (
+            {paginatedUsers.length === 0 && (
               <tr>
                 <td
                   colSpan={5}
@@ -144,6 +157,25 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 gap-2 flex-wrap">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-3 py-1 rounded border text-sm ${
+                currentPage === i + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500 hover:bg-blue-100"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
-// app/admin/users/page.tsx
-import UsersTable from "@/app/(admin)/admin/components/UsersTable";
+import UsersTable from "@/app/admin/components/UsersTable";
 import { PublicUser } from "@/app/types";
-import prisma from "@/app/libs/prismadb"; // تأكد من مسار prisma الصحيح
+import prisma from "@/app/libs/prismadb";
 
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
@@ -16,9 +15,14 @@ export default async function UsersPage() {
     },
   });
 
+  const safeUsers: PublicUser[] = users.map((user) => ({
+    ...user,
+    createdAt: user.createdAt.toISOString(),
+  }));
+
   return (
     <div className="p-6 space-y-4">
-      <UsersTable users={users as unknown as PublicUser[]} />
+      <UsersTable users={safeUsers} />
     </div>
   );
 }

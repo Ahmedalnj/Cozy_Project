@@ -1,6 +1,5 @@
+import { Prisma } from "@prisma/client";
 import prisma from "@/app/libs/prismadb";
-
-
 
 export interface IListingsParams {
   userId?: string;
@@ -12,7 +11,8 @@ export interface IListingsParams {
   locationValue?: string;
   category?: string;
 }
-export default async function getListing(params: IListingsParams) {
+
+export default async function getListings(params: IListingsParams) {
   try {
     const {
       userId,
@@ -25,51 +25,66 @@ export default async function getListing(params: IListingsParams) {
       category,
     } = params;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
-    let query: any = {};
+    // بناء كائن الاستعلام بشكل تدريجي
+    const query: Prisma.ListingWhereInput = {};
 
+    // فلترة حسب المعرف إذا وجد
     if (userId) {
       query.userId = userId;
     }
 
+    // فلترة حسب الفئة إذا وجدت
     if (category) {
       query.category = category;
     }
 
+    // فلترة حسب الموقع إذا وجد
+    if (locationValue) {
+      query.locationValue = locationValue;
+    }
+
+    // فلترة حسب عدد الغرف إذا وجد
     if (roomCount) {
       query.roomCount = {
-        gte: +roomCount,
+        gte: +roomCount, // استخدام + للتحويل إلى عدد
       };
     }
 
+    // فلترة حسب عدد الحمامات إذا وجد
     if (bathroomCount) {
       query.bathroomCount = {
         gte: +bathroomCount,
       };
     }
 
+    // فلترة حسب عدد الضيوف إذا وجد
     if (guestCount) {
       query.guestCount = {
         gte: +guestCount,
       };
     }
 
-    if (locationValue) {
-      query.locationValue = locationValue;
-    }
-
+    // فلترة حسب التواريخ إذا وجدت
     if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // التأكد من أن التواريخ صالحة
+      if (isNaN(start.getTime())) throw new Error("تاريخ البداية غير صالح");
+      if (isNaN(end.getTime())) throw new Error("تاريخ النهاية غير صالح");
+
+      // التأكد من أن تاريخ البداية قبل النهاية
+      if (start > end) {
+        throw new Error("تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+      }
+
       query.NOT = {
         reservations: {
           some: {
             OR: [
               {
-                endDate: { gte: startDate },
-                startDate: { lte: startDate },
-              },
-              {
-                startDate: { lte: endDate },
-                endDate: { gte: endDate },
+                startDate: { lte: end },
+                endDate: { gte: start },
               },
             ],
           },
@@ -77,6 +92,7 @@ export default async function getListing(params: IListingsParams) {
       };
     }
 
+    // تنفيذ الاستعلام
     const listings = await prisma.listing.findMany({
       where: query,
       orderBy: {
@@ -84,14 +100,15 @@ export default async function getListing(params: IListingsParams) {
       },
     });
 
-    const safeListings = listings.map((listing) => ({
+    // تحويل النتائج إلى تنسيق آمن
+    return listings.map((listing) => ({
       ...listing,
-      createdAt: listing.createdAt.toISOString(), // تحويل التاريخ إلى سلسلة نصية
+      createdAt: listing.createdAt.toISOString(),
     }));
-
-    return safeListings;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    throw new Error(error);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`فشل في جلب القوائم: ${error.message}`);
+    }
+    throw new Error("حدث خطأ غير معروف أثناء جلب القوائم");
   }
 }

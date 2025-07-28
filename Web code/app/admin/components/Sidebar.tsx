@@ -35,14 +35,14 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="h-screen w-64 bg-white border-r p-4 shadow-sm fixed left-0 top-0">
+    <aside className="fixed top-9 right-0 h-screen w-64 bg-white border-l p-4 shadow-sm">
       <nav className="space-y-2 mt-4">
         {routes.map((route) => (
           <Link
             key={route.href}
             href={route.href}
             className={clsx(
-              "flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition",
+              "flex flex-row-reverse items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition",
               pathname === route.href && "bg-gray-200 font-semibold"
             )}
           >

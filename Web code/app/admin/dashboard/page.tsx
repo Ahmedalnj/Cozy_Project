@@ -2,9 +2,9 @@ import { formatCurrency } from "@/app/types/index"; // سنضيفها بعد ق�
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 import EmptyState from "@/app/components/EmptyState";
-import UsersTable from "@/app/(admin)/admin/components/UsersTable";
-import ListingsTable from "@/app/(admin)/admin/components/ListingsTable";
-import ReservationsTable from "@/app/(admin)/admin/components/ReservationsTable";
+import UsersTable from "@/app/admin/components/UsersTable";
+import ListingsTable from "@/app/admin/components/ListingsTable";
+import ReservationsTable from "@/app/admin/components/ReservationsTable";
 
 const AdminPage = async () => {
   const currentUser = await getCurrentUser();
@@ -45,6 +45,7 @@ const AdminPage = async () => {
 
   const allListingsRaw = await prisma.listing.findMany({
     orderBy: { createdAt: "desc" },
+    take: 10,
   });
 
   const allListings = allListingsRaw.map((listing) => ({
@@ -58,6 +59,7 @@ const AdminPage = async () => {
       listing: true,
     },
     orderBy: { createdAt: "desc" },
+    take: 10,
   });
 
   const allReservations = allReservationsRaw.map((reservation) => ({
@@ -77,7 +79,7 @@ const AdminPage = async () => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
         <StatCard title="Total Users" icon="👥" value={users} />
         <StatCard title="Total Listings " icon="🏠" value={listings} />
         <StatCard title="Total Reservations" icon="📅" value={reservations} />
@@ -103,7 +105,7 @@ const StatCard = ({
   value: number | string;
   icon?: string;
 }) => (
-  <div className="p-6 bg-white rounded-2xl shadow text-center">
+  <div className="p-6 bg-[#00B4D8] rounded-2xl shadow text-center">
     {icon && <div className="text-3xl mb-2">{icon}</div>}
     <h2 className="text-sm text-neutral-500">{title}</h2>
     <p className="text-2xl font-semibold text-black mt-2">{value}</p>
