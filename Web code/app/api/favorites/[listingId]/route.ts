@@ -2,17 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
-export async function POST(
-  request: NextRequest,
-  context: { params: { listingId: string } }
-) {
+export async function POST(request: NextRequest) {
   const currentUser = await getCurrentUser();
-
   if (!currentUser) {
     return NextResponse.error();
   }
 
-  const { listingId } = context.params;
+  // جلب listingId من الـ URL (request.nextUrl.pathname أو .searchParams)
+  const url = new URL(request.url);
+  const pathnameParts = url.pathname.split("/");
+  const listingId = pathnameParts[pathnameParts.length - 1];
 
   if (!listingId || typeof listingId !== "string") {
     throw new Error("Invalid ID");
@@ -29,17 +28,15 @@ export async function POST(
   return NextResponse.json(user);
 }
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { listingId: string } }
-) {
+export async function DELETE(request: NextRequest) {
   const currentUser = await getCurrentUser();
-
   if (!currentUser) {
     return NextResponse.error();
   }
 
-  const { listingId } = context.params;
+  const url = new URL(request.url);
+  const pathnameParts = url.pathname.split("/");
+  const listingId = pathnameParts[pathnameParts.length - 1];
 
   if (!listingId || typeof listingId !== "string") {
     throw new Error("Invalid ID");
