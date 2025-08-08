@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic"; // 👈 أضفه هنا
-
 import getCurrentUser from "./actions/getCurrentUser";
 import getListings, { IListingsParams } from "./actions/getListings";
 import Container from "./components/Container";
@@ -7,10 +5,10 @@ import EmptyState from "./components/EmptyState";
 import ListingCard from "./components/listings/ListingCard";
 
 interface HomeProps {
-  searchParams: IListingsParams;
+  searchParams: Promise<IListingsParams>;
 }
 const Home = async (props: HomeProps) => {
-  const searchParams = props.searchParams;
+  const searchParams = await props.searchParams;
   const listings = await getListings(searchParams);
   const currentUser = await getCurrentUser();
 
@@ -46,5 +44,4 @@ const Home = async (props: HomeProps) => {
     </Container>
   );
 };
-
 export default Home;
