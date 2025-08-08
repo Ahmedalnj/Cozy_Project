@@ -1,14 +1,16 @@
 // app/admin/reservations/page.tsx
 import prisma from "@/app/libs/prismadb";
 import { SaveReservation } from "@/app/types"; // تأكد أن لديك نوع SafeReservation في types.ts
-import ReservationsTable from "@/app/admin/components/ReservationsTable"; // تحتاج تنشئ هذا الكمبوننت
+import ReservationsTable from "@/app/admin/components/ReservationsTable";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminReservationsPage() {
   const reservations = await prisma.reservation.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      listing: true, // لو تريد بيانات العقار مع الحجز
-      user: true, // لو تريد بيانات المستخدم مع الحجز
+      listing: true,
+      user: true,
     },
   });
 
