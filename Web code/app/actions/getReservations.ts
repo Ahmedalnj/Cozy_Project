@@ -12,7 +12,7 @@ export default async function getReservations(params: IParams) {
 
     console.log("Received params:", params);
 
-    // نبني شرط البحث تدريجياً
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const whereClause: any = {};
 
     if (listingId) {

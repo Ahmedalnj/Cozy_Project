@@ -29,7 +29,6 @@ interface ListingCardProps {
 const ListingCard: React.FC<ListingCardProps> = ({
   data,
   reservation,
-  description,
   onAction,
   disabled,
   actionLabel,
