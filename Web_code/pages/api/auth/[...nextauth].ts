@@ -52,30 +52,48 @@ export const authOptions: NextAuthOptions = {
           email: user.email ?? undefined,
           image: user.image ?? undefined,
           emailVerified: user.emailVerified ?? undefined,
-          role: user.role ?? undefined, // بدون تعديل الحالة
+          role: user.role ?? "USER",
         };
       },
     }),
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        let dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
 
-        if (user.role) {
-          console.log("User role from user object:", user.role);
-          token.role = user.role;
-        } else if (user.email) {
-          const dbUser = await prisma.user.findUnique({
-            where: { email: user.email },
-            select: { role: true },
+        if (!dbUser) {
+          // إذا المستخدم جديد → أنشئه برول افتراضي USER
+          dbUser = await prisma.user.create({
+            data: {
+              email: user.email!,
+              name: user.name || "",
+              image: user.image || "",
+              role: "USER",
+            },
           });
-          console.log("User role from DB:", dbUser?.role);
-          token.role = dbUser?.role ?? "USER";
+          console.log("New Google user created with role:", dbUser.role);
+        } else {
+          console.log("Existing Google user role:", dbUser.role);
         }
       }
+      return true;
+    },
 
+    async jwt({ token, user }) {
+      if (user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { id: true, role: true },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role || "USER";
+        }
+      }
       return token;
     },
 
