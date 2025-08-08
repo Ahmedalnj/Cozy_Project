@@ -1,38 +1,39 @@
-import { getServerSession } from 'next-auth/next';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import prisma from '@/app/libs/prismadb';
+import prisma from "@/app/libs/prismadb";
 
 export async function getSession() {
-    return await getServerSession(authOptions);
+  return await getServerSession(authOptions);
 }
 
 export default async function getCurrentUser() {
-    try {
-        const session = await getSession();
-        if (!session?.user?.email) {
-            return null;
-        }
+  try {
+    const session = await getSession();
 
-        const currentUser = await prisma.user.findUnique({
-            where: {
-                email: session.user.email as string,
-            },
-        });
-
-        if (!currentUser) {
-            return null;
-        }
-
-        return {
-            ...currentUser,
-            createdAt: currentUser.createdAt.toISOString(),
-            updatedAt: currentUser.updatedAt.toISOString(),
-            emailVerified: currentUser.emailVerified?.toISOString() || null
-        };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error: unknown) {
-        return null;
-    } finally {
-        await prisma.$disconnect(); // تأكد من إغلاق الاتصال بعد العملية
+    if (!session?.user?.email) {
+      return null;
     }
+
+    const currentUser = await prisma.user.findUnique({
+      where: {
+        email: session.user.email,
+      },
+    });
+
+    if (!currentUser) {
+      return null;
+    }
+
+    return {
+      ...currentUser,
+      createdAt: currentUser.createdAt.toISOString(),
+      updatedAt: currentUser.updatedAt.toISOString(),
+      emailVerified: currentUser.emailVerified?.toISOString() || null,
+    };
+  } catch (error: unknown) {
+    return null;
+  } finally {
+    await prisma.$disconnect();
+  }
 }

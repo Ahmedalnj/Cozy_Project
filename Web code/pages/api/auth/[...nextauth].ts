@@ -1,24 +1,15 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth, { AuthOptions } from "next-auth";
-import FacebookProvider from "next-auth/providers/facebook";
-import GoogleProvider from "next-auth/providers/google";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
+
 import prisma from "@/app/libs/prismadb";
 
-export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+// 🧠 تهيئة الإعدادات
+export const authOptions: NextAuthOptions = {
   providers: [
-    FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID as string,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
@@ -32,58 +23,62 @@ export const authOptions: AuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !user?.hashedPassword) {
+        if (!user || !user.hashedPassword) {
           throw new Error("Invalid email or password");
         }
 
-        const isValidPassword = await bcrypt.compare(
+        const isCorrectPassword = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
         );
-        if (!isValidPassword) {
+
+        if (!isCorrectPassword) {
           throw new Error("Invalid email or password");
         }
-        // Omit sensitive fields and ensure role is string | undefined
-        const { id, name, email, emailVerified, image, role } = user;
+
+        // ✅ نحذف كلمة المرور ونُعيد المستخدم
         return {
-          id,
-          name,
-          email,
-          emailVerified,
-          image,
-          role: role ?? undefined,
+          id: user.id,
+          name: user.name ?? undefined,
+          email: user.email ?? undefined,
+          image: user.image ?? undefined,
+          emailVerified: user.emailVerified ?? undefined,
+          role: user.role ?? undefined,
         };
       },
     }),
   ],
-  pages: {
-    signIn: "/",
-  },
-  debug: process.env.NODE_ENV === "development",
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role; // يضيف الدور عند تسجيل الدخول
-      } else if (!token.role && token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
-        });
-        token.role = dbUser?.role ?? undefined;
+        token.id = user.id;
+        token.email = user.email ?? undefined;
+        token.name = user.name ?? undefined;
+        token.image = user.image ?? undefined;
+        token.role = (user as any).role ?? undefined;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role as string;
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.email = token.email;
+        session.user.name = token.name;
+        session.user.image = token.image;
+        (session.user as any).role = token.role;
       }
       return session;
     },
   },
+  pages: {
+    signIn: "/", // يمكنك تغييره لمسارك المخصص لتسجيل الدخول
+  },
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
 export default NextAuth(authOptions);

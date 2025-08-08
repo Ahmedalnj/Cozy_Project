@@ -10,6 +10,9 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: ["app/generated/**"],  // تجاهل مجلد generated كاملاً
+  },
   ...compat.config({
     extends: ["next/core-web-vitals", "next/typescript"],
     rules: {
@@ -17,6 +20,6 @@ const eslintConfig = [
       '@next/next/no-page-custom-font': 'off',
     },
   }),
-]
+];
 
 export default eslintConfig;
