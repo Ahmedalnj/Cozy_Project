@@ -2,6 +2,8 @@ import UsersTable from "@/app/admin/components/UsersTable";
 import { PublicUser } from "@/app/types";
 import prisma from "@/app/libs/prismadb";
 
+export const dynamic = "force-dynamic";
+
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },

@@ -3,6 +3,8 @@ import prisma from "@/app/libs/prismadb";
 import { SafeListing } from "@/app/types";
 import ListingsTable from "@/app/admin/components/ListingsTable";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminListingsPage() {
   const listings = await prisma.listing.findMany({
     orderBy: { createdAt: "desc" },
