@@ -4,13 +4,17 @@ import { NextResponse } from "next/server";
 export default withAuth(
   function middleware(req) {
     const userRole = req.nextauth.token?.role;
-    if (req.nextUrl.pathname.startsWith("/admin") && userRole !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url)); // رجع المستخدم للصفحة الرئيسية
+
+    if (
+      req.nextUrl.pathname.startsWith("/admin") &&
+      userRole !== "ADMIN" // بدون تعديل الحالة
+    ) {
+      return NextResponse.redirect(new URL("/", req.url));
     }
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, // يسمح بالدخول إذا فيه جلسة
+      authorized: ({ token }) => !!token,
     },
   }
 );
@@ -21,6 +25,6 @@ export const config = {
     "/reservations/:path*",
     "/properties/:path*",
     "/favorites/:path*",
-    "/admin/:path*", // إضافة حماية لمسار الأدمن
+    "/admin/:path*",
   ],
 };

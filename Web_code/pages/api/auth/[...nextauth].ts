@@ -1,20 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google"; // 👈 إضافة Google Provider
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
-
 import prisma from "@/app/libs/prismadb";
+
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  throw new Error("Missing Google OAuth environment variables");
+}
+
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("Missing NEXTAUTH_SECRET environment variable");
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    // ✅ Google OAuth
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-
-    // ✅ Credentials
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -23,7 +26,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required");
+          return null;
         }
 
         const user = await prisma.user.findUnique({
@@ -31,7 +34,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.hashedPassword) {
-          throw new Error("Invalid email or password");
+          return null;
         }
 
         const isCorrectPassword = await bcrypt.compare(
@@ -40,7 +43,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isCorrectPassword) {
-          throw new Error("Invalid email or password");
+          return null;
         }
 
         return {
@@ -49,33 +52,42 @@ export const authOptions: NextAuthOptions = {
           email: user.email ?? undefined,
           image: user.image ?? undefined,
           emailVerified: user.emailVerified ?? undefined,
-          role: user.role ?? undefined,
+          role: user.role ?? undefined, // بدون تعديل الحالة
         };
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email ?? undefined;
-        token.name = user.name ?? undefined;
-        token.image = user.image ?? undefined;
-        token.role = (user as any).role ?? undefined;
+
+        if (user.role) {
+          console.log("User role from user object:", user.role);
+          token.role = user.role;
+        } else if (user.email) {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            select: { role: true },
+          });
+          console.log("User role from DB:", dbUser?.role);
+          token.role = dbUser?.role ?? "USER";
+        }
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        session.user.email = token.email;
-        session.user.name = token.name;
-        session.user.image = token.image;
-        (session.user as any).role = token.role;
+        session.user.role = token.role as string;
       }
       return session;
     },
   },
+
   pages: {
     signIn: "/",
   },
@@ -87,4 +99,4 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-export default NextAuth(authOptions);
+export default handler;
