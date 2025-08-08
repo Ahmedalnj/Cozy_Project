@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
 export async function POST(
-  req: Request,
-  context: { params: { listingId: string } }
+  request: NextRequest,
+  { params }: { params: { listingId: string } }
 ) {
   const currentUser = await getCurrentUser();
 
@@ -12,7 +12,7 @@ export async function POST(
     return NextResponse.error();
   }
 
-  const { listingId } = context.params;
+  const { listingId } = params;
 
   if (!listingId || typeof listingId !== "string") {
     throw new Error("Invalid ID");
