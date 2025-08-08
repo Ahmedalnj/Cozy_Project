@@ -12,6 +12,13 @@ interface ListingsTableProps {
   listings: SafeListing[];
 }
 
+type SortColumn =
+  | "title"
+  | "category"
+  | "locationValue"
+  | "price"
+  | "createdAt";
+
 const LISTINGS_PER_PAGE = 10;
 
 const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
@@ -20,6 +27,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
+  const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -48,12 +56,32 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
           listing.title.toLowerCase().includes(search.toLowerCase()) ||
           listing.category.toLowerCase().includes(search.toLowerCase())
       )
-      .sort((a, b) =>
-        sortAsc
-          ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }, [search, sortAsc, listings]);
+      .sort((a, b) => {
+        const valA = a[sortBy];
+        const valB = b[sortBy];
+
+        if (sortBy === "price") {
+          return sortAsc
+            ? (valA as number) - (valB as number)
+            : (valB as number) - (valA as number);
+        }
+
+        if (sortBy === "createdAt") {
+          return sortAsc
+            ? new Date(valA as string).getTime() -
+                new Date(valB as string).getTime()
+            : new Date(valB as string).getTime() -
+                new Date(valA as string).getTime();
+        }
+
+        // لباقي الأعمدة نصية: title, category, locationValue
+        if (typeof valA === "string" && typeof valB === "string") {
+          return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+
+        return 0;
+      });
+  }, [search, sortAsc, sortBy, listings]);
 
   const totalPages = Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
 
@@ -62,40 +90,78 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
     return filteredListings.slice(start, start + LISTINGS_PER_PAGE);
   }, [filteredListings, currentPage]);
 
-  return (
-    <div className="mt-10">
-      <h2 className="text-xl font-semibold mb-4">Listings</h2>
+  const handleSort = (column: SortColumn) => {
+    if (sortBy === column) {
+      setSortAsc(!sortAsc); // إذا ضغط على نفس العمود غير اتجاه الترتيب
+    } else {
+      setSortBy(column); // غير العمود المرتب عليه
+      setSortAsc(true); // بدء بترتيب تصاعدي
+    }
+  };
 
-      {/* Search and Sort Bar */}
+  const renderSortIcon = (column: SortColumn) => {
+    if (sortBy !== column) return null;
+    return sortAsc ? (
+      <FiChevronUp className="inline" />
+    ) : (
+      <FiChevronDown className="inline" />
+    );
+  };
+
+  return (
+    <div className="mt-5">
+      <h2 className="text-5xl font-semibold mb-4 text-center p-4">
+        Listing Table
+      </h2>
+
+      {/* Search Bar */}
       <div className="flex flex-row-reverse items-center justify-between mb-4">
         <input
           type="text"
-          placeholder="🔍 بحث بالعنوان أو الفئة..."
+          placeholder="🔍 Search by Title or Category"
           className="border px-3 py-2 rounded-md w-full max-w-xs text-sm focus:outline-none"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setCurrentPage(1); // إعادة للصفحة الأولى عند البحث
+            setCurrentPage(1);
           }}
         />
-        <button
-          onClick={() => setSortAsc(!sortAsc)}
-          className="flex items-center gap-1 text-sm text-gray-700 hover:text-black"
-        >
-          {sortAsc ? <FiChevronDown /> : <FiChevronUp />}
-          ترتيب بالتاريخ
-        </button>
       </div>
 
       <div className="overflow-x-auto rounded-xl border shadow-sm">
-        <table className="min-w-full bg-white text-sm">
+        <table className="min-w-full bg-white text-sm text-gray-700">
           <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="py-2 px-4">Title</th>
-              <th className="py-2 px-4">Category</th>
-              <th className="py-2 px-4">Location</th>
-              <th className="py-2 px-4">Price</th>
-              <th className="py-2 px-4">Created At</th>
+            <tr className="bg-gray-100 text-left text-gray-600 uppercase text-xs tracking-wider">
+              <th
+                className="py-2 px-4 cursor-pointer select-none"
+                onClick={() => handleSort("title")}
+              >
+                Title {renderSortIcon("title")}
+              </th>
+              <th
+                className="py-2 px-4 cursor-pointer select-none"
+                onClick={() => handleSort("category")}
+              >
+                Category {renderSortIcon("category")}
+              </th>
+              <th
+                className="py-2 px-4 cursor-pointer select-none"
+                onClick={() => handleSort("locationValue")}
+              >
+                Location {renderSortIcon("locationValue")}
+              </th>
+              <th
+                className="py-2 px-4 cursor-pointer select-none"
+                onClick={() => handleSort("price")}
+              >
+                Price {renderSortIcon("price")}
+              </th>
+              <th
+                className="py-2 px-4 cursor-pointer select-none"
+                onClick={() => handleSort("createdAt")}
+              >
+                Created At {renderSortIcon("createdAt")}
+              </th>
               <th className="py-2 px-4 text-center">Actions</th>
             </tr>
           </thead>
@@ -130,7 +196,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
                   colSpan={6}
                   className="text-center text-gray-400 py-6 font-semibold"
                 >
-                  لا توجد عقارات مطابقة.
+                  No Listings found
                 </td>
               </tr>
             )}
@@ -138,7 +204,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
         </table>
       </div>
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-4 gap-2 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => (

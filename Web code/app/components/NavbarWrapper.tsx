@@ -30,7 +30,7 @@ export default function LayoutController({
         {isAdminPage ? (
           <div>{children}</div>
         ) : (
-          <div className="pb-20 pt-28">{children}</div>
+          <div className="pb-15 pt-12">{children}</div>
         )}
       </div>
     </>

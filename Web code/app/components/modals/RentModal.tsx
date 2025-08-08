@@ -122,11 +122,14 @@ const RentModal = () => {
   };
 
   const actionLabel = useMemo(() => {
-    if (step == STEPS.PRICE) {
+    if (isLoading) {
+      return step === STEPS.PRICE ? "Creating..." : "Loading...";
+    }
+    if (step === STEPS.PRICE) {
       return "Create";
     }
     return "NEXT";
-  }, [step]);
+  }, [step, isLoading]);
   const secondaryActionLabel = useMemo(() => {
     if (step == STEPS.CATEGORY) {
       return undefined;

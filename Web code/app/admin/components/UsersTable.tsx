@@ -12,12 +12,15 @@ interface UsersTableProps {
   users: PublicUser[];
 }
 
+type SortColumn = "name" | "email" | "role" | "createdAt";
+
 const USERS_PER_PAGE = 10;
 
 const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
   const [localUsers, setLocalUsers] = useState(users);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
+  const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
@@ -53,12 +56,36 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
           user.name?.toLowerCase().includes(search.toLowerCase()) ||
           user.email?.toLowerCase().includes(search.toLowerCase())
       )
-      .sort((a, b) =>
-        sortAsc
-          ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }, [search, sortAsc, localUsers]);
+      .sort((a, b) => {
+        let valA: string = "";
+        let valB: string = "";
+
+        switch (sortBy) {
+          case "name":
+            valA = a.name?.toLowerCase() || "";
+            valB = b.name?.toLowerCase() || "";
+            break;
+          case "email":
+            valA = a.email?.toLowerCase() || "";
+            valB = b.email?.toLowerCase() || "";
+            break;
+          case "role":
+            valA = a.role?.toLowerCase() || "";
+            valB = b.role?.toLowerCase() || "";
+            break;
+          case "createdAt":
+            return sortAsc
+              ? new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              : new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime();
+        }
+
+        if (valA < valB) return sortAsc ? -1 : 1;
+        if (valA > valB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+  }, [search, sortAsc, sortBy, localUsers]);
 
   const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
 
@@ -67,37 +94,72 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
     return filteredUsers.slice(start, start + USERS_PER_PAGE);
   }, [filteredUsers, currentPage]);
 
+  const handleSort = (column: SortColumn) => {
+    if (sortBy === column) {
+      setSortAsc(!sortAsc); // إذا ضغط على نفس العمود، بدل اتجاه الفرز
+    } else {
+      setSortBy(column); // غير العمود المراد فرزه
+      setSortAsc(true); // فرز تصاعدي افتراضي
+    }
+  };
+
+  const renderSortIcon = (column: SortColumn) => {
+    if (sortBy !== column) return null;
+    return sortAsc ? (
+      <FiChevronUp className="inline ml-1" />
+    ) : (
+      <FiChevronDown className="inline ml-1" />
+    );
+  };
+
   return (
     <div className="mt-10">
-      {/* Search and Sort Bar */}
+      <h2 className="text-5xl font-semibold mb-4 text-center p-4">
+        User Table
+      </h2>
+
+      {/* Search Bar */}
       <div className="flex flex-row-reverse items-center justify-between mb-4">
         <input
           type="text"
-          placeholder="🔍 بحث باسم أو بريد المستخدم..."
+          placeholder="🔍 Search by Name or Email"
           className="border px-3 py-2 rounded-md w-full max-w-xs text-sm focus:outline-none"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setCurrentPage(1); // إعادة الصفحة الأولى عند البحث
+            setCurrentPage(1);
           }}
         />
-        <button
-          onClick={() => setSortAsc(!sortAsc)}
-          className="ml-4 flex items-center gap-1 text-sm text-gray-700 hover:text-black"
-        >
-          {sortAsc ? <FiChevronDown /> : <FiChevronUp />}
-          ترتيب بالتاريخ
-        </button>
       </div>
 
       <div className="overflow-x-auto rounded-xl border shadow-sm">
         <table className="min-w-full bg-white text-sm text-gray-700">
           <thead>
             <tr className="bg-gray-100 text-left text-gray-600 uppercase text-xs tracking-wider">
-              <th className="py-3 px-6">User</th>
-              <th className="py-3 px-6">Email</th>
-              <th className="py-3 px-6">Role</th>
-              <th className="py-3 px-6">Created At</th>
+              <th
+                className="py-3 px-6 cursor-pointer select-none"
+                onClick={() => handleSort("name")}
+              >
+                User {renderSortIcon("name")}
+              </th>
+              <th
+                className="py-3 px-6 cursor-pointer select-none"
+                onClick={() => handleSort("email")}
+              >
+                Email {renderSortIcon("email")}
+              </th>
+              <th
+                className="py-3 px-6 cursor-pointer select-none"
+                onClick={() => handleSort("role")}
+              >
+                Role {renderSortIcon("role")}
+              </th>
+              <th
+                className="py-3 px-6 cursor-pointer select-none"
+                onClick={() => handleSort("createdAt")}
+              >
+                Created At {renderSortIcon("createdAt")}
+              </th>
               <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
@@ -150,7 +212,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                   colSpan={5}
                   className="text-center text-gray-400 py-6 font-semibold"
                 >
-                  لا توجد نتائج مطابقة.
+                  No Users found
                 </td>
               </tr>
             )}

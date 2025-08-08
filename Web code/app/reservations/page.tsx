@@ -1,9 +1,9 @@
 import EmptyState from "../components/EmptyState";
 import ClientOnly from "../components/ClientOnly";
-
 import getCurrentUser from "../actions/getCurrentUser";
 import getReservations from "../actions/getReservations";
 import ReservationsClient from "./ReservationsClient";
+import { SaveReservation } from "../types"; // ✅ Import the type
 
 const ReservationsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -11,22 +11,23 @@ const ReservationsPage = async () => {
   if (!currentUser) {
     return (
       <ClientOnly>
-        <EmptyState title="unauthorized" subtitle="Please Login"></EmptyState>
+        <EmptyState title="unauthorized" subtitle="Please Login" />
       </ClientOnly>
     );
   }
 
-  const reservations = await getReservations({
+  // ✅ Explicitly type the reservations
+  const reservations: SaveReservation[] = await getReservations({
     authorId: currentUser.id,
   });
 
-  if (reservations.length == 0) {
+  if (reservations.length === 0) {
     return (
       <ClientOnly>
         <EmptyState
           title="No Reservations found"
-          subtitle="looks like you have no reservations on your properties."
-        ></EmptyState>
+          subtitle="Looks like you have no reservations on your properties."
+        />
       </ClientOnly>
     );
   }
@@ -40,4 +41,5 @@ const ReservationsPage = async () => {
     </ClientOnly>
   );
 };
+
 export default ReservationsPage;

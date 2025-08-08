@@ -47,7 +47,7 @@
 /* تخصيص أيام البداية والنهاية */
 .rdrStartEdge,
 .rdrEndEdge {
-  background: #FF9A36 !important; /* لون أغمق قليلاً للحدود */
+  background: #3122b2 !important; /* لون أغمق قليلاً للحدود */
   color: white !important;
 }
 
