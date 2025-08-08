@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google"; // 👈 إضافة Google Provider
 import bcrypt from "bcrypt";
 
 import prisma from "@/app/libs/prismadb";
 
-// 🧠 تهيئة الإعدادات
 export const authOptions: NextAuthOptions = {
   providers: [
+    // ✅ Google OAuth
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
+    // ✅ Credentials
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -36,7 +43,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        // ✅ نحذف كلمة المرور ونُعيد المستخدم
         return {
           id: user.id,
           name: user.name ?? undefined,
@@ -71,7 +77,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/", // يمكنك تغييره لمسارك المخصص لتسجيل الدخول
+    signIn: "/",
   },
   session: {
     strategy: "jwt",
