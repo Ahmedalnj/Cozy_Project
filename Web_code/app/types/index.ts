@@ -1,27 +1,28 @@
 import type { Listing, Reservation, User } from "@prisma/client";
 
-export type SafeListing = Omit<
-  Listing,
-  "createdAt"
+export type SafeListing = Omit<Listing, "createdAt"> & {
+  createdAt: string;
+  user?: {
+    name: string | null;
+    email: string | null;
+  };
+};
 
+export type SaveReservation = Omit<
+  Reservation,
+  "createdAt" | "startDate" | "endDate" | "listing"
 > & {
-  createdAt: string; // تحويل تاريخ الإنشاء إلى string
-}
-
-export type SaveReservation =Omit<
-Reservation,
-"createdAt" | "startDate" | "endDate" |"listing" 
->&{
   id: string;
   user: {
     name: string | null;
     email: string | null;
+    image?: string | null;
   };
-  createdAt :string;
-  startDate :string;
-  endDate:string;
-  listing:SafeListing;
-}
+  createdAt: string;
+  startDate: string;
+  endDate: string;
+  listing: SafeListing;
+};
 
 // تعريف نوع SafeUser مع الحقول المناسبة
 export type SafeUser = Omit<
@@ -40,7 +41,6 @@ export type PublicUser = Pick<
   createdAt: string;
   image?: string | null;
 };
-
 
 export const formatCurrency = (amount: number): string =>
   new Intl.NumberFormat("en-US", {

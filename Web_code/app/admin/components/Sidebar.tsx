@@ -13,7 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 
-const routes = [
+export const routes = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
   { label: "Users", icon: Users, href: "/admin/dashboard/users" },
   { label: "Listings", icon: Home, href: "/admin/dashboard/listings" },
@@ -33,24 +33,44 @@ const routes = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith("/admin");
+  if (!isAdminPage) return null;
 
   return (
-    <aside className="fixed top-9 right-0 h-screen w-64 bg-white border-l p-4 shadow-sm">
-      <nav className="space-y-2 mt-4">
-        {routes.map((route) => (
-          <Link
-            key={route.href}
-            href={route.href}
-            className={clsx(
-              "flex flex-row-reverse items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 transition",
-              pathname === route.href && "bg-gray-200 font-semibold"
-            )}
-          >
-            <route.icon className="h-5 w-5" />
-            {route.label}
-          </Link>
-        ))}
+    <div
+      className="max-w-screen-2xl  // Similar to Airbnb's very wide container
+      mx-auto
+      xl:px-20         // Larger padding on extra large screens
+      lg:px-10         // Standard padding on large screens
+      md:px-8          // Medium padding on tablets
+      sm:px-6          // Small padding on small tablets
+      px-4 "
+    >
+      <nav
+        className="pt-4
+      flex 
+      flex-row
+      items-center
+      justify-between
+      overflow-x-auto"
+      >
+        {routes.map((route) => {
+          const isActive = pathname === route.href;
+          return (
+            <Link
+              key={route.href}
+              href={route.href}
+              className={clsx(
+                "flex items-center gap-2 whitespace-nowrap px-3 py-2 rounded-md hover:bg-gray-100 transition",
+                isActive && "bg-gray-200 font-semibold"
+              )}
+            >
+              <route.icon className="h-5 w-5" />
+              {route.label}
+            </Link>
+          );
+        })}
       </nav>
-    </aside>
+    </div>
   );
 }

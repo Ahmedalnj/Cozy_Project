@@ -10,19 +10,15 @@ export default async function getReservations(params: IParams) {
   try {
     const { listingId, userId, authorId } = params;
 
-    console.log("Received params:", params);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const whereClause: any = {};
 
     if (listingId) {
       whereClause.listingId = listingId;
-      console.log("Filter by listingId:", listingId);
     }
 
     if (userId) {
       whereClause.userId = userId;
-      console.log("Filter by userId:", userId);
     }
 
     if (authorId) {
@@ -31,10 +27,7 @@ export default async function getReservations(params: IParams) {
           userId: authorId,
         },
       };
-      console.log("Filter by authorId (listing.userId):", authorId);
     }
-
-    console.log("Final where clause:", JSON.stringify(whereClause, null, 2));
 
     // لو الشرط فارغ، نحاول جلب جميع الحجوزات (أو نرجع مصفوفة فارغة)
     if (!listingId && !userId && !authorId) {
@@ -45,15 +38,17 @@ export default async function getReservations(params: IParams) {
     const reservations = await prisma.reservation.findMany({
       where: whereClause,
       include: {
-        listing: true,
+        listing: {
+          include: {
+            user: true, // <== هنا نضيف user ضمن listing
+          },
+        },
         user: true,
       },
       orderBy: {
         createdAt: "desc",
       },
     });
-
-    console.log("Fetched reservations:", reservations.length);
 
     // تحويل التواريخ إلى string
     const safeReservation = reservations.map((reservation) => ({
@@ -73,7 +68,6 @@ export default async function getReservations(params: IParams) {
 
     return safeReservation;
   } catch (error: unknown) {
-    console.error("Error in getReservations:", error);
     if (error instanceof Error) {
       throw new Error(error.message);
     }

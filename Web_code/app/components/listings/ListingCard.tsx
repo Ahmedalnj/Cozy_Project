@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import HeartButton from "@/app/components/HeartButton";
 import Button from "../Button";
+import Avatar from "../Avatar";
 
 interface ListingCardProps {
   data: SafeListing;
@@ -43,7 +44,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const { getByValue } = useCountries();
 
   const location = getByValue(data.locationValue);
-
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
@@ -123,7 +123,13 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <HeartButton listingId={data.id} currentUser={currentUser} />
           </div>
         </div>
-
+        {reservation?.user?.name && (
+          <div className="flex items-center gap-2 font-light text-sm text-gray-600 mt-1">
+            <span>Booked by:</span>
+            <Avatar src={reservation?.user?.image || "/images/user.png"} />
+            <span className="font-semibold">{reservation.user.name}</span>
+          </div>
+        )}
         <div className="font-semibold text-lg">
           {location?.region}, {location?.label}
         </div>
@@ -131,6 +137,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
         <div className="font-light text-neutral-500">
           {reservationDate || data.category}
         </div>
+
         <div className="flex flex-row items-center gap-1">
           <div className="font-semibold">${price}</div>
 
