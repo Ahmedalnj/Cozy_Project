@@ -1,7 +1,8 @@
 "use client";
+
 import useRentModal from "@/app/hooks/useRentModal";
 import Modal from "./modal";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
@@ -24,12 +25,16 @@ enum STEPS {
   DESCRIPTION = 4,
   PRICE = 5,
 }
+
 const RentModal = () => {
   const router = useRouter();
   const rentmodal = useRentModal();
 
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
+
+  // State محلي لإدارة الصور
+  const [localImages, setLocalImages] = useState<string[]>([]);
 
   const {
     register,
@@ -45,7 +50,7 @@ const RentModal = () => {
       guestCount: 1,
       roomCount: 1,
       bathroomCount: 1,
-      imageSrc: "",
+      imageSrc: [],
       price: 1,
       title: "",
       description: "",
@@ -54,7 +59,16 @@ const RentModal = () => {
 
   const category = watch("category");
   const location = watch("location");
-  const imageSrc = watch("imageSrc");
+
+  // مزامنة الصور المحلية مع form state
+  useEffect(() => {
+    setValue("imageSrc", localImages, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [localImages, setValue]);
+
   const roomCount = watch("roomCount");
   const bathroomCount = watch("bathroomCount");
   const guestCount = watch("guestCount");
@@ -66,6 +80,7 @@ const RentModal = () => {
       }),
     []
   );
+
   const setCustomValue = (id: string, value: unknown) => {
     setValue(id, value, {
       shouldValidate: true,
@@ -74,27 +89,34 @@ const RentModal = () => {
     });
   };
 
+  // أضف صورة جديدة
+  const addImage = (newImg: string) => {
+    setLocalImages((imgs) => [...imgs, newImg]);
+  };
+
+  // حذف صورة
+  const removeImage = (img: string) => {
+    setLocalImages((imgs) => imgs.filter((i) => i !== img));
+  };
+
   const onBack = () => {
     setStep((value) => value - 1);
   };
+
   const onNext = () => {
-    // تحقق من أن كل الحقول المطلوبة تم تعبئتها
     if (step === STEPS.CATEGORY && !category) {
       toast.error("Category is required");
-      return; // لا تتابع إذا لم يتم تحديد الفئة
+      return;
     }
-
-    if (step === STEPS.IMAGE && !imageSrc) {
+    if (step === STEPS.IMAGE && localImages.length === 0) {
       toast.error("Image is required");
-      return; // لا تتابع إذا لم يتم تحميل صورة
+      return;
     }
-
     if (step === STEPS.LOCATION && !location) {
       toast.error("Location is required");
-      return; // لا تتابع إذا لم يتم تحديد الموقع
+      return;
     }
-
-    setStep((value) => value + 1); // الانتقال للخطوة التالية
+    setStep((value) => value + 1);
   };
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -110,6 +132,7 @@ const RentModal = () => {
         toast.success("Listing Created");
         router.refresh();
         reset();
+        setLocalImages([]); // إعادة تعيين الصور المحلية بعد الإرسال
         setStep(STEPS.CATEGORY);
         rentmodal.onClose();
       })
@@ -130,37 +153,26 @@ const RentModal = () => {
     }
     return "NEXT";
   }, [step, isLoading]);
+
   const secondaryActionLabel = useMemo(() => {
-    if (step == STEPS.CATEGORY) {
+    if (step === STEPS.CATEGORY) {
       return undefined;
     }
     return "Back";
   }, [step]);
 
   let bodyContent = (
-    <div
-      className="
-    flex flex-col gap-8
-    "
-    >
+    <div className="flex flex-col gap-8">
       <Heading
-        title="which of these best describes your place?"
+        title="Which of these best describes your place?"
         subtitle="Pick a category"
       />
-      <div
-        className="
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        gap-3
-        max-h-[50vh]
-        overflow-y-auto"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
         {categories.map((item) => (
           <div key={item.label} className="col-span-1">
             <CategoryInput
               onClick={(category) => setCustomValue("category", category)}
-              selected={category == item.label}
+              selected={category === item.label}
               label={item.label}
               icon={item.icon}
             />
@@ -169,7 +181,8 @@ const RentModal = () => {
       </div>
     </div>
   );
-  if (step == STEPS.LOCATION) {
+
+  if (step === STEPS.LOCATION) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
@@ -184,12 +197,13 @@ const RentModal = () => {
       </div>
     );
   }
+
   if (step === STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
           title="Share some basic about your place"
-          subtitle="What amenities do you have ? "
+          subtitle="What amenities do you have?"
         />
 
         <Counter
@@ -201,14 +215,14 @@ const RentModal = () => {
         <hr />
         <Counter
           title="Rooms"
-          subtitle="How many Room do you have?"
+          subtitle="How many Rooms do you have?"
           value={roomCount}
           onChange={(value) => setCustomValue("roomCount", value)}
         />
         <hr />
         <Counter
-          title="BathRooms"
-          subtitle="How many BathRooms do you have?"
+          title="Bathrooms"
+          subtitle="How many Bathrooms do you have?"
           value={bathroomCount}
           onChange={(value) => setCustomValue("bathroomCount", value)}
         />
@@ -224,8 +238,9 @@ const RentModal = () => {
           subtitle="Show guests what your place looks like"
         />
         <ImageUpload
-          value={imageSrc}
-          onChange={(value) => setCustomValue("imageSrc", value)}
+          images={localImages}
+          addImage={addImage}
+          removeImage={removeImage}
         />
       </div>
     );
@@ -285,6 +300,7 @@ const RentModal = () => {
       </div>
     );
   }
+
   return (
     <Modal
       isOpen={rentmodal.isOpen}
@@ -292,10 +308,10 @@ const RentModal = () => {
       onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
-      secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
+      secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
       title="Cozy Your Home"
       body={bodyContent}
-    ></Modal>
+    />
   );
 };
 

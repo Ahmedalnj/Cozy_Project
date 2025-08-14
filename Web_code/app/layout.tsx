@@ -12,6 +12,8 @@ import SearchModal from "./components/modals/SearchModal";
 import TermsModal from "./components/modals/TermsModal";
 import PolicyModal from "./components/modals/PolicyModal";
 import NavbarWrapper from "./components/NavbarWrapper";
+import ForgotPasswordModal from "./components/modals/ForgotPasswordModal";
+import ResetPasswordModal from "./components/modals/ResetPasswordModal";
 const font = Nunito({
   subsets: ["latin"],
 });
@@ -39,6 +41,8 @@ export default async function RootLayout({
           <PolicyModal />
           <RentModal />
           <RegisterModal />
+          <ForgotPasswordModal />
+          <ResetPasswordModal />
           <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
         </ClientOnly>
       </body>

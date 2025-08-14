@@ -5,22 +5,27 @@ import {
   FieldValues,
   UseFormRegister,
   RegisterOptions,
+  Path,
 } from "react-hook-form";
 import { BiDollar } from "react-icons/bi";
 
-interface InputProps {
-  id: string;
+interface InputProps<T extends FieldValues> {
+  id: Path<T>;
   label: string;
   type?: string;
   disabled?: boolean;
   required?: boolean;
+  readOnly?: boolean;
   formatPrice?: boolean;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors;
-  validation?: RegisterOptions;
+  register?: UseFormRegister<T>; // جعلها اختيارية
+  errors: FieldErrors<T>;
+  validation?: RegisterOptions<T>;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
+  defaultValue?: string | null;
 }
-const Input: React.FC<InputProps> = ({
+
+const Input = <T extends FieldValues>({
   id,
   label,
   type = "text",
@@ -30,23 +35,30 @@ const Input: React.FC<InputProps> = ({
   register,
   errors,
   validation,
-}) => {
+  value,
+  defaultValue,
+  readOnly,
+}: InputProps<T>) => {
   return (
     <div className="w-full relative">
       {formatPrice && (
         <BiDollar
           size={24}
           className="
-        text-neutral-700
-        absolute
-        top-5
-        left-2"
+            text-neutral-700
+            absolute
+            top-5
+            left-2
+          "
         />
       )}
       <input
         id={id}
         disabled={disabled}
-        {...register(id, { required, ...validation })}
+        value={value}
+        defaultValue={defaultValue ?? undefined}
+        readOnly={readOnly}
+        {...(register ? register(id, { required, ...validation }) : {})}
         placeholder=" "
         type={type}
         className={`
@@ -91,8 +103,7 @@ const Input: React.FC<InputProps> = ({
           ${errors[id] ? "peer-focus:text-rose-500" : "peer-focus:text-black"}
           ${disabled ? "text-neutral-400" : "text-zinc-400"}
           ${disabled ? "peer-focus:text-neutral-400" : "peer-focus:text-black"}
-
-          `}
+        `}
       >
         {label}
       </label>

@@ -138,13 +138,17 @@ const ListingClient: React.FC<ListingClientProps> = ({
     return categories.find((item) => item.label === listing.category);
   }, [listing.category]);
 
+  const images = Array.isArray(listing.imageSrc)
+    ? listing.imageSrc
+    : [listing.imageSrc];
+
   return (
     <Container>
       <div className="max-w-screen-lg mx-auto">
         <div className="flex flex-col gap-6">
           <ListingHead
             title={listing.title}
-            imageSrc={listing.imageSrc}
+            imageSrc={images}
             locationValue={listing.locationValue}
             id={listing.id}
             currentUser={currentUser}
@@ -159,7 +163,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
             />
-            <div className="order-first mb-10 md:order-last md:col-span-3">
+            <div className="order-first mb-10 md:order-last md:col-span-3 sticky top-20">
               <ListingReservation
                 price={listing.price}
                 totalPrice={totalPrice}

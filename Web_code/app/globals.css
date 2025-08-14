@@ -102,3 +102,8 @@
 .swiper-button-next {
   left: 30px !important; /* 40px button width + 12px gap */
 }
+.image-gallery-slide img {
+  object-fit: contain !important;
+  height: 60vh !important;
+  width: 100% !important;
+}

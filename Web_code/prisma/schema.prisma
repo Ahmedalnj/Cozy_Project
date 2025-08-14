@@ -15,6 +15,8 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  resetCode      String?
+  codeExpiresAt  DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   favoriteIds    String[]      @db.Uuid
@@ -46,7 +48,7 @@ model Listing {
   id            String        @id @default(uuid()) @map("_id") @db.Uuid
   title         String
   description   String
-  imageSrc      String
+  imageSrc      String[]      @db.Text
   createdAt     DateTime      @default(now())
   category      String
   roomCount     Int

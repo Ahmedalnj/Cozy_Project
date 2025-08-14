@@ -14,6 +14,7 @@ import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useRouter } from "next/navigation";
 import useTermsModal from "@/app/hooks/useTerms";
 import usePolicy from "@/app/hooks/usePolicy";
+import useForgotPasswordModal from "@/app/hooks/useForgotPasswordModal";
 
 const LoginModal = () => {
   const router = useRouter();
@@ -21,8 +22,10 @@ const LoginModal = () => {
   const loginModal = useLoginModal();
   const TermsModal = useTermsModal();
   const PolicyModal = usePolicy();
+  const forgotPasswordModal = useForgotPasswordModal();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   const {
     register,
@@ -35,7 +38,6 @@ const LoginModal = () => {
     },
   });
 
-  // دالة إرسال البيانات
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
     signIn("credentials", {
@@ -43,27 +45,23 @@ const LoginModal = () => {
       redirect: false,
     }).then((callback) => {
       setIsLoading(false);
+
       if (callback?.error) {
         toast.error(callback.error);
+        setShowResetPassword(true);
       }
-      if (callback?.ok && !callback?.error) {
+
+      if (callback?.ok) {
         toast.success("Logged in successfully");
-
         router.refresh();
-
         loginModal.onClose();
-        // إعادة التوجيه إلى الصفحة الرئيسية بعد تسجيل الدخول
-      }
-      if (callback?.error) {
-        toast.error("Invalid credentials");
       }
     });
   };
-  // محتوى جسم المودال
+
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading title="Welcome Back" subtitle="Login to your account" />
-
       <Input
         id="email"
         label="Email"
@@ -73,7 +71,7 @@ const LoginModal = () => {
         required
         validation={{
           pattern: {
-            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, // نمط إيميل صحيح
+            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
             message: "Please enter a valid email address",
           },
         }}
@@ -90,7 +88,6 @@ const LoginModal = () => {
     </div>
   );
 
-  // محتوى التذييل (footer) للمودال
   const footerContent = (
     <div className="flex flex-col gap-4 mt-3">
       <hr />
@@ -107,9 +104,30 @@ const LoginModal = () => {
           icon={AiFillFacebook}
           onClick={() => signIn("facebook")}
         />
+
         <div className="text-neutral-500 text-center mt-4 font-light">
+          {showResetPassword && (
+            <div className="text-black pb-3">
+              Forgot your password?{" "}
+              <span
+                onClick={() => {
+                  loginModal.onClose();
+                  forgotPasswordModal.onOpen();
+                  console.log("LoginModal state:", loginModal.isOpen);
+                  console.log(
+                    "ForgotPasswordModal state:",
+                    forgotPasswordModal.isOpen
+                  );
+                }}
+                className="text-red-600 cursor-pointer hover:underline"
+              >
+                Reset it here
+              </span>
+            </div>
+          )}
+
           <div>
-            Do not have an account?
+            Don't have an account?{" "}
             <span
               onClick={() => {
                 loginModal.onClose();
@@ -120,15 +138,16 @@ const LoginModal = () => {
               Create an Account
             </span>
           </div>
+
           <div>
-            By continuing, you agree to Cozy
+            By continuing, you agree to Cozy's{" "}
             <span
               onClick={TermsModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
               Terms of Service
-            </span>
-            and
+            </span>{" "}
+            and{" "}
             <span
               onClick={PolicyModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
@@ -141,15 +160,14 @@ const LoginModal = () => {
     </div>
   );
 
-  // إرجاع المودال مع محتوياته
   return (
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
       title="Login"
-      actionLabel="Submit"
+      actionLabel="Continue"
       onClose={loginModal.onClose}
-      onSubmit={handleSubmit(onSubmit)} // استخدم onSubmit بدلاً من onsubmit
+      onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
     />

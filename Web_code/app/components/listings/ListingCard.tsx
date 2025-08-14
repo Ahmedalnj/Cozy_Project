@@ -89,6 +89,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
     return `${format(start, "PP")} - ${format(end, "PP")}`;
   }, [reservation]);
 
+  const imageSrc =
+    Array.isArray(data.imageSrc) && data.imageSrc.length > 0
+      ? data.imageSrc[0]
+      : "/images/Empty.png";
+
   return (
     <div
       onClick={() => router.push(`/listings/${data.id}`)}
@@ -109,7 +114,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
           <Image
             fill
             alt="Listing"
-            src={data.imageSrc || "/images/Empty.png"}
+            src={imageSrc}
             className="
                     object-cover
                     h-full
