@@ -47,11 +47,6 @@ const ResetPasswordModal = () => {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    if (data.password === "كلمة المرور القديمة") {
-      // يمكنك تخزين كلمة المرور القديمة إذا كانت متاحة
-      toast.error("كلمة المرور الجديدة يجب أن تكون مختلفة عن القديمة");
-      return;
-    }
     try {
       const response = await fetch("/api/resetpassword/updatepassword/", {
         method: "POST",
