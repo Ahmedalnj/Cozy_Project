@@ -45,6 +45,7 @@
     "swiper": "^11.2.10",
     "use-places-autocomplete": "^4.0.1",
     "world-countries": "^5.1.0",
+    "yet-another-react-lightbox": "^3.25.0",
     "zustand": "^5.0.5",
     "zxcvbn": "^4.4.2"
   },

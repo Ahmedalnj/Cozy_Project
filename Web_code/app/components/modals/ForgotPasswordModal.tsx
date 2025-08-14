@@ -210,7 +210,7 @@ const ForgotPasswordModal = () => {
       disabled={isLoading}
       isOpen={forgotPasswordModal.isOpen}
       title={step === "email" ? "Reset Password" : "Verify Code"}
-      actionLabel={actionLabel}
+      actionLabel={actionLabel || ""}
       onClose={forgotPasswordModal.onClose}
       onSubmit={
         step === "email"

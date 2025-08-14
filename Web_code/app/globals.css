@@ -41,27 +41,27 @@
 
 /* تخصيص أيام النطاق */
 .rdrDayInRange {
-  background: #FFBA76 !important; /* لون النطاق: برتقالي دافئ */
-  color: #03045E !important;      /* نص أزرق داكن */
+  background: #6a6a6a !important; /* لون النطاق: برتقالي دافئ */
+  color: #000000 !important;      /* نص أزرق داكن */
 }
 
 /* تخصيص أيام البداية والنهاية */
 .rdrStartEdge,
 .rdrEndEdge {
-  background: #3122b2 !important; /* لون أغمق قليلاً للحدود */
+  background: #000000 !important; /* لون أغمق قليلاً للحدود */
   color: white !important;
 }
 
 /* إصلاح مشكلة عدم ظهور النطاق */
 .rdrInRange {
-  background: #FFE5B4 !important; /* لون أفتح للنطاق */
-  color: #03045E !important;
+  background: #7d7d7d !important; /* لون أفتح للنطاق */
+  color: #000000 !important;
 }
 
 /* تحسين ظهور التواريخ المحددة */
 .rdrDaySelected {
-  background: #FFBA76 !important;
-  color: #03045E !important;
+  background: #000000 !important;
+  color: #ffffff !important;
 }
 
 /* تحسين مظهر الأيام عند التمرير */
@@ -75,12 +75,12 @@
 /* تحسين مظهر أرقام الأيام */
 .rdrDayNumber {
   font-weight: 500 !important;
-  color: #03045E !important;
+  color: #000000 !important;
 }
 
 .rdrDay:not(.rdrDayPassive):hover .rdrDayNumber span {
-  background: #FFBA76 !important;
-  color: #03045E !important;
+  background: #000000 !important;
+  color: #ffffff !important;
   border-radius: 40px !important;
   transform: scaleX(1.1) scaleY(1.3);
   transition: all 0.2s ease-out;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Range } from "react-date-range";
+import { Range, RangeKeyDict } from "react-date-range";
 import Calendar from "../inputs/Calender";
 import Button from "../Button";
 import { format } from "date-fns";
@@ -32,25 +32,17 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
   const [showDayCountHint, setShowDayCountHint] = useState(false);
 
   useEffect(() => {
-    if (days === 0) {
-      setShowDayCountHint(true);
-    } else {
-      setShowDayCountHint(false);
-    }
+    setShowDayCountHint(days === 0);
   }, [days]);
 
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 p-6 shadow-sm">
+    <div className="bg-white rounded-xl border border-neutral-200 p-4 shadow-sm">
       {/* Header with nights and location */}
       {dateRange.startDate && dateRange.endDate && (
         <div className="mb-4">
           <h3 className="text-lg font-semibold">
             {days} night{days && days > 1 ? "s" : ""} in {locationLabel}
           </h3>
-          {/* <p className="text-gray-600">
-            {format(dateRange.startDate, "MMM d, yyyy")} -{" "}
-            {format(dateRange.endDate, "MMM d, yyyy")}
-          </p> */}
         </div>
       )}
 
@@ -60,7 +52,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
           <div className="text-xs font-medium text-gray-500">CHECK IN</div>
           <div className="text-sm">
             {dateRange.startDate
-              ? format(dateRange.startDate, "yyyy-MM-dd")
+              ? format(dateRange.startDate, "MMM d, yyyy")
               : "Add date"}
           </div>
         </div>
@@ -68,7 +60,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
           <div className="text-xs font-medium text-gray-500">CHECKOUT</div>
           <div className="text-sm">
             {dateRange.endDate
-              ? format(dateRange.endDate, "yyyy-MM-dd")
+              ? format(dateRange.endDate, "MMM d, yyyy")
               : "Add date"}
           </div>
         </div>
@@ -79,9 +71,10 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
         <Calendar
           value={dateRange}
           disabledDates={disabledDates}
-          onChange={(value) => onChangeDate(value.selection)}
+          onChange={(value: RangeKeyDict) => onChangeDate(value.selection)}
         />
       </div>
+
       {/* Price Summary */}
       <div className="mb-4 p-4 border rounded-lg">
         <div className="flex justify-between font-semibold">
