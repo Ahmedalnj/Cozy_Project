@@ -32,7 +32,8 @@ const EditModal = () => {
   const router = useRouter();
   const editModal = useEditModal();
   const listing = editModal.listingData as SafeListing | null;
-
+  // State محلي لإدارة الصور
+  const [localImages, setLocalImages] = useState<string[]>([]);
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
   const getCountryByValue = (value: string) => {
@@ -85,9 +86,16 @@ const EditModal = () => {
     }
   }, [editModal.isOpen, listing, reset]);
 
+  useEffect(() => {
+    setValue("imageSrc", localImages, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [localImages, setValue]);
+
   const category = watch("category");
   const location = watch("location");
-  const imageSrc = watch("imageSrc");
   const roomCount = watch("roomCount");
   const bathroomCount = watch("bathroomCount");
   const guestCount = watch("guestCount");
@@ -108,6 +116,16 @@ const EditModal = () => {
     });
   };
 
+  // أضف صورة جديدة
+  const addImage = (newImg: string) => {
+    setLocalImages((imgs) => [...imgs, newImg]);
+  };
+
+  // حذف صورة
+  const removeImage = (img: string) => {
+    setLocalImages((imgs) => imgs.filter((i) => i !== img));
+  };
+
   const onBack = () => {
     setStep((value) => value - 1);
   };
@@ -117,7 +135,7 @@ const EditModal = () => {
       toast.error("Category is required");
       return;
     }
-    if (step === STEPS.IMAGE && !imageSrc) {
+    if (step === STEPS.IMAGE && localImages.length === 0) {
       toast.error("Image is required");
       return;
     }
@@ -141,6 +159,7 @@ const EditModal = () => {
         toast.success("Listing updated successfully");
         router.refresh();
         reset();
+        setLocalImages([]);
         setStep(STEPS.CATEGORY);
         editModal.onClose();
       })
@@ -242,8 +261,9 @@ const EditModal = () => {
           subtitle="Show guests what your place looks like"
         />
         <ImageUpload
-          value={imageSrc}
-          onChange={(value) => setCustomValue("imageSrc", value)}
+          images={localImages}
+          addImage={addImage}
+          removeImage={removeImage}
         />
       </div>
     );
