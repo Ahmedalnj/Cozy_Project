@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,6 +10,7 @@ import Input from "../inputs/Input";
 import toast from "react-hot-toast";
 import useResetPasswordModal from "@/app/hooks/useResetPasswordModal";
 import { useRouter } from "next/navigation";
+import useLoginModal from "@/app/hooks/useLoginModal";
 
 const schema = z
   .object({
@@ -27,6 +28,7 @@ type FormData = z.infer<typeof schema>;
 const ResetPasswordModal = () => {
   const router = useRouter();
   const resetPasswordModal = useResetPasswordModal();
+  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
   const { email: storedEmail } = useResetPasswordModal();
 
@@ -58,8 +60,9 @@ const ResetPasswordModal = () => {
       if (!response.ok) throw new Error(await response.text());
       console.log("Form submitted", data);
       toast.success("Password updated successfully");
-      router.push("/login");
+      router.refresh();
       resetPasswordModal.onClose();
+      loginModal.onOpen();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to reset password"
@@ -68,10 +71,6 @@ const ResetPasswordModal = () => {
       setIsLoading(false);
     }
   };
-  console.log("Form errors", errors);
-  useEffect(() => {
-    console.log("Stored email:", storedEmail);
-  }, [storedEmail]);
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
