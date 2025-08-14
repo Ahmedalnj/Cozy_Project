@@ -1,67 +1,66 @@
 "use client";
 import Container from "../Container";
-import { TbBeach, TbMountain, TbPool } from "react-icons/tb";
+import { TbBuilding, TbBuildingStore, TbHome, TbPool } from "react-icons/tb";
 import {
-  GiBoatFishing,
-  GiCastle,
+  GiFamilyHouse,
+  GiFarmTractor,
   GiForestCamp,
   GiIsland,
-  GiWindmill,
+  GiPartyPopper,
 } from "react-icons/gi";
 import { MdOutlineVilla } from "react-icons/md";
 import CategoryBox from "../CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
-import { FaSkiing } from "react-icons/fa";
 export const categories = [
   {
-    label: "Beach",
-    icon: TbBeach,
-    description: "xc",
+    label: "شقق",
+    icon: TbHome,
+    description: "شقق للإيجار اليومي أو الشهري",
   },
   {
-    label: "windmills",
-    icon: GiWindmill,
-    description: "xc",
-  },
-  {
-    label: "Countryside",
-    icon: TbMountain,
-    description: "xc",
-  },
-  {
-    label: "Pools",
-    icon: TbPool,
-    description: "xc",
-  },
-  {
-    label: "Islands",
-    icon: GiIsland,
-    description: "xc",
-  },
-  {
-    label: "Modren",
+    label: "فلل",
     icon: MdOutlineVilla,
-    description: "xc",
+    description: "فلل فاخرة أو عائلية",
   },
   {
-    label: "Lake",
-    icon: GiBoatFishing,
-    description: "xc",
+    label: "بيوت شعبية",
+    icon: GiFamilyHouse,
+    description: "منازل تقليدية في الأحياء الشعبية",
   },
   {
-    label: "Skiing",
-    icon: FaSkiing,
-    description: "xc",
+    label: "مزارع",
+    icon: GiFarmTractor,
+    description: "مزارع للإيجار مع مساحات خضراء",
   },
   {
-    label: "Castles",
-    icon: GiCastle,
-    description: "xc",
+    label: "قاعات مناسبات",
+    icon: GiPartyPopper,
+    description: "قاعات للأعراس والمناسبات",
   },
   {
-    label: "Camping",
+    label: "استراحات",
+    icon: TbPool,
+    description: "استراحات مع مسبح أو جلسات خارجية",
+  },
+  {
+    label: "شاليهات",
+    icon: GiIsland,
+    description: "شاليهات على البحر أو قربه",
+  },
+  {
+    label: "مخيمات",
     icon: GiForestCamp,
-    description: "xc",
+    description: "مخيمات صحراوية ورحلات سفاري",
+  },
+  {
+    label: "محلات تجارية",
+    icon: TbBuildingStore,
+    description: "محلات للإيجار التجاري",
+  },
+  {
+    label: "مكاتب",
+    icon: TbBuilding,
+    description: "مكاتب إدارية للإيجار",
   },
 ];
 

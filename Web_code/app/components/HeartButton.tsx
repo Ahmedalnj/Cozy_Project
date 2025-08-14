@@ -7,13 +7,15 @@ import { useState, MouseEvent } from "react";
 interface HeartButtonProps {
   listingId: string;
   currentUser?: SafeUser | null;
-  label: string;
+  label?: string;
+  showLabel?: boolean; // أضفنا خاصية جديدة للتحكم في عرض النص
 }
 
 const HeartButton: React.FC<HeartButtonProps> = ({
   listingId,
   currentUser,
-  label,
+  label, // قيمة افتراضية
+  showLabel = true, // افتراضيًا يعرض النص
 }) => {
   const { hasFavorited, toggleFavorite } = useFavorite({
     listingId,
@@ -31,18 +33,11 @@ const HeartButton: React.FC<HeartButtonProps> = ({
   return (
     <div
       onClick={handleClick}
-      className="flex items-center gap-2 group cursor-pointer"
+      className={`flex items-center gap-2 group cursor-pointer ${
+        !showLabel ? "justify-center" : ""
+      }`}
     >
       <div className="relative">
-        {/* Floating circle background */}
-        <div
-          className={`
-          absolute -inset-2 rounded-full bg-rose-100/50
-          transition-all duration-500 ease-out
-          ${isAnimating ? "scale-125 opacity-80" : "scale-0 opacity-0"}
-        `}
-        />
-
         {/* Heart icons */}
         <AiOutlineHeart
           size={28}
@@ -52,28 +47,30 @@ const HeartButton: React.FC<HeartButtonProps> = ({
             -top-[2px]
             -right-[2px]
             transition-all
-            duration-300
+            duration-80
           "
         />
         <AiFillHeart
           size={24}
           className={`
-            relative z-10
+            relative z-auto
             ${hasFavorited ? "fill-rose-500" : "fill-neutral-500/70"}
-            transition-all duration-400 ease-out
+            transition-all duration-70 ease-out
             ${isAnimating ? "scale-110 -translate-y-1" : ""}
           `}
         />
       </div>
 
-      <span
-        className={`
-        text-sm transition-all duration-300
-        group-hover:text-rose-500
-        ${hasFavorited ? "text-rose-500 font-medium" : "text-gray-600"}`}
-      >
-        {hasFavorited ? "Saved" : label}
-      </span>
+      {showLabel && (
+        <span
+          className={`
+          text-sm transition-all duration-50
+          group-hover:text-rose-500
+          ${hasFavorited ? "text-rose-500 font-medium" : "text-gray-600"}`}
+        >
+          {hasFavorited ? "Added to Favorites" : label}
+        </span>
+      )}
     </div>
   );
 };

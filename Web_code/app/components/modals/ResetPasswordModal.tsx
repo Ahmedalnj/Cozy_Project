@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,11 +11,20 @@ import toast from "react-hot-toast";
 import useResetPasswordModal from "@/app/hooks/useResetPasswordModal";
 import { useRouter } from "next/navigation";
 import useLoginModal from "@/app/hooks/useLoginModal";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+// Improved password validation schema
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Must contain at least one special character");
 
 const schema = z
   .object({
     email: z.string().email("Invalid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -30,12 +39,15 @@ const ResetPasswordModal = () => {
   const resetPasswordModal = useResetPasswordModal();
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
-  const { email: storedEmail } = useResetPasswordModal();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { email: storedEmail } = resetPasswordModal;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -44,6 +56,10 @@ const ResetPasswordModal = () => {
       confirmPassword: "",
     },
   });
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -57,12 +73,19 @@ const ResetPasswordModal = () => {
         }),
       });
 
-      if (!response.ok) throw new Error(await response.text());
-      console.log("Form submitted", data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to reset password");
+      }
+
       toast.success("Password updated successfully");
-      router.refresh();
-      resetPasswordModal.onClose();
-      loginModal.onOpen();
+      reset();
+      handleClose();
+      router.push("/");
+      setTimeout(() => {
+        loginModal.onOpen();
+        toast.success("You can now login with your new password");
+      }, 500);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to reset password"
@@ -71,6 +94,13 @@ const ResetPasswordModal = () => {
       setIsLoading(false);
     }
   };
+  const handleClose = useCallback(() => {
+    if (isLoading) {
+      toast("Please wait until the process completes");
+      return;
+    }
+    resetPasswordModal.onClose();
+  }, [isLoading, resetPasswordModal]);
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
@@ -78,28 +108,49 @@ const ResetPasswordModal = () => {
         title="Set a new password"
         subtitle="Enter new password for your email"
       />
-      <div className="text-center text-gray-600 mb-4">
-        For: <span className="font-semibold">{storedEmail}</span>
+      <div className="text-left text-gray-600 mb-4">
+        Email: <span className="font-bold">{storedEmail}</span>
       </div>
 
-      <Input
-        id="password"
-        label="New Password"
-        type="password"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
-      <Input
-        id="confirmPassword"
-        label="Confirm Password"
-        type="password"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
+      <div className="relative">
+        <Input
+          id="password"
+          label="New Password"
+          type={showPassword ? "text" : "password"}
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+        <button
+          type="button"
+          className="absolute right-3 top-6 text-gray-500 hover:text-gray-700"
+          onClick={togglePasswordVisibility}
+          disabled={isLoading}
+        >
+          {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+      </div>
+
+      <div className="relative">
+        <Input
+          id="confirmPassword"
+          label="Confirm Password"
+          type={showConfirmPassword ? "text" : "password"}
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+        <button
+          type="button"
+          className="absolute right-3 top-6 text-gray-500 hover:text-gray-700"
+          onClick={toggleConfirmPasswordVisibility}
+          disabled={isLoading}
+        >
+          {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+      </div>
     </div>
   );
 
@@ -108,7 +159,8 @@ const ResetPasswordModal = () => {
       disabled={isLoading}
       isOpen={resetPasswordModal.isOpen}
       title="Reset Password"
-      actionLabel="Update Password"
+      actionLabel="Update Password" // نص عادي فقط
+      isLoading={isLoading} // تمرير حالة التحميل
       onClose={resetPasswordModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}

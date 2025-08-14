@@ -42,7 +42,8 @@ const ListingHead: React.FC<ListingHeadProps> = ({
         <HeartButton
           listingId={id}
           currentUser={currentUser}
-          label="Save to Favorites"
+          showLabel={true}
+          label="Add to Favorites"
         ></HeartButton>
       </div>
       <div className="relative rounded-xl overflow-hidden">

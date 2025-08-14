@@ -128,7 +128,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <HeartButton
               listingId={data.id}
               currentUser={currentUser}
-              label=""
+              showLabel={false}
             />
           </div>
         </div>

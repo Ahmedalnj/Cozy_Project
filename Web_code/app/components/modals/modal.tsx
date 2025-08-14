@@ -9,7 +9,8 @@ interface ModalProps {
   onSubmit?: () => void;
   title?: string;
   body?: React.ReactElement;
-  actionLabel?: string;
+  actionLabel: string;
+  isLoading?: boolean;
   secondaryAction?: () => void;
   secondaryActionLabel?: string;
   disabled?: boolean;
@@ -22,6 +23,7 @@ const Modal: React.FC<ModalProps> = ({
   onSubmit,
   title = "Default Title",
   body,
+  isLoading,
   footer,
   actionLabel = "Submit",
   secondaryAction,
@@ -49,7 +51,9 @@ const Modal: React.FC<ModalProps> = ({
     if (disabled || !onSubmit) {
       return;
     }
-    onSubmit();
+    if (typeof onSubmit === "function") {
+      onSubmit();
+    }
   }, [disabled, onSubmit]);
 
   const handleSecondaryAction = useCallback(() => {
@@ -99,9 +103,10 @@ const Modal: React.FC<ModalProps> = ({
                     />
                   )}
                   <Button
-                    disabled={disabled}
+                    disabled={disabled || isLoading}
                     label={actionLabel}
                     onClick={handleSubmit}
+                    isLoading={isLoading}
                   />
                 </div>
                 {footer}
