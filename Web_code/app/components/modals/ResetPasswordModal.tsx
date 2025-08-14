@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,7 +10,6 @@ import Input from "../inputs/Input";
 import toast from "react-hot-toast";
 import useResetPasswordModal from "@/app/hooks/useResetPasswordModal";
 import { useRouter } from "next/navigation";
-import useLoginModal from "@/app/hooks/useLoginModal";
 
 const schema = z
   .object({
@@ -28,7 +27,6 @@ type FormData = z.infer<typeof schema>;
 const ResetPasswordModal = () => {
   const router = useRouter();
   const resetPasswordModal = useResetPasswordModal();
-  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
   const { email: storedEmail } = useResetPasswordModal();
 
@@ -39,7 +37,7 @@ const ResetPasswordModal = () => {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      email: storedEmail,
+      email: storedEmail || "",
       password: "",
       confirmPassword: "",
     },
@@ -52,27 +50,28 @@ const ResetPasswordModal = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: storedEmail, // البريد الإلكتروني المخزن
-          newPassword: data.password, // كلمة المرور الجديدة من الحقل
+          email: storedEmail,
+          newPassword: data.password,
         }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "فشل في تحديث كلمة المرور");
-      }
-
-      toast.success("تم تحديث كلمة المرور بنجاح!");
-      router.refresh();
+      if (!response.ok) throw new Error(await response.text());
+      console.log("Form submitted", data);
+      toast.success("Password updated successfully");
+      router.push("/login");
       resetPasswordModal.onClose();
-      loginModal.onOpen();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "حدث خطأ غير متوقع");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to reset password"
+      );
     } finally {
       setIsLoading(false);
     }
   };
+  console.log("Form errors", errors);
+  useEffect(() => {
+    console.log("Stored email:", storedEmail);
+  }, [storedEmail]);
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
@@ -80,6 +79,10 @@ const ResetPasswordModal = () => {
         title="Set a new password"
         subtitle="Enter new password for your email"
       />
+      <div className="text-center text-gray-600 mb-4">
+        For: <span className="font-semibold">{storedEmail}</span>
+      </div>
+
       <Input
         id="password"
         label="New Password"
