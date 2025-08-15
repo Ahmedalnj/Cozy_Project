@@ -59,8 +59,9 @@ function classNames(...arr: (string | false | null | undefined)[]) {
 type RangeKey = "7d" | "30d" | "90d" | "all";
 
 // ---------- Page ----------
-const AdminPage = ({ currentUser }: { currentUser?: SafeUser | null }) => {
+const AdminPage = () => {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<SafeUser | null>(null);
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,10 +72,14 @@ const AdminPage = ({ currentUser }: { currentUser?: SafeUser | null }) => {
 
   // Access control (role)
   useEffect(() => {
-    if (currentUser && (currentUser as any).role !== "ADMIN") {
-      router.push("/");
-    }
-  }, [currentUser, router]);
+    fetch("/api/admin/currentUser")
+      .then((res) => {
+        if (!res.ok) throw new Error("Not authorized");
+        return res.json();
+      })
+      .then((user: SafeUser) => setCurrentUser(user))
+      .catch(() => router.push("/")); // redirect if not admin
+  }, [router]);
 
   // Fetch dashboard data (useCallback -> fixes exhaustive-deps)
   const fetchDashboardData = useCallback(
@@ -195,6 +200,19 @@ const AdminPage = ({ currentUser }: { currentUser?: SafeUser | null }) => {
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#00B4D8] border-solid" />
       </div>
     );
+  }
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#00B4D8] border-solid" />
+      </div>
+    );
+  }
+
+  // Only allow admins
+  if (currentUser.role !== "ADMIN") {
+    router.push("/");
+    return null;
   }
 
   if (error) {
