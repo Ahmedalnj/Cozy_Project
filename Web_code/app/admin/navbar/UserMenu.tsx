@@ -1,6 +1,11 @@
 "use client";
 
-import { AiOutlineMenu } from "react-icons/ai";
+import {
+  AiOutlineDashboard,
+  AiOutlineHome,
+  AiOutlineLogout,
+  AiOutlineMenu,
+} from "react-icons/ai";
 
 import { useCallback, useState } from "react";
 import MenuItem from "./MenuItem";
@@ -9,6 +14,7 @@ import { signOut } from "next-auth/react";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
 import Avatar from "@/app/components/Avatar";
+import { FiKey } from "react-icons/fi";
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
@@ -98,17 +104,24 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                 <MenuItem
                   onClick={() => router.push("/properties")}
                   label="My Properties"
+                  Icon={FiKey}
                 />
                 <MenuItem
                   onClick={() => router.push("/admin/dashboard")}
                   label="My Dashboard"
+                  Icon={AiOutlineDashboard}
                 />
-                <MenuItem onClick={rentModal.onOpen} label="Cozy my home" />
+                <MenuItem
+                  onClick={rentModal.onOpen}
+                  label="Cozy my home"
+                  Icon={AiOutlineHome}
+                />
                 <hr />
                 <MenuItem
                   onClick={() => signOut()}
                   label="Logout"
                   variant="logout"
+                  Icon={AiOutlineLogout}
                 />
               </>
             )}

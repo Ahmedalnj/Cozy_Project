@@ -1,14 +1,16 @@
 "use client";
-
+import { IconType } from "react-icons";
 interface MenuItemProps {
   onClick: () => void;
   label: string;
+  Icon: IconType;
   variant?: "default" | "logout";
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
   onClick,
   label,
+  Icon,
   variant = "default",
 }) => {
   const baseClasses = `
@@ -18,6 +20,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
     font-semibold
     cursor-pointer
     rounded-md
+    flex
+        justify-between
   `;
 
   // تحديد الستايل حسب النوع
@@ -29,6 +33,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   return (
     <div onClick={onClick} className={`${baseClasses} ${variantClasses}`}>
       {label}
+      <Icon size={15} />
     </div>
   );
 };

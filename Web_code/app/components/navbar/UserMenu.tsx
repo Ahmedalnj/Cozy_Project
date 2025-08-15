@@ -10,6 +10,17 @@ import { SafeUser } from "@/app/types";
 import { signOut } from "next-auth/react";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
+import {
+  AiOutlineHome,
+  AiOutlineHeart,
+  AiOutlineCalendar,
+  AiOutlineDashboard,
+  AiOutlineLogout,
+  AiOutlineLogin,
+  AiOutlineUserAdd,
+} from "react-icons/ai";
+import { FiKey } from "react-icons/fi";
+import { PiAirplaneTiltFill } from "react-icons/pi";
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
@@ -33,43 +44,47 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   }, [currentUser, loginModal, rentModal]);
   return (
     <div className="relative">
-      <div className=" flex flex-row items-center gap-3">
+      <div className="flex flex-row items-center gap-3">
         <div
           onClick={onRent}
           className="
-            hidden
-            md:block
-            text-sm
-            font-semibold
-            py-3
-            px-4
-            rounded-full
-            hover:bg-neutral-100
-            transition
-            cursor-pointer
-            "
+      hidden
+      md:block
+      text-sm
+      font-semibold
+      py-3
+      px-4
+      rounded-full
+      hover:bg-neutral-100
+      transition
+      cursor-pointer
+    "
         >
           Cozy your home
         </div>
         <div
           onClick={toggleOpen}
           className="
-            p-4
-            md:py-1
-            md:px-2
-            border-[1px]
-            border-neutral-200
-            flex
-            flex-row    
-            items-center
-            gap-3
-            rounded-full
-            cursor-pointer
-            hover:shadow-md
-            transition
-            "
+      p-0.5
+      md:py-1
+      md:px-2
+      border-[1px]
+      border-neutral-200
+      flex
+      flex-row    
+      items-center
+      gap-3
+      rounded-full
+      cursor-pointer
+      hover:shadow-md
+      transition
+    "
         >
-          <AiOutlineMenu />
+          {/* تعديل هنا: إظهار Avatar في الهاتف وإخفاء AiOutlineMenu */}
+          <div className="md:hidden">
+            <Avatar src={currentUser?.image} />
+          </div>
+          <AiOutlineMenu className="hidden md:block" />
           <div className="hidden md:block">
             <Avatar src={currentUser?.image} />
           </div>
@@ -96,33 +111,54 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                 <MenuItem
                   onClick={() => router.push("/trips")}
                   label="My Trips"
+                  Icon={PiAirplaneTiltFill}
                 />
                 <MenuItem
                   onClick={() => router.push("/favorites")}
                   label="My Favorites"
+                  Icon={AiOutlineHeart}
                 />
                 <MenuItem
                   onClick={() => router.push("/reservations")}
                   label="My Reservations"
+                  Icon={AiOutlineCalendar}
                 />
                 <MenuItem
                   onClick={() => router.push("/properties")}
                   label="My Properties"
+                  Icon={FiKey}
                 />
                 {currentUser.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => router.push("/admin/dashboard")}
                     label="My Dashboard"
+                    Icon={AiOutlineDashboard}
                   />
                 )}
-                <MenuItem onClick={rentModal.onOpen} label="Cozy my home" />
+                <MenuItem
+                  onClick={rentModal.onOpen}
+                  label="Cozy my home"
+                  Icon={AiOutlineHome}
+                />
                 <hr />
-                <MenuItem onClick={() => signOut()} label="Logout" />
+                <MenuItem
+                  onClick={() => signOut()}
+                  label="Logout"
+                  Icon={AiOutlineLogout}
+                />
               </>
             ) : (
               <>
-                <MenuItem onClick={loginModal.onOpen} label="Login" />
-                <MenuItem onClick={registerModal.onOpen} label="Sign Up" />
+                <MenuItem
+                  onClick={loginModal.onOpen}
+                  label="Login"
+                  Icon={AiOutlineLogin}
+                />
+                <MenuItem
+                  onClick={registerModal.onOpen}
+                  label="Sign Up"
+                  Icon={AiOutlineUserAdd}
+                />
               </>
             )}
           </div>
