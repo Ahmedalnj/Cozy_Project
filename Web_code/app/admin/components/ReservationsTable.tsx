@@ -3,12 +3,13 @@
 import { SaveReservation } from "@/app/types";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
 
 interface ReservationsTableProps {
   reservations: SaveReservation[];
+  onRefresh?: () => Promise<void>;
 }
 
 type SortColumn = "listing" | "guest" | "startDate" | "endDate" | "totalPrice";
@@ -17,8 +18,16 @@ const RESERVATIONS_PER_PAGE = 10;
 
 const ReservationsTable: React.FC<ReservationsTableProps> = ({
   reservations,
+  onRefresh,
 }) => {
   const [search, setSearch] = useState("");
+
+  // Update local state when props change (dashboard refresh)
+  useEffect(() => {
+    // Reset search and pagination when data changes
+    setSearch("");
+    setCurrentPage(1);
+  }, [reservations]);
   const [sortAsc, setSortAsc] = useState(true);
   const [sortBy, setSortBy] = useState<SortColumn>("startDate");
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,9 +118,14 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
 
       axios
         .delete(`/api/reservations/${id}`)
-        .then(() => {
+        .then(async () => {
           toast.success("تم إلغاء الحجز");
-          router.refresh();
+          // Refresh dashboard data to update stats
+          if (onRefresh) {
+            await onRefresh();
+          } else {
+            router.refresh();
+          }
         })
         .catch((error) => {
           toast.error(
@@ -122,7 +136,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
           setCancelId("");
         });
     },
-    [router]
+    [router, onRefresh]
   );
 
   return (
@@ -132,10 +146,10 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
       </h2>
 
       {/* شريط البحث */}
-      <div className="flex flex-row-reverse items-center justify-between mb-4">
+      <div className="flex items-center gap-2 mb-4">
         <input
           type="text"
-          placeholder="🔍 Search by GUset or Email or Name"
+          placeholder="🔍 Search by Guest or Email or Name"
           className="border px-3 py-2 rounded-md w-full max-w-xs text-sm focus:outline-none"
           value={search}
           onChange={(e) => {
@@ -143,6 +157,19 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
             setCurrentPage(1);
           }}
         />
+        <button
+          onClick={onRefresh || (() => window.location.reload())}
+          disabled={!onRefresh}
+          className={`p-2 rounded text-white ${
+            !onRefresh
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600"
+          } transition`}
+          title="تحديث"
+          aria-label="تحديث"
+        >
+          <FiRefreshCw size={20} />
+        </button>
       </div>
 
       <div className="overflow-x-auto rounded-xl border shadow-sm">

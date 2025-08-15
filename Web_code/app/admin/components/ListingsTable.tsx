@@ -10,6 +10,7 @@ import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
 
 interface ListingsTableProps {
   listings: SafeListing[];
+  onRefresh?: () => Promise<void>;
 }
 
 type SortColumn =
@@ -21,8 +22,16 @@ type SortColumn =
 
 const LISTINGS_PER_PAGE = 10;
 
-const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
+const ListingsTable: React.FC<ListingsTableProps> = ({
+  listings,
+  onRefresh,
+}) => {
   const [localListings, setLocalListings] = useState(listings);
+
+  // Update local state when props change (dashboard refresh)
+  useEffect(() => {
+    setLocalListings(listings);
+  }, [listings]);
   const [deletingId, setDeletingId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -33,13 +42,17 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/listings");
-      if (!res.ok) throw new Error("فشل في جلب البيانات");
-      const data: SafeListing[] = await res.json();
-      setLocalListings(data);
-      setSearch("");
-      setCurrentPage(1);
-      toast.success("تم تحديث البيانات");
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        const res = await fetch("/api/admin/listings");
+        if (!res.ok) throw new Error("فشل في جلب البيانات");
+        const data: SafeListing[] = await res.json();
+        setLocalListings(data);
+        setSearch("");
+        setCurrentPage(1);
+        toast.success("تم تحديث البيانات");
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "حدث خطأ أثناء جلب البيانات"
@@ -49,22 +62,31 @@ const ListingsTable: React.FC<ListingsTableProps> = ({ listings }) => {
     }
   };
 
-  const handleDelete = useCallback((id: string) => {
-    setDeletingId(id);
+  const handleDelete = useCallback(
+    (id: string) => {
+      setDeletingId(id);
 
-    axios
-      .delete(`/api/listings/${id}`)
-      .then(() => {
-        toast.success("تم حذف العقار");
-        setLocalListings((prev) => prev.filter((listing) => listing.id !== id)); // ✅ يحدث القائمة مباشرة
-      })
-      .catch((error) => {
-        toast.error(error?.response?.data?.error || "حدث خطأ أثناء الحذف");
-      })
-      .finally(() => {
-        setDeletingId("");
-      });
-  }, []);
+      axios
+        .delete(`/api/listings/${id}`)
+        .then(async () => {
+          toast.success("تم حذف العقار");
+          setLocalListings((prev) =>
+            prev.filter((listing) => listing.id !== id)
+          );
+          // Refresh dashboard data to update stats
+          if (onRefresh) {
+            await onRefresh();
+          }
+        })
+        .catch((error) => {
+          toast.error(error?.response?.data?.error || "حدث خطأ أثناء الحذف");
+        })
+        .finally(() => {
+          setDeletingId("");
+        });
+    },
+    [onRefresh]
+  );
 
   const filteredListings = useMemo(() => {
     return localListings

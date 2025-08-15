@@ -3,7 +3,7 @@
 import { PublicUser } from "@/app/types";
 import { format } from "date-fns";
 import { updateUserRole, deleteUser } from "@/app/actions/users.actions";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
 import Avatar from "@/app/components/Avatar";
@@ -11,14 +11,20 @@ import ConfirmationModal from "@/app/components/ConfirmationModal";
 
 interface UsersTableProps {
   users: PublicUser[];
+  onRefresh?: () => Promise<void>;
 }
 
 type SortColumn = "name" | "email" | "role" | "createdAt";
 
 const USERS_PER_PAGE = 10;
 
-const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh }) => {
   const [localUsers, setLocalUsers] = useState(users);
+
+  // Update local state when props change (dashboard refresh)
+  useEffect(() => {
+    setLocalUsers(users);
+  }, [users]);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
@@ -35,13 +41,17 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/users");
-      if (!res.ok) throw new Error("فشل في جلب البيانات");
-      const data: PublicUser[] = await res.json();
-      setLocalUsers(data);
-      setSearch("");
-      setCurrentPage(1);
-      toast.success("تم تحديث البيانات");
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        const res = await fetch("/api/admin/users");
+        if (!res.ok) throw new Error("فشل في جلب البيانات");
+        const data: PublicUser[] = await res.json();
+        setLocalUsers(data);
+        setSearch("");
+        setCurrentPage(1);
+        toast.success("تم تحديث البيانات");
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "حدث خطأ أثناء جلب البيانات"
@@ -77,6 +87,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
         )
       );
       toast.success("تم تحديث الدور بنجاح");
+      // Refresh dashboard data to update stats
+      if (onRefresh) {
+        await onRefresh();
+      }
     } catch {
       toast.error("حدث خطأ أثناء تحديث الدور");
     }
@@ -91,6 +105,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
           await deleteUser(userId);
           setLocalUsers((prev) => prev.filter((user) => user.id !== userId));
           toast.success("تم حذف المستخدم بنجاح");
+          // Refresh dashboard data to update stats
+          if (onRefresh) {
+            await onRefresh();
+          }
         } catch {
           toast.error("حدث خطأ أثناء حذف المستخدم");
         }
