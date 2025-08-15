@@ -18,7 +18,7 @@ const Home = async (props: HomeProps) => {
 
   return (
     <Container>
-      <div className="pt-24">
+      <div className="pt-26 pb-8">
         <ListingSlider listings={listings} currentUser={currentUser} />
       </div>
     </Container>

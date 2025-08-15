@@ -8,11 +8,15 @@ const Logo = () => {
     <Image
       onClick={() => router.push("/")}
       alt="logo"
-      className=" hidden md:block cursor-pointer"
-      height="100"
-      width="100"
+      className="cursor-pointer transition-all duration-300"
+      height={100}
+      width={100}
       src="/images/Cozy_logo.png"
-    ></Image>
+      style={{
+        width: "clamp(40px, 10vw, 100px)",
+        height: "auto",
+      }}
+    />
   );
 };
 

@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
 import ListingCard from "./ListingCard";
 import { SafeListing, SafeUser } from "@/app/types";
@@ -29,16 +29,16 @@ export default function ListingSlider({
         {/* Navigation Buttons (left side) */}
         <div className="flex gap-2">
           <button
-            aria-label="السابق"
-            className="swiper-button-prev !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-white !p-1.5 !rounded-full !shadow-sm hover:!bg-gray-100 transition-colors flex items-center justify-center"
+            aria-label="previous"
+            className="swiper-button-prev-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 transition-colors flex items-center justify-center"
           >
-            <FiChevronRight className="w-4 h-4 text-gray-600" />
+            <HiOutlineChevronLeft className="w-4 h-4 text-black " />
           </button>
           <button
-            aria-label="التالي"
-            className="swiper-button-next !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-white !p-1.5 !rounded-full !shadow-sm hover:!bg-gray-100 transition-colors flex items-center justify-center"
+            aria-label="next"
+            className="swiper-button-next-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100  transition-colors flex items-center justify-center"
           >
-            <FiChevronLeft className="w-4 h-4 text-gray-600" />
+            <HiOutlineChevronRight className="w-4 h-4 text-black " />
           </button>
         </div>
 
@@ -49,8 +49,9 @@ export default function ListingSlider({
       <Swiper
         modules={[Navigation]}
         navigation={{
-          nextEl: ".swiper-button-next",
-          prevEl: ".swiper-button-prev",
+          nextEl: ".swiper-button-next-custom",
+          prevEl: ".swiper-button-prev-custom",
+          disabledClass: "swiper-button-disabled", // Optional: for disabled state styling
         }}
         spaceBetween={16}
         slidesPerView={1.2}

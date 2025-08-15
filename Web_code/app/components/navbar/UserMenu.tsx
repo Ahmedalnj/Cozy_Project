@@ -21,6 +21,7 @@ import {
 } from "react-icons/ai";
 import { FiKey } from "react-icons/fi";
 import { PiAirplaneTiltFill } from "react-icons/pi";
+import { TbHome } from "react-icons/tb";
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
@@ -112,6 +113,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
           <div className=" flex flex-col cursor-pointer">
             {currentUser ? (
               <>
+                <MenuItem
+                  onClick={() => handleMenuItemClick(() => router.push("/"))}
+                  label="Home"
+                  Icon={TbHome}
+                />
                 <MenuItem
                   onClick={() =>
                     handleMenuItemClick(() => router.push("/trips"))

@@ -1,7 +1,6 @@
 "use client";
 
 import { SafeListing, SafeUser, SaveReservation } from "@/app/types";
-
 import { useRouter } from "next/navigation";
 import useCountries from "@/app/hooks/useCountry";
 import { useCallback, useMemo } from "react";
@@ -19,9 +18,6 @@ interface ListingCardProps {
   actionLabel?: string;
   actionId?: string;
   currentUser?: SafeUser | null;
-  description?: string;
-
-  // الإضافة هنا:
   secondaryAction?: (id: string) => void;
   secondaryActionLabel?: string;
   secondaryActionId?: string;
@@ -35,7 +31,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionLabel,
   actionId = "",
   currentUser,
-
   secondaryAction,
   secondaryActionLabel,
   secondaryActionId = "",
@@ -44,15 +39,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const { getByValue } = useCountries();
 
   const location = getByValue(data.locationValue);
+
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-
-      if (disabled) {
-        return;
-      }
-
-      onAction?.(actionId);
+      if (!disabled) onAction?.(actionId);
     },
     [onAction, actionId, disabled]
   );
@@ -60,32 +51,20 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const handleSecondaryAction = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-
-      if (disabled) {
-        return;
-      }
-
-      secondaryAction?.(secondaryActionId);
+      if (!disabled) secondaryAction?.(secondaryActionId);
     },
     [secondaryAction, secondaryActionId, disabled]
   );
 
-  const price = useMemo(() => {
-    if (reservation) {
-      return reservation.totalPrice;
-    }
-
-    return data.price;
-  }, [reservation, data.price]);
+  const price = useMemo(
+    () => (reservation ? reservation.totalPrice : data.price),
+    [reservation, data.price]
+  );
 
   const reservationDate = useMemo(() => {
-    if (!reservation) {
-      return null;
-    }
-
+    if (!reservation) return null;
     const start = new Date(reservation.startDate);
     const end = new Date(reservation.endDate);
-
     return `${format(start, "PP")} - ${format(end, "PP")}`;
   }, [reservation]);
 
@@ -97,82 +76,72 @@ const ListingCard: React.FC<ListingCardProps> = ({
   return (
     <div
       onClick={() => router.push(`/listings/${data.id}`)}
-      className="
-            col-span-1 cursor-pointer group
-            "
+      className="col-span-1 cursor-pointer group p-2 sm:p-0"
     >
-      <div className="flex flex-col gap-2 w-full">
-        <div
-          className="
-                aspect-square
-                w-full
-                relative
-                overflow-hidden
-                rounded-lg
-                "
-        >
+      <div className="flex flex-col gap-1 sm:gap-2 xs:w-auto">
+        <div className="aspect-square w-full relative overflow-hidden rounded-lg">
           <Image
             fill
             alt="Listing"
             src={imageSrc}
-            className="
-                    object-cover
-                    h-full
-                    w-full
-                    group-hover:scale-110
-                    transition
-                    "
+            className="object-cover h-full w-full group-hover:scale-110 transition"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           />
-
-          <div className="absolute top-3 right-3">
-            <HeartButton
-              listingId={data.id}
-              currentUser={currentUser}
-              showLabel={false}
-            />
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+            <HeartButton listingId={data.id} currentUser={currentUser} />
           </div>
         </div>
+
         {reservation?.user?.name && (
-          <div className="flex items-center gap-2 font-light text-sm text-gray-600 mt-1">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mt-1">
             <span>Booked by:</span>
-            <Avatar src={reservation?.user?.image || "/images/user.png"} />
-            <span className="font-semibold">{reservation.user.name}</span>
+            <Avatar src={reservation?.user?.image} />
+            <span className="font-medium sm:font-semibold">
+              {reservation.user.name}
+            </span>
           </div>
         )}
-        <div className="font-semibold text-lg">
+
+        <div className="font-semibold text-base sm:text-lg">
           {location?.region}, {location?.label}
         </div>
 
-        <div className="font-light text-neutral-500">
+        <div className="font-light text-xs sm:text-sm text-neutral-500">
           {reservationDate || data.category}
         </div>
 
-        <div className="flex flex-row items-center gap-1">
+        <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
           <div className="font-semibold">${price}</div>
-
-          {!reservation && <div className="font-light">per night</div>}
-        </div>
-
-        <div className="flex flex-row gap-2">
-          {onAction && actionLabel && (
-            <Button
-              disabled={disabled}
-              small
-              label={actionLabel}
-              onClick={handleCancel}
-            />
-          )}
-
-          {secondaryAction && secondaryActionLabel && (
-            <Button
-              disabled={disabled}
-              small
-              outline // إضافة لتوضيح الفرق إذا تحب (اختياري)
-              label={secondaryActionLabel}
-              onClick={handleSecondaryAction}
-            />
+          {!reservation && (
+            <div className="font-light text-xs sm:text-sm">per night</div>
           )}
         </div>
+
+        {(onAction || secondaryAction) && (
+          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+            {onAction && actionLabel && (
+              <div className="w-full xs:w-auto">
+                <Button
+                  disabled={disabled}
+                  small
+                  label={actionLabel}
+                  onClick={handleCancel}
+                />
+              </div>
+            )}
+            {secondaryAction && secondaryActionLabel && (
+              <div className="w-full xs:w-auto">
+                <Button
+                  disabled={disabled}
+                  small
+                  outline
+                  label={secondaryActionLabel}
+                  onClick={handleSecondaryAction}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
