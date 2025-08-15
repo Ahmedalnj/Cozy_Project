@@ -50,7 +50,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
         <div
           onClick={toggleOpen}
           className="
-          p-4
+          p-0.5
           md:py-1
           md:px-2
           border-[1px]
@@ -74,16 +74,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       {isOpen && (
         <div
           className="
-        absolute
+        fixed sm:absolute
         rounded
         shadow-md
-        w-[40vw]
+        w-[80vw] sm:w-[40vw]
         md:w-3/4
         bg-white
         overflow-hidden
-        right-0
-        top-12
+        right-4 sm:right-0
+        top-16 sm:top-12
         text-sm
+        z-50
         "
         >
           <div className=" flex flex-col cursor-pointer">

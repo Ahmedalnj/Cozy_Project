@@ -21,7 +21,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
     cursor-pointer
     rounded-md
     flex
-        justify-between
+    justify-between
   `;
 
   // تحديد الستايل حسب النوع

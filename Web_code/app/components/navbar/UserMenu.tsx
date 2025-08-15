@@ -35,6 +35,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     setIsOpen((value) => !value);
   }, []);
 
+  const handleMenuItemClick = useCallback((callback: () => void) => {
+    setIsOpen(false);
+    callback();
+  }, []);
+
   const onRent = useCallback(() => {
     if (!currentUser) {
       return loginModal.onOpen();
@@ -80,7 +85,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       transition
     "
         >
-          {/* تعديل هنا: إظهار Avatar في الهاتف وإخفاء AiOutlineMenu */}
           <div className="md:hidden">
             <Avatar src={currentUser?.image} />
           </div>
@@ -109,40 +113,50 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
             {currentUser ? (
               <>
                 <MenuItem
-                  onClick={() => router.push("/trips")}
+                  onClick={() =>
+                    handleMenuItemClick(() => router.push("/trips"))
+                  }
                   label="My Trips"
                   Icon={PiAirplaneTiltFill}
                 />
                 <MenuItem
-                  onClick={() => router.push("/favorites")}
+                  onClick={() =>
+                    handleMenuItemClick(() => router.push("/favorites"))
+                  }
                   label="My Favorites"
                   Icon={AiOutlineHeart}
                 />
                 <MenuItem
-                  onClick={() => router.push("/reservations")}
+                  onClick={() =>
+                    handleMenuItemClick(() => router.push("/reservations"))
+                  }
                   label="My Reservations"
                   Icon={AiOutlineCalendar}
                 />
                 <MenuItem
-                  onClick={() => router.push("/properties")}
+                  onClick={() =>
+                    handleMenuItemClick(() => router.push("/properties"))
+                  }
                   label="My Properties"
                   Icon={FiKey}
                 />
                 {currentUser.role === "ADMIN" && (
                   <MenuItem
-                    onClick={() => router.push("/admin/dashboard")}
+                    onClick={() =>
+                      handleMenuItemClick(() => router.push("/admin/dashboard"))
+                    }
                     label="My Dashboard"
                     Icon={AiOutlineDashboard}
                   />
                 )}
                 <MenuItem
-                  onClick={rentModal.onOpen}
+                  onClick={() => handleMenuItemClick(rentModal.onOpen)}
                   label="Cozy my home"
                   Icon={AiOutlineHome}
                 />
                 <hr />
                 <MenuItem
-                  onClick={() => signOut()}
+                  onClick={() => handleMenuItemClick(() => signOut())}
                   label="Logout"
                   Icon={AiOutlineLogout}
                 />
@@ -150,12 +164,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
             ) : (
               <>
                 <MenuItem
-                  onClick={loginModal.onOpen}
+                  onClick={() => handleMenuItemClick(loginModal.onOpen)}
                   label="Login"
                   Icon={AiOutlineLogin}
                 />
                 <MenuItem
-                  onClick={registerModal.onOpen}
+                  onClick={() => handleMenuItemClick(registerModal.onOpen)}
                   label="Sign Up"
                   Icon={AiOutlineUserAdd}
                 />

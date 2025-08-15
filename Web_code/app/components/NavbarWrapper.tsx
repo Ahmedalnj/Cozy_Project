@@ -26,7 +26,7 @@ export default function LayoutController({
       ) : (
         <Navbar currentUser={currentUser} />
       )}
-      <div className="pt-16">
+      <div className="pb-15 pt-12">
         {isAdminPage ? (
           <div>{children}</div>
         ) : (
