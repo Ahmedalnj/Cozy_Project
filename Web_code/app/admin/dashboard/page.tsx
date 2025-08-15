@@ -33,13 +33,11 @@ interface DashboardData {
   };
 }
 
-type RangeKey = "7d" | "30d" | "90d" | "all";
-
 // ---------- Helpers ----------
 function isWithinRange(dateStr: string | Date, range: RangeKey) {
   if (range === "all") return true;
   const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return true;
+  if (Number.isNaN(d.getTime())) return true; // if unknown, don't filter out
   const now = new Date();
   const ms = { "7d": 7, "30d": 30, "90d": 90 }[range] * 24 * 60 * 60 * 1000;
   return now.getTime() - d.getTime() <= ms;
@@ -58,10 +56,11 @@ function classNames(...arr: (string | false | null | undefined)[]) {
   return arr.filter(Boolean).join(" ");
 }
 
+type RangeKey = "7d" | "30d" | "90d" | "all";
+
 // ---------- Page ----------
-const AdminPage = () => {
+const AdminPage = ({ currentUser }: { currentUser?: SafeUser | null }) => {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<SafeUser | null>(null);
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,25 +69,14 @@ const AdminPage = () => {
   const [query, setQuery] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
 
-  // Fetch current user
+  // Access control (role)
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/auth/currentUser");
-        if (!res.ok) throw new Error("Failed to fetch user");
-        const user: SafeUser = await res.json();
-        setCurrentUser(user);
+    if (currentUser && (currentUser as any).role !== "ADMIN") {
+      router.push("/");
+    }
+  }, [currentUser, router]);
 
-        if (user.role !== "ADMIN") {
-          router.push("/");
-        }
-      } catch {
-        router.push("/");
-      }
-    };
-    fetchUser();
-  }, [router]);
-
+  // Fetch dashboard data (useCallback -> fixes exhaustive-deps)
   const fetchDashboardData = useCallback(
     async (isRefresh = false) => {
       try {
@@ -115,11 +103,12 @@ const AdminPage = () => {
     [router]
   );
 
+  // Initial load
   useEffect(() => {
-    if (!currentUser) return;
     fetchDashboardData();
-  }, [fetchDashboardData, currentUser]);
+  }, [fetchDashboardData]);
 
+  // Optional auto refresh
   useEffect(() => {
     if (!autoRefresh) return;
     const id = setInterval(() => fetchDashboardData(true), 30000);
@@ -200,7 +189,7 @@ const AdminPage = () => {
   }, [filtered]);
 
   // -------------- UI --------------
-  if (!currentUser || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#00B4D8] border-solid" />
