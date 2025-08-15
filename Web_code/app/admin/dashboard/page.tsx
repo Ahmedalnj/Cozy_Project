@@ -370,7 +370,12 @@ const AdminPage = ({ currentUser }: { currentUser?: SafeUser | null }) => {
                       "Revenue",
                     ]}
                   />
-                  <Bar dataKey="revenue" />
+                  <Bar
+                    dataKey="revenue"
+                    fill="#00B4D8"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
