@@ -14,6 +14,9 @@ import toast from "react-hot-toast";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
 import useCountries from "@/app/hooks/useCountry";
+import { offers as allOffers } from "@/app/components/offers";
+import { IconType } from "react-icons";
+import ListingMap from "@/app/components/listings/ListingMap";
 
 const initialDateRange: Range = {
   startDate: new Date(),
@@ -142,16 +145,28 @@ const ListingClient: React.FC<ListingClientProps> = ({
     ? listing.imageSrc
     : [listing.imageSrc];
 
+  const listingOffers = useMemo(() => {
+    if (!listing.offers || listing.offers.length === 0) return [];
+
+    return listing.offers
+      .map((label) => allOffers.find((o) => o.label === label))
+      .filter(Boolean) as {
+      icon: IconType;
+      label: string;
+      description: string;
+    }[];
+  }, [listing.offers]);
+
   return (
     <Container>
-      <div className="max-w-screen-lg mx-auto">
+      <div className="xl:px-35 max-w-screen-2xl mx-auto">
         <div className="flex flex-col gap-6">
           <ListingHead
             title={listing.title}
             imageSrc={images}
-            locationValue={listing.locationValue}
             id={listing.id}
             currentUser={currentUser}
+            showLabel={false}
           />
           <div className="grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6">
             <ListingInfo
@@ -161,7 +176,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               roomCount={listing.roomCount}
               guestCount={listing.guestCount}
               bathroomCount={listing.bathroomCount}
-              locationValue={listing.locationValue}
+              offers={listingOffers}
             />
             <div className="order-first mb-10 md:order-last md:col-span-3">
               <ListingReservation
@@ -184,6 +199,12 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 </div>
               )}
             </div>
+          </div>
+          <div>
+            <ListingMap
+              locationValue={listing.locationValue}
+              locationLabel={location?.label || ""}
+            />
           </div>
         </div>
       </div>

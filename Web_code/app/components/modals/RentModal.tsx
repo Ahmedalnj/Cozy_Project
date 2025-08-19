@@ -16,14 +16,16 @@ import toast from "react-hot-toast";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
+import { offers } from "../offers";
 
 enum STEPS {
   CATEGORY = 0,
-  LOCATION = 1,
-  INFO = 2,
-  IMAGE = 3,
-  DESCRIPTION = 4,
-  PRICE = 5,
+  OFFERS = 1,
+  LOCATION = 2,
+  INFO = 3,
+  IMAGE = 4,
+  DESCRIPTION = 5,
+  PRICE = 6,
 }
 
 const RentModal = () => {
@@ -46,6 +48,7 @@ const RentModal = () => {
   } = useForm<FieldValues>({
     defaultValues: {
       category: "",
+      offers: [],
       location: null,
       guestCount: 1,
       roomCount: 1,
@@ -59,6 +62,7 @@ const RentModal = () => {
 
   const category = watch("category");
   const location = watch("location");
+  const Offers = watch("offers");
 
   // مزامنة الصور المحلية مع form state
   useEffect(() => {
@@ -106,6 +110,20 @@ const RentModal = () => {
   const onNext = () => {
     if (step === STEPS.CATEGORY && !category) {
       toast.error("Category is required");
+      return;
+    }
+    if (step === STEPS.OFFERS && Offers.length === 0) {
+      toast("Select at least 1 offer!", {
+        icon: "ℹ️",
+        style: {
+          backgroundColor: "#fff",
+          color: "#007bff",
+          padding: "10px",
+          borderRadius: "8px",
+        },
+        duration: 4000,
+        position: "top-center",
+      });
       return;
     }
     if (step === STEPS.IMAGE && localImages.length === 0) {
@@ -181,7 +199,39 @@ const RentModal = () => {
       </div>
     </div>
   );
-
+  if (step === STEPS.OFFERS) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading
+          title="Which of these best describes your place?"
+          subtitle="Pick a category"
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+          {offers.map((item) => (
+            <CategoryInput
+              key={item.label}
+              onClick={(label) => {
+                const selected = Offers;
+                if (selected.includes(label)) {
+                  // remove from list
+                  setCustomValue(
+                    "offers",
+                    selected.filter((o: string) => o !== label)
+                  );
+                } else {
+                  // add to list
+                  setCustomValue("offers", [...selected, label]);
+                }
+              }}
+              selected={Offers.includes(item.label)}
+              label={item.label}
+              icon={item.icon}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (step === STEPS.LOCATION) {
     bodyContent = (
       <div className="flex flex-col gap-8">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 // import Navbar from "./components/navbar/navbar";
 import RegisterModal from "./components/modals/RegisterModal";
@@ -14,9 +14,7 @@ import PolicyModal from "./components/modals/PolicyModal";
 import NavbarWrapper from "./components/NavbarWrapper";
 import ForgotPasswordModal from "./components/modals/ForgotPasswordModal";
 import ResetPasswordModal from "./components/modals/ResetPasswordModal";
-const font = Nunito({
-  subsets: ["latin"],
-});
+const font = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Cozy",

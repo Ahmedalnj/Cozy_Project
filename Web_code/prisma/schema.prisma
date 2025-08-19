@@ -15,12 +15,12 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
-  resetCode      String?
-  codeExpiresAt  DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   favoriteIds    String[]      @db.Uuid
   role           String?       @default("USER")
+  codeExpiresAt  DateTime?
+  resetCode      String?
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
@@ -48,15 +48,16 @@ model Listing {
   id            String        @id @default(uuid()) @map("_id") @db.Uuid
   title         String
   description   String
-  imageSrc      String[]      @db.Text
   createdAt     DateTime      @default(now())
   category      String
+  offers        String[]      @db.Text
   roomCount     Int
   bathroomCount Int
   guestCount    Int
   locationValue String
   price         Int
   userId        String        @map("user_id") @db.Uuid
+  imageSrc      String[]
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations  Reservation[]
 }

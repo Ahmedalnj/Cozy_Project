@@ -88,7 +88,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           />
           <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-            <HeartButton listingId={data.id} currentUser={currentUser} />
+            <HeartButton
+              listingId={data.id}
+              currentUser={currentUser}
+              showLabel={false}
+            />
           </div>
         </div>
 

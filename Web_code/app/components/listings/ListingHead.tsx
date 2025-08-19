@@ -11,18 +11,20 @@ import "yet-another-react-lightbox/styles.css";
 
 interface ListingHeadProps {
   title: string;
-  locationValue: string;
+  locationValue?: string;
   imageSrc: string[];
   id: string;
   currentUser?: SafeUser | null;
+  showLabel?: boolean;
 }
 
 const ListingHead: React.FC<ListingHeadProps> = ({
   title,
-  locationValue,
+  locationValue = "",
   imageSrc,
   id,
   currentUser,
+  showLabel = true,
 }) => {
   const { getByValue } = useCountries();
   const location = getByValue(locationValue);
@@ -103,13 +105,12 @@ const ListingHead: React.FC<ListingHeadProps> = ({
       </div>
     );
   };
-
   return (
     <>
-      <div className="mt-1 flex items-start justify-between">
+      <div className="flex items-start justify-between">
         <Heading
           title={title}
-          subtitle={`${location?.region}, ${location?.label}`}
+          subtitle={showLabel ? `${location?.region}, ${location?.label}` : ""}
         />
         <HeartButton
           listingId={id}

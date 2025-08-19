@@ -1,16 +1,10 @@
 "use client";
 
-import useCountries from "@/app/hooks/useCountry";
 import { SafeUser } from "@/app/types";
 import { IconType } from "react-icons";
 import Avatar from "../Avatar";
-import ListingCategory from "./ListingCategory";
-import dynamic from "next/dynamic";
+import { ListingCategory, ListingOffer } from "./ListingCategory";
 import { FaUser, FaBed, FaBath } from "react-icons/fa";
-
-const Map = dynamic(() => import("../Map"), {
-  ssr: false,
-});
 
 interface ListingInfoProps {
   user: SafeUser;
@@ -23,7 +17,11 @@ interface ListingInfoProps {
     label: string;
     description: string;
   };
-  locationValue: string;
+  offers?: {
+    icon: IconType;
+    label: string;
+    description: string;
+  }[];
 }
 
 const ListingInfo: React.FC<ListingInfoProps> = ({
@@ -33,11 +31,8 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   roomCount,
   bathroomCount,
   category,
-  locationValue,
+  offers,
 }) => {
-  const { getByValue } = useCountries();
-  const coordination = getByValue(locationValue)?.latlng;
-
   return (
     <div className="col-span-4 flex flex-col gap-6 md:gap-8">
       {/* معلومات المضيف */}
@@ -83,6 +78,9 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
           description={category.description}
         />
       )}
+      <hr className="my-2 md:my-4" />
+      {/* العروض */}
+      {offers && offers.length > 0 && <ListingOffer offers={offers} />}
 
       {/* الوصف */}
       <div className="space-y-2">
@@ -93,11 +91,6 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       </div>
 
       <hr className="my-2 md:my-4" />
-
-      {/* الخريطة */}
-      <div className="hover:shadow-md transition-shadow duration-300 rounded-xl overflow-hidden">
-        <Map center={coordination} />
-      </div>
     </div>
   );
 };
