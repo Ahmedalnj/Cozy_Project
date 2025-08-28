@@ -45,8 +45,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
   showPaidStatus = false,
   showCashPendingStatus = false,
   showRejectedStatus = false,
-  showPendingStatus = false,
-  pendingMessage = "",
   isHostView = false,
 }) => {
   const router = useRouter();
@@ -157,26 +155,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
-        {/* Pending Status */}
-        {showPendingStatus && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-2">
-            <div className="text-xs sm:text-sm text-blue-800 font-semibold">
-              ⚙️ {t("reservation_pending")}
-            </div>
-            <div className="text-xs text-blue-700 mt-1">
-              {pendingMessage || t("reservation_pending_note")}
-            </div>
-          </div>
-        )}
-
-        <div className="font-semibold text-base sm:text-lg">
+        <div className="font-semibold sm:font-bold text-sm sm:text-base">
           {reservationDate ||
             t(`categories.${data.category}.label`).slice(0, -1)}{" "}
           In {""}
           {location?.label}
         </div>
-
-        <div className="font-light text-xs sm:text-sm text-neutral-500"></div>
 
         <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
           <div className="font-semibold">${price}</div>

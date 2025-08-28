@@ -86,13 +86,6 @@ export async function POST(req: Request) {
     // ✅ إنشاء الحجز والدفع النقدي في نفس المعاملة
     console.log("Creating cash reservation and payment");
 
-    // توليد رقم الحجز المكون من 8 أرقام
-    const generateReservationCode = (): string => {
-      return Math.floor(10000000 + Math.random() * 90000000).toString();
-    };
-
-    const reservationCode = generateReservationCode();
-
     const result = await prisma.$transaction(async (tx) => {
       // إنشاء الحجز
       const reservation = await tx.reservation.create({
@@ -105,7 +98,6 @@ export async function POST(req: Request) {
           SessionId: `cash_${Date.now()}_${Math.random()
             .toString(36)
             .substr(2, 9)}`, // إنشاء session ID فريد للحجز النقدي
-          reservationCode: reservationCode, // إضافة رقم الحجز
         },
       });
 
@@ -127,7 +119,7 @@ export async function POST(req: Request) {
         },
       });
 
-      return { reservation, payment, reservationCode };
+      return { reservation, payment };
     });
 
     // ✅ جلب بيانات المستخدم والعقار لإرسال البريد الإلكتروني

@@ -5,6 +5,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "@/locales/locales/en/common.json";
 import ar from "@/locales/locales/ar/common.json";
+import Loader from "@/app/components/Loader";
 
 interface I18nProviderProps {
   children: React.ReactNode;
@@ -61,7 +62,7 @@ export default function I18nProvider({ children }: I18nProviderProps) {
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading translations...</div>
+        <Loader />
       </div>
     );
   }
