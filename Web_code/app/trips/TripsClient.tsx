@@ -60,7 +60,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
         {reservations.map((reservation) => {
           // Determine payment type and status
           const isCashPayment = reservation.payment?.paymentMethod === "cash";
-          const isPaid = reservation.payment?.status === "SUCCESS";
+          const isPaid = reservation.payment?.status === "PAID";
           
           // For cash payments, show pending status until host accepts
           if (isCashPayment && !isPaid) {

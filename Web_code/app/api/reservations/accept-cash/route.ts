@@ -58,11 +58,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // Update the payment status to SUCCESS
+    // Update the payment status to PAID
     const updatedPayment = await prisma.payment.update({
       where: { id: existingPayment.id },
       data: {
-        status: "SUCCESS",
+        status: "PAID",
       },
     });
 

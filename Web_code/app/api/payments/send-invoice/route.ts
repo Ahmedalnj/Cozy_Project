@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
             <div class="row">
               <span class="label">حالة الدفع:</span>
               <span class="value" style="color: #059669;">${
-                payment.status === "SUCCESS" ? "مكتمل" : payment.status
+                payment.status === "PAID" ? "مكتمل" : payment.status
               }</span>
             </div>
           </div>
