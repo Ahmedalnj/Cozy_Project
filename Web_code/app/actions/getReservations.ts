@@ -65,7 +65,6 @@ export default async function getReservations(params: IParams) {
     // تحويل التواريخ إلى string
     const safeReservation = reservations.map((reservation) => ({
       ...reservation,
-      status: reservation.status, // <== حالة الحجز
       createdAt: reservation.createdAt.toISOString(),
       startDate: reservation.startDate.toISOString(),
       endDate: reservation.endDate.toISOString(),

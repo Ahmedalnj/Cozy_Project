@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
 import { useTranslation } from "react-i18next";
 import RejectionModal from "../components/modals/RejectionModal";
+import ConfirmAcceptModal from "../components/modals/ConfirmAcceptModal";
 
 interface ReservationsClientProps {
   reservations: SaveReservation[];
@@ -26,7 +27,15 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
   const [acceptingCashId, setAcceptingCashId] = useState("");
   const [rejectingId, setRejectingId] = useState("");
   const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
+  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [selectedReservationId, setSelectedReservationId] = useState("");
+  const [selectedReservationData, setSelectedReservationData] = useState<{
+    guestName: string;
+    listingTitle: string;
+    totalPrice: number;
+    startDate: string;
+    endDate: string;
+  } | undefined>(undefined);
 
   const onCancel = useCallback(
     (id: string) => {
@@ -50,23 +59,42 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
 
   const onAcceptCash = useCallback(
     (id: string) => {
-      setAcceptingCashId(id);
-
-      axios
-        .post("/api/reservations/accept-cash", { reservationId: id })
-        .then(() => {
-          toast.success(t("cash_payment_accepted"));
-          router.refresh();
-        })
-        .catch((error) => {
-          toast.error(error?.response?.data?.error);
-        })
-        .finally(() => {
-          setAcceptingCashId("");
+      // Find the reservation data
+      const reservation = reservations.find(r => r.id === id);
+      if (reservation) {
+        setSelectedReservationData({
+          guestName: reservation.user?.name || "Guest",
+          listingTitle: reservation.listing?.title || "Property",
+          totalPrice: reservation.totalPrice,
+          startDate: new Date(reservation.startDate).toLocaleDateString(),
+          endDate: new Date(reservation.endDate).toLocaleDateString(),
         });
+        setSelectedReservationId(id);
+        setIsAcceptModalOpen(true);
+      }
     },
-    [router]
+    [reservations]
   );
+
+  const handleAcceptConfirm = useCallback(() => {
+    setAcceptingCashId(selectedReservationId);
+
+    axios
+      .post("/api/reservations/accept-cash", { reservationId: selectedReservationId })
+      .then(() => {
+        toast.success(t("cash_payment_accepted"));
+        setIsAcceptModalOpen(false);
+        setSelectedReservationId("");
+        setSelectedReservationData(undefined);
+        router.refresh();
+      })
+      .catch((error) => {
+        toast.error(error?.response?.data?.error);
+      })
+      .finally(() => {
+        setAcceptingCashId("");
+      });
+  }, [router, t, selectedReservationId]);
 
   const onRejectReservation = useCallback(
     (id: string) => {
@@ -122,7 +150,7 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
           const isCashPayment = reservation.payment?.paymentMethod === "cash";
           const isPaid = reservation.payment?.status === "SUCCESS";
           
-          // For cash payments that are not yet paid, show accept cash button
+          // For cash payments that are not yet paid, show review button
           if (isCashPayment && !isPaid) {
             return (
               <ListingCard
@@ -132,13 +160,15 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
                 actionId={reservation.id}
                 onAction={onAcceptCash}
                 disabled={acceptingCashId === reservation.id}
-                actionLabel={acceptingCashId === reservation.id ? t("accepting_cash") : t("accept_cash_on_arrival")}
+                actionLabel={acceptingCashId === reservation.id ? t("reviewing") : t("review")}
                 currentUser={currentUser}
                 secondaryAction={onRejectReservation}
                 secondaryActionId={reservation.id}
                 secondaryActionLabel={rejectingId === reservation.id ? t("rejecting_reservation") : t("reject_reservation")}
                 showGuestDetails={true}
                 isHostView={true}
+                showPendingStatus={true}
+                pendingMessage={t("reservation_pending_review")}
               />
             );
           }
@@ -180,17 +210,30 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
       </div>
 
       {/* Rejection Modal */}
-      <RejectionModal
-        isOpen={isRejectionModalOpen}
-        onClose={() => {
-          setIsRejectionModalOpen(false);
-          setSelectedReservationId("");
-        }}
-        onConfirm={handleRejectionConfirm}
-        isLoading={rejectingId === selectedReservationId}
-      />
-    </Container>
-  );
+              <RejectionModal
+          isOpen={isRejectionModalOpen}
+          onClose={() => {
+            setIsRejectionModalOpen(false);
+            setSelectedReservationId("");
+          }}
+          onConfirm={handleRejectionConfirm}
+          isLoading={rejectingId === selectedReservationId}
+        />
+
+        {/* Confirm Accept Modal */}
+        <ConfirmAcceptModal
+          isOpen={isAcceptModalOpen}
+          onClose={() => {
+            setIsAcceptModalOpen(false);
+            setSelectedReservationId("");
+            setSelectedReservationData(undefined);
+          }}
+          onConfirm={handleAcceptConfirm}
+          reservationData={selectedReservationData}
+          isLoading={acceptingCashId === selectedReservationId}
+        />
+      </Container>
+    );
 };
 
 export default ReservationsClient;

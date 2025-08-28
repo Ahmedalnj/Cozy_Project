@@ -26,6 +26,8 @@ interface ListingCardProps {
   showPaidStatus?: boolean;
   showCashPendingStatus?: boolean;
   showRejectedStatus?: boolean;
+  showPendingStatus?: boolean;
+  pendingMessage?: string;
   isHostView?: boolean;
 }
 
@@ -40,10 +42,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
   secondaryAction,
   secondaryActionLabel,
   secondaryActionId = "",
-  showGuestDetails = false,
   showPaidStatus = false,
   showCashPendingStatus = false,
   showRejectedStatus = false,
+  showPendingStatus = false,
+  pendingMessage = "",
   isHostView = false,
 }) => {
   const router = useRouter();
@@ -119,21 +122,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
-        {/* Guest Details for Host View */}
-        {showGuestDetails && reservation?.user && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-2">
-            <div className="text-xs sm:text-sm text-blue-800">
-              <div className="font-semibold mb-1">{t("guest_details")}</div>
-              <div className="space-y-1">
-                <div>
-                  <span className="font-medium">{t("email")}:</span>{" "}
-                  {reservation.user.email}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Payment Status */}
         {showPaidStatus && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-2 mt-2">
@@ -165,6 +153,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
               {isHostView
                 ? t("reservation_rejected_host_note")
                 : t("reservation_rejected_note")}
+            </div>
+          </div>
+        )}
+
+        {/* Pending Status */}
+        {showPendingStatus && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-2">
+            <div className="text-xs sm:text-sm text-blue-800 font-semibold">
+              ⚙️ {t("reservation_pending")}
+            </div>
+            <div className="text-xs text-blue-700 mt-1">
+              {pendingMessage || t("reservation_pending_note")}
             </div>
           </div>
         )}

@@ -152,7 +152,6 @@ export async function POST(req: Request) {
       endDate: endDate,
       totalPrice: price,
       reservationId: result.reservation.id,
-      reservationCode: result.reservationCode, // إضافة رقم الحجز
     });
 
     return NextResponse.json({

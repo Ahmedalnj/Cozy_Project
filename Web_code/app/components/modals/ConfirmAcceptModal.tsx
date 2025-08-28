@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Modal from "./modal";
 import { useTranslation } from "react-i18next";
-import {
-  FaCheckCircle,
-  FaMoneyBillWave,
-  FaUser,
-  FaShieldAlt,
-} from "react-icons/fa";
+import { FaCheckCircle, FaMoneyBillWave, FaUser } from "react-icons/fa";
 
 interface ConfirmAcceptModalProps {
   isOpen: boolean;
@@ -21,7 +15,6 @@ interface ConfirmAcceptModalProps {
     totalPrice: number;
     startDate: string;
     endDate: string;
-    reservationCode: string; // رقم الحجز المكون من 8 أرقام
   };
 }
 
@@ -33,30 +26,12 @@ const ConfirmAcceptModal: React.FC<ConfirmAcceptModalProps> = ({
   reservationData,
 }) => {
   const { t } = useTranslation("common");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [isVerified, setIsVerified] = useState(false);
-  const [verificationError, setVerificationError] = useState("");
-
-  const handleVerify = () => {
-    if (verificationCode === reservationData?.reservationCode) {
-      setIsVerified(true);
-      setVerificationError("");
-    } else {
-      setIsVerified(false);
-      setVerificationError(t("invalid_reservation_code"));
-    }
-  };
 
   const handleConfirm = () => {
-    if (isVerified) {
-      onConfirm();
-    }
+    onConfirm();
   };
 
   const handleClose = () => {
-    setVerificationCode("");
-    setIsVerified(false);
-    setVerificationError("");
     onClose();
   };
 
@@ -104,82 +79,6 @@ const ConfirmAcceptModal: React.FC<ConfirmAcceptModalProps> = ({
         </div>
       )}
 
-      {/* Verification Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <FaShieldAlt className="text-blue-600" />
-          <h4 className="font-medium text-blue-900">
-            {t("verification_required")}
-          </h4>
-        </div>
-
-        <p className="text-sm text-blue-800 mb-3">
-          {t("verification_description")}
-        </p>
-
-        <div className="space-y-3">
-          {/* Reservation Code Display */}
-          <div className="bg-white rounded-lg p-3 border border-blue-300">
-            <div className="text-xs text-blue-600 mb-1">
-              {t("reservation_code")}
-            </div>
-            <div className="text-lg font-mono font-bold text-blue-900 tracking-wider">
-              {reservationData?.reservationCode}
-            </div>
-          </div>
-
-          {/* Verification Input */}
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={verificationCode}
-                onChange={(e) => {
-                  setVerificationCode(
-                    e.target.value.replace(/\D/g, "").slice(0, 8)
-                  );
-                  setIsVerified(false);
-                  setVerificationError("");
-                }}
-                placeholder={t("enter_reservation_code")}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  isVerified
-                    ? "border-green-300 bg-green-50"
-                    : verificationError
-                    ? "border-red-300 bg-red-50"
-                    : "border-gray-300"
-                }`}
-                maxLength={8}
-                disabled={isVerified}
-              />
-              {verificationError && (
-                <p className="text-xs text-red-600 mt-1">{verificationError}</p>
-              )}
-            </div>
-            <button
-              onClick={handleVerify}
-              disabled={verificationCode.length !== 8 || isVerified}
-              className={`px-4 py-2 rounded-md text-sm font-medium ${
-                verificationCode.length === 8 && !isVerified
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              {isVerified ? t("verified") : t("verify")}
-            </button>
-          </div>
-
-          {isVerified && (
-            <div className="flex items-center gap-2 text-green-700 bg-green-50 p-2 rounded-md">
-              <FaCheckCircle className="text-green-600" />
-              <span className="text-sm font-medium">
-                {t("verification_successful")}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Warning Note */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <div className="flex">
@@ -217,7 +116,7 @@ const ConfirmAcceptModal: React.FC<ConfirmAcceptModalProps> = ({
       secondaryActionLabel={t("cancel")}
       secondaryAction={handleClose}
       isLoading={isLoading}
-      disabled={isLoading || !isVerified}
+      disabled={isLoading}
     />
   );
 };

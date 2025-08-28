@@ -302,5 +302,15 @@
       "label": "مكاتب",
       "description": "مكاتب إدارية للإيجار"
     }
-  }
+  },
+  "payment_confirmed": "تم تأكيد الدفع",
+  "confirm_accept_reservation": "تأكيد قبول الحجز",
+  "confirm_accept_description": "يرجى مراجعة تفاصيل الحجز قبل القبول",
+  "guest": "الضيف",
+  "property": "العقار",
+  "dates": "التواريخ",
+  "cash_payment": "الدفع النقدي",
+  "important_note": "ملاحظة مهمة",
+  "accept_cash_note": "بقبول هذا الحجز، تؤكد أن الضيف سيدفع نقداً عند الوصول",
+  "accept_reservation": "قبول الحجز"
 }

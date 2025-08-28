@@ -370,5 +370,15 @@
       "label": "Offices",
       "description": "Administrative offices for rent"
     }
-  }
+  },
+  "payment_confirmed": "Payment Confirmed",
+  "confirm_accept_reservation": "Confirm Accept Reservation",
+  "confirm_accept_description": "Please review the reservation details before accepting",
+  "guest": "Guest",
+  "property": "Property",
+  "dates": "Dates",
+  "cash_payment": "Cash Payment",
+  "important_note": "Important Note",
+  "accept_cash_note": "By accepting this reservation, you confirm that the guest will pay in cash upon arrival",
+  "accept_reservation": "Accept Reservation"
 }

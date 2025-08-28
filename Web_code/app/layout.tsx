@@ -32,8 +32,8 @@ export default async function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <body className={font.className}>
-        <ClientOnly>
-          <I18NProvider>
+        <I18NProvider>
+          <ClientOnly>
             <ToasterProvider />
             <SearchModal />
             <LoginModal />
@@ -44,8 +44,8 @@ export default async function RootLayout({
             <ForgotPasswordModal />
             <ResetPasswordModal />
             <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
-          </I18NProvider>
-        </ClientOnly>
+          </ClientOnly>
+        </I18NProvider>
       </body>
     </html>
   );
