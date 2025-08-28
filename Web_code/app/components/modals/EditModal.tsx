@@ -18,6 +18,7 @@ import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
 import { SafeListing } from "@/app/types";
 import countries from "world-countries";
+import { useTranslation } from "react-i18next";
 
 enum STEPS {
   CATEGORY = 0,
@@ -32,6 +33,9 @@ const EditModal = () => {
   const router = useRouter();
   const editModal = useEditModal();
   const listing = editModal.listingData as SafeListing | null;
+
+  const { t } = useTranslation("common");
+
   // State محلي لإدارة الصور
   const [localImages, setLocalImages] = useState<string[]>([]);
   const [step, setStep] = useState(STEPS.CATEGORY);
@@ -132,15 +136,15 @@ const EditModal = () => {
 
   const onNext = () => {
     if (step === STEPS.CATEGORY && !category) {
-      toast.error("Category is required");
+      toast.error(t("category_required"));
       return;
     }
     if (step === STEPS.IMAGE && localImages.length === 0) {
-      toast.error("Image is required");
+      toast.error(t("image_required"));
       return;
     }
     if (step === STEPS.LOCATION && !location) {
-      toast.error("Location is required");
+      toast.error(t("location_required"));
       return;
     }
     setStep((value) => value + 1);
@@ -156,7 +160,7 @@ const EditModal = () => {
     axios
       .put(`/api/listings/${listing?.id}`, data)
       .then(() => {
-        toast.success("Listing updated successfully");
+        toast.success(t("listing_updated"));
         router.refresh();
         reset();
         setLocalImages([]);
@@ -164,7 +168,7 @@ const EditModal = () => {
         editModal.onClose();
       })
       .catch(() => {
-        toast.error("Something went wrong.");
+        toast.error(t("something_went_wrong"));
       })
       .finally(() => {
         setIsLoading(false);
@@ -173,23 +177,23 @@ const EditModal = () => {
 
   const actionLabel = useMemo(() => {
     if (step === STEPS.PRICE) {
-      return "Update";
+      return t("update");
     }
-    return "Next";
-  }, [step]);
+    return "";
+  }, [step, t]);
 
   const secondaryActionLabel = useMemo(() => {
     if (step === STEPS.CATEGORY) {
       return undefined;
     }
-    return "Back";
-  }, [step]);
+    return t("next");
+  }, [step, t]);
 
   let bodyContent = (
     <div className="flex flex-col gap-8">
       <Heading
-        title="Which of these best describes your place?"
-        subtitle="Pick a category"
+        title={t("which_best_describes")}
+        subtitle={t("pick_category")}
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
         {categories.map((item) => (
@@ -210,8 +214,8 @@ const EditModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="Where is your place located?"
-          subtitle="Help guests find you!"
+          title={t("where_place_located")}
+          subtitle={t("help_guests_find")}
         />
         <CountrySelect
           value={location}
@@ -226,26 +230,26 @@ const EditModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="Share some basic about your place"
-          subtitle="What amenities do you have?"
+          title={t("share_basic_about")}
+          subtitle={t("what_amenities")}
         />
         <Counter
-          title="Guests"
-          subtitle="How many guests do you allow?"
+          title={t("guests")}
+          subtitle={t("how_many_guests_allow")}
           value={guestCount}
           onChange={(value) => setCustomValue("guestCount", value)}
         />
         <hr />
         <Counter
-          title="Rooms"
-          subtitle="How many Rooms do you have?"
+          title={t("bedrooms")}
+          subtitle={t("how_many_rooms")}
           value={roomCount}
           onChange={(value) => setCustomValue("roomCount", value)}
         />
         <hr />
         <Counter
-          title="BathRooms"
-          subtitle="How many BathRooms do you have?"
+          title={t("bathrooms")}
+          subtitle={t("how_many_bathrooms")}
           value={bathroomCount}
           onChange={(value) => setCustomValue("bathroomCount", value)}
         />
@@ -257,8 +261,8 @@ const EditModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="Add a photo of your place"
-          subtitle="Show guests what your place looks like"
+          title={t("add_photo_place")}
+          subtitle={t("show_guests_looks")}
         />
         <ImageUpload
           images={localImages}
@@ -273,12 +277,12 @@ const EditModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="How would you describe your place?"
-          subtitle="Short and sweet works best!"
+          title={t("how_describe_place")}
+          subtitle={t("short_sweet_works")}
         />
         <Input
           id="title"
-          label="Title"
+          label={t("title")}
           disabled={isLoading}
           register={register}
           errors={errors}
@@ -287,7 +291,7 @@ const EditModal = () => {
         <hr />
         <Input
           id="description"
-          label="Description"
+          label={t("description")}
           disabled={isLoading}
           register={register}
           errors={errors}
@@ -301,12 +305,12 @@ const EditModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="Now, set your price"
-          subtitle="How much do you charge per night?"
+          title={t("now_set_price")}
+          subtitle={`How much do you charge ${t("per_night")}?`}
         />
         <Input
           id="price"
-          label="Price"
+          label={t("price")}
           formatPrice
           type="number"
           disabled={isLoading}
@@ -314,7 +318,7 @@ const EditModal = () => {
           errors={errors}
           required
           validation={{
-            min: { value: 1, message: "Price must be at least 1" },
+            min: { value: 1, message: t("price_min_error") },
           }}
         />
       </div>
@@ -329,7 +333,7 @@ const EditModal = () => {
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
-      title="Edit Your Listing"
+      title={t("edit_your_listing")}
       body={bodyContent}
     />
   );

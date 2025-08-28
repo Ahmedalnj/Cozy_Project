@@ -2,7 +2,7 @@ import Container from "../components/Container";
 import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
 import { SafeListing, SafeUser } from "../types";
-
+import { useTranslation } from "react-i18next";
 interface FavoriteClient {
   listings: SafeListing[];
   currentUser?: SafeUser | null;
@@ -11,9 +11,10 @@ const FavoriteClient: React.FC<FavoriteClient> = ({
   listings,
   currentUser,
 }) => {
+  const { t } = useTranslation("common");
   return (
     <Container>
-      <Heading title="Favorites" subtitle="list of places you have favorited" />
+      <Heading title={t("favorites")} subtitle={t("favorites_subtitle")} />
       <div
         className="
       mt-10

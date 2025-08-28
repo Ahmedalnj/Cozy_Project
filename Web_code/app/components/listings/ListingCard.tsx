@@ -9,6 +9,7 @@ import Image from "next/image";
 import HeartButton from "@/app/components/HeartButton";
 import Button from "../Button";
 import Avatar from "../Avatar";
+import { useTranslation } from "react-i18next";
 
 interface ListingCardProps {
   data: SafeListing;
@@ -21,6 +22,11 @@ interface ListingCardProps {
   secondaryAction?: (id: string) => void;
   secondaryActionLabel?: string;
   secondaryActionId?: string;
+  showGuestDetails?: boolean;
+  showPaidStatus?: boolean;
+  showCashPendingStatus?: boolean;
+  showRejectedStatus?: boolean;
+  isHostView?: boolean;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
@@ -34,11 +40,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
   secondaryAction,
   secondaryActionLabel,
   secondaryActionId = "",
+  showGuestDetails = false,
+  showPaidStatus = false,
+  showCashPendingStatus = false,
+  showRejectedStatus = false,
+  isHostView = false,
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
 
   const location = getByValue(data.locationValue);
+
+  const { t } = useTranslation("common");
 
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -98,7 +111,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
         {reservation?.user?.name && (
           <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mt-1">
-            <span>Booked by:</span>
+            <span>{t("booked_by")}</span>
             <Avatar src={reservation?.user?.image} />
             <span className="font-medium sm:font-semibold">
               {reservation.user.name}
@@ -106,18 +119,71 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
+        {/* Guest Details for Host View */}
+        {showGuestDetails && reservation?.user && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mt-2">
+            <div className="text-xs sm:text-sm text-blue-800">
+              <div className="font-semibold mb-1">{t("guest_details")}</div>
+              <div className="space-y-1">
+                <div>
+                  <span className="font-medium">{t("email")}:</span>{" "}
+                  {reservation.user.email}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Status */}
+        {showPaidStatus && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-2 mt-2">
+            <div className="text-xs sm:text-sm text-green-800 font-semibold">
+              ✅ {t("paid")}
+            </div>
+          </div>
+        )}
+
+        {/* Cash Pending Status */}
+        {showCashPendingStatus && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mt-2">
+            <div className="text-xs sm:text-sm text-yellow-800 font-semibold">
+              ⏳ {t("cash_pending")}
+            </div>
+            <div className="text-xs text-yellow-700 mt-1">
+              {t("cash_pending_note")}
+            </div>
+          </div>
+        )}
+
+        {/* Rejected Status */}
+        {showRejectedStatus && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2">
+            <div className="text-xs sm:text-sm text-red-800 font-semibold">
+              ❌ {t("reservation_rejected")}
+            </div>
+            <div className="text-xs text-red-700 mt-1">
+              {isHostView
+                ? t("reservation_rejected_host_note")
+                : t("reservation_rejected_note")}
+            </div>
+          </div>
+        )}
+
         <div className="font-semibold text-base sm:text-lg">
-          {location?.region}, {location?.label}
+          {reservationDate ||
+            t(`categories.${data.category}.label`).slice(0, -1)}{" "}
+          In {""}
+          {location?.label}
         </div>
 
-        <div className="font-light text-xs sm:text-sm text-neutral-500">
-          {reservationDate || data.category}
-        </div>
+        <div className="font-light text-xs sm:text-sm text-neutral-500"></div>
 
         <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
           <div className="font-semibold">${price}</div>
           {!reservation && (
-            <div className="font-light text-xs sm:text-sm">per night</div>
+            <div className="font-light text-xs sm:text-sm">
+              {t("per_night")}
+            </div>
           )}
         </div>
 

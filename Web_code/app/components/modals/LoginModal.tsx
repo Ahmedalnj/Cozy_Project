@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import useTermsModal from "@/app/hooks/useTerms";
 import usePolicy from "@/app/hooks/usePolicy";
 import useForgotPasswordModal from "@/app/hooks/useForgotPasswordModal";
+import { useTranslation } from "react-i18next";
 
 const LoginModal = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const LoginModal = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const { t } = useTranslation("common");
 
   const {
     register,
@@ -47,12 +49,13 @@ const LoginModal = () => {
       setIsLoading(false);
 
       if (callback?.error) {
-        toast.error(callback.error);
+        // استبدلت الرسالة بنص مترجم ودّي بدل رسالة NextAuth الخام
+        toast.error(t("invalid_credentials"));
         setShowResetPassword(true);
       }
 
       if (callback?.ok) {
-        toast.success("Logged in successfully");
+        toast.success(t("login_success"));
         router.refresh();
         loginModal.onClose();
       }
@@ -61,10 +64,10 @@ const LoginModal = () => {
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading title="Welcome Back" subtitle="Login to your account" />
+      <Heading title={t("welcome_back")} subtitle={t("login_to_account")} />
       <Input
         id="email"
-        label="Email"
+        label={t("email")}
         disabled={isLoading}
         register={register}
         errors={errors}
@@ -72,13 +75,13 @@ const LoginModal = () => {
         validation={{
           pattern: {
             value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-            message: "Please enter a valid email address",
+            message: t("invalid_email"),
           },
         }}
       />
       <Input
         id="password"
-        label="Password"
+        label={t("password")}
         type="password"
         disabled={isLoading}
         register={register}
@@ -94,13 +97,13 @@ const LoginModal = () => {
       <div className="flex flex-col gap-4">
         <Button
           outline
-          label="Continue with Google"
+          label={t("continue_with_google")}
           icon={FcGoogle}
           onClick={() => signIn("google")}
         />
         <Button
           outline
-          label="Continue with Facebook"
+          label={t("continue_with_facebook")}
           icon={AiFillFacebook}
           onClick={() => signIn("facebook")}
         />
@@ -108,26 +111,21 @@ const LoginModal = () => {
         <div className="text-neutral-500 text-center mt-4 font-light">
           {showResetPassword && (
             <div className="text-black pb-3">
-              Forgot your password?{" "}
+              {t("forgot_password")}{" "}
               <span
                 onClick={() => {
                   loginModal.onClose();
                   forgotPasswordModal.onOpen();
-                  console.log("LoginModal state:", loginModal.isOpen);
-                  console.log(
-                    "ForgotPasswordModal state:",
-                    forgotPasswordModal.isOpen
-                  );
                 }}
                 className="text-red-600 cursor-pointer hover:underline"
               >
-                Reset it here
+                {t("reset_here")}
               </span>
             </div>
           )}
 
           <div>
-            Don't have an account?{" "}
+            {t("no_account")}{" "}
             <span
               onClick={() => {
                 loginModal.onClose();
@@ -135,24 +133,24 @@ const LoginModal = () => {
               }}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Create an Account
+              {t("create_account")}
             </span>
           </div>
 
           <div>
-            By continuing, you agree to Cozy's{" "}
+            {t("by_continuing")}{" "}
             <span
               onClick={TermsModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Terms of Service
+              {t("terms")}
             </span>{" "}
-            and{" "}
+            {t("and")}{" "}
             <span
               onClick={PolicyModal.onOpen}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Privacy Policy
+              {t("policy")}
             </span>
           </div>
         </div>
@@ -164,8 +162,8 @@ const LoginModal = () => {
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
-      title="Login"
-      actionLabel="Continue"
+      title={t("login")}
+      actionLabel={t("continue")}
       onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}

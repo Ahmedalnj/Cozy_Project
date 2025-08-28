@@ -65,27 +65,41 @@ const Counter: React.FC<CounterProps> = ({
   return (
     <div className="flex flex-row items-center justify-between">
       <div className="flex flex-col">
-        <div className="font-medium">{title}</div>
-        <div className="font-light text-gray-600">{subtitle}</div>
+        <div className="font-semibold text-lg text-gray-800">{title}</div>
+        <div className="font-light text-gray-600 text-sm">{subtitle}</div>
       </div>
       <div className="flex flex-row items-center gap-4">
         <div
           onClick={onReduce}
-          className="w-10 h-10 rounded-full border-[1px] border-neutral-400 flex items-center justify-center text-neutral-600 cursor-pointer hover:opacity-80 transition"
+          className={`
+            w-12 h-12 rounded-full border-2 flex items-center justify-center 
+            cursor-pointer transition-all duration-200 transform hover:scale-110
+            ${value === 1 
+              ? "border-gray-200 text-gray-300 cursor-not-allowed" 
+              : "border-rose-500 text-rose-500 hover:bg-rose-50"
+            }
+          `}
         >
-          <AiOutlineMinus />
+          <AiOutlineMinus size={20} />
         </div>
-        <div className="font-light text-xl text-neutral-600">{value}</div>
+        <div className="font-bold text-2xl text-gray-800 min-w-[3rem] text-center">
+          {value}
+        </div>
         <div
           onClick={onAdd}
-          className="w-10 h-10 rounded-full border-[1px] border-neutral-400 flex items-center justify-center text-neutral-600 cursor-pointer hover:opacity-80 transition"
+          className="w-12 h-12 rounded-full border-2 border-rose-500 flex items-center justify-center text-rose-500 cursor-pointer hover:bg-rose-50 transition-all duration-200 transform hover:scale-110"
         >
-          <AiOutlinePlus />
+          <AiOutlinePlus size={20} />
         </div>
       </div>
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && (
+        <div className="absolute -bottom-6 left-0">
+          <p className="text-red-500 text-sm">{error}</p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Counter;
+

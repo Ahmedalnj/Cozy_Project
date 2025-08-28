@@ -14,6 +14,7 @@ import PolicyModal from "./components/modals/PolicyModal";
 import NavbarWrapper from "./components/NavbarWrapper";
 import ForgotPasswordModal from "./components/modals/ForgotPasswordModal";
 import ResetPasswordModal from "./components/modals/ResetPasswordModal";
+import I18NProvider from "./Providers/I18nProvider";
 const font = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
@@ -29,19 +30,21 @@ export default async function RootLayout({
   const currentUser = await getCurrentUser();
 
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
       <body className={font.className}>
         <ClientOnly>
-          <ToasterProvider />
-          <SearchModal />
-          <LoginModal />
-          <TermsModal />
-          <PolicyModal />
-          <RentModal />
-          <RegisterModal />
-          <ForgotPasswordModal />
-          <ResetPasswordModal />
-          <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
+          <I18NProvider>
+            <ToasterProvider />
+            <SearchModal />
+            <LoginModal />
+            <TermsModal />
+            <PolicyModal />
+            <RentModal />
+            <RegisterModal />
+            <ForgotPasswordModal />
+            <ResetPasswordModal />
+            <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
+          </I18NProvider>
         </ClientOnly>
       </body>
     </html>

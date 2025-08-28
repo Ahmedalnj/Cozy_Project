@@ -16,6 +16,7 @@ interface ListingReservationProps {
   disabledDates: Date[];
   days?: number;
   locationLabel: string;
+  isReserved?: boolean;
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({

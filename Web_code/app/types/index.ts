@@ -22,6 +22,12 @@ export type SaveReservation = Omit<
   startDate: string;
   endDate: string;
   listing: SafeListing;
+  payment?: {
+    id: string;
+    status: string;
+    paymentMethod: string | null; // السماح بالقيمة null
+    amount: number;
+  } | null;
 };
 
 // تعريف نوع SafeUser مع الحقول المناسبة

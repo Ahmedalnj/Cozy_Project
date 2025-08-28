@@ -9,7 +9,6 @@ import ListingInfo from "@/app/components/listings/ListingInfo";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
 import { differenceInCalendarDays, eachDayOfInterval } from "date-fns";
-import axios from "axios";
 import toast from "react-hot-toast";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
@@ -58,11 +57,19 @@ const ListingClient: React.FC<ListingClientProps> = ({
     return dates;
   }, [reservations]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
-  const onCreateReservation = useCallback(() => {
+  const dayCount = useMemo(() => {
+    if (dateRange.startDate && dateRange.endDate) {
+      return differenceInCalendarDays(dateRange.endDate, dateRange.startDate);
+    }
+    return 0;
+  }, [dateRange]);
+
+  const handleReservationRedirect = useCallback(() => {
     if (!currentUser) {
       return LoginModal.onOpen();
     }
@@ -84,58 +91,54 @@ const ListingClient: React.FC<ListingClientProps> = ({
       toast.error("Minimum 1 night stay required");
       return;
     }
+    console.log("Listing imageSrc:", listing.imageSrc);
 
-    setIsLoading(true);
-    axios
-      .post("/api/reservations", {
-        totalPrice,
-        startDate: dateRange.startDate,
-        endDate: dateRange.endDate,
-        listingId: listing?.id,
-      })
-      .then(() => {
-        toast.success("Listing reserved!");
-        setDateRange(initialDateRange);
-        router.push("/trips");
-      })
-      .catch(() => {
-        toast.error("Something went wrong");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    // إعداد بيانات الحجز للتوجيه إلى صفحة الحجز
+    const reservationData = {
+      totalPrice,
+      startDate: dateRange.startDate.toISOString(),
+      endDate: dateRange.endDate.toISOString(),
+      days: dayCount,
+      listingId: listing.id,
+      listingTitle: listing.title,
+      pricePerNight: listing.price,
+      location: location?.label || listing.locationValue,
+      imageSrc: listing.imageSrc,
+      // إضافة بيانات المستخدم الحالي
+      currentUser: {
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUser.name,
+      },
+    };
+
+    // التوجيه إلى صفحة الحجز مع بيانات الحجز كاستعلام
+    router.push(
+      `/reservation?data=${encodeURIComponent(JSON.stringify(reservationData))}`
+    );
   }, [
     totalPrice,
     dateRange,
-    listing?.id,
+    dayCount,
+    listing.id,
+    listing.title,
+    listing.price,
+    listing.locationValue,
+    listing.imageSrc,
+    location,
     router,
     currentUser,
     LoginModal,
     isOwner,
   ]);
 
-  const dayCount = useMemo(() => {
-    if (dateRange.startDate && dateRange.endDate) {
-      return differenceInCalendarDays(dateRange.endDate, dateRange.startDate);
-    }
-    return 0;
-  }, [dateRange]);
-
   useEffect(() => {
     if (dayCount && listing.price) {
       setTotalPrice(dayCount * listing.price);
-      setIsLoading(false);
     } else {
       setTotalPrice(listing.price);
-      // Show hint if user has interacted with dates but has 0 days
-      if (
-        dateRange.startDate !== initialDateRange.startDate ||
-        dateRange.endDate !== initialDateRange.endDate
-      ) {
-        setIsLoading(true);
-      }
     }
-  }, [dayCount, listing.price, dateRange.startDate, dateRange.endDate]);
+  }, [dayCount, listing.price]);
 
   const category = useMemo(() => {
     return categories.find((item) => item.label === listing.category);
@@ -184,7 +187,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 totalPrice={totalPrice}
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
-                onSubmit={onCreateReservation}
+                onSubmit={handleReservationRedirect}
                 disabled={isLoading || isOwner}
                 disabledDates={disabledDate}
                 days={dayCount}

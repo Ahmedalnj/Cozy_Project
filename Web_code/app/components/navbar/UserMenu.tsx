@@ -1,6 +1,5 @@
 "use client";
 
-import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../Avatar";
 import { useCallback, useState } from "react";
 import MenuItem from "./MenuItem";
@@ -10,6 +9,9 @@ import { SafeUser } from "@/app/types";
 import { signOut } from "next-auth/react";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
+
+//icons imports
 import {
   AiOutlineHome,
   AiOutlineHeart,
@@ -19,19 +21,29 @@ import {
   AiOutlineLogin,
   AiOutlineUserAdd,
 } from "react-icons/ai";
+import { AiOutlineMenu } from "react-icons/ai";
 import { FiKey } from "react-icons/fi";
 import { PiAirplaneTiltFill } from "react-icons/pi";
 import { TbHome } from "react-icons/tb";
+import LanguageSwitcher from "@/app/components/LanguageSwitcher";
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
 }
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
+  // Translation hook
+  const { t } = useTranslation("common");
+
   const router = useRouter();
+
   const registerModal = useRegisterModal();
+
   const loginModal = useLoginModal();
+
   const rentModal = useRentModal();
+
   const [isOpen, setIsOpen] = useState(false);
+
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
   }, []);
@@ -66,7 +78,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       cursor-pointer
     "
         >
-          Cozy your home
+          {t("cozy_my_home")}
         </div>
         <div
           onClick={toggleOpen}
@@ -115,35 +127,35 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
               <>
                 <MenuItem
                   onClick={() => handleMenuItemClick(() => router.push("/"))}
-                  label="Home"
+                  label={t("Home")}
                   Icon={TbHome}
                 />
                 <MenuItem
                   onClick={() =>
                     handleMenuItemClick(() => router.push("/trips"))
                   }
-                  label="My Trips"
+                  label={t("my_trips")}
                   Icon={PiAirplaneTiltFill}
                 />
                 <MenuItem
                   onClick={() =>
                     handleMenuItemClick(() => router.push("/favorites"))
                   }
-                  label="My Favorites"
+                  label={t("my_favorites")}
                   Icon={AiOutlineHeart}
                 />
                 <MenuItem
                   onClick={() =>
                     handleMenuItemClick(() => router.push("/reservations"))
                   }
-                  label="My Reservations"
+                  label={t("my_reservations")}
                   Icon={AiOutlineCalendar}
                 />
                 <MenuItem
                   onClick={() =>
                     handleMenuItemClick(() => router.push("/properties"))
                   }
-                  label="My Properties"
+                  label={t("my_properties")}
                   Icon={FiKey}
                 />
                 {currentUser.role === "ADMIN" && (
@@ -151,19 +163,22 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                     onClick={() =>
                       handleMenuItemClick(() => router.push("/admin/dashboard"))
                     }
-                    label="My Dashboard"
+                    label={t("my_dashboard")}
                     Icon={AiOutlineDashboard}
                   />
                 )}
                 <MenuItem
                   onClick={() => handleMenuItemClick(rentModal.onOpen)}
-                  label="Cozy my home"
+                  label={t("cozy_my_home")}
                   Icon={AiOutlineHome}
                 />
+                <div className="px-3 py-2">
+                  <LanguageSwitcher fullLabel />
+                </div>
                 <hr />
                 <MenuItem
                   onClick={() => handleMenuItemClick(() => signOut())}
-                  label="Logout"
+                  label={t("logout")}
                   Icon={AiOutlineLogout}
                 />
               </>
@@ -171,12 +186,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
               <>
                 <MenuItem
                   onClick={() => handleMenuItemClick(loginModal.onOpen)}
-                  label="Login"
+                  label={t("login")}
                   Icon={AiOutlineLogin}
                 />
                 <MenuItem
                   onClick={() => handleMenuItemClick(registerModal.onOpen)}
-                  label="Sign Up"
+                  label={t("sign_up")}
                   Icon={AiOutlineUserAdd}
                 />
               </>

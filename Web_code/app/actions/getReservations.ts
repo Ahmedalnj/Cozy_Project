@@ -44,6 +44,18 @@ export default async function getReservations(params: IParams) {
           },
         },
         user: true,
+        payments: {
+          select: {
+            id: true,
+            status: true,
+            paymentMethod: true,
+            amount: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1, // Get the most recent payment
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -53,6 +65,7 @@ export default async function getReservations(params: IParams) {
     // تحويل التواريخ إلى string
     const safeReservation = reservations.map((reservation) => ({
       ...reservation,
+      status: reservation.status, // <== حالة الحجز
       createdAt: reservation.createdAt.toISOString(),
       startDate: reservation.startDate.toISOString(),
       endDate: reservation.endDate.toISOString(),
@@ -64,6 +77,12 @@ export default async function getReservations(params: IParams) {
         name: reservation.user?.name ?? null,
         email: reservation.user?.email ?? null,
       },
+      payment: reservation.payments[0] ? {
+        id: reservation.payments[0].id,
+        status: reservation.payments[0].status,
+        paymentMethod: reservation.payments[0].paymentMethod,
+        amount: reservation.payments[0].amount,
+      } : null,
     }));
 
     return safeReservation;

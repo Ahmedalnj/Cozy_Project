@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
+import { useTranslation } from "react-i18next";
 
 interface TripsClientProps {
   reservations: SaveReservation[];
@@ -20,6 +21,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
 }) => {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
+  const { t } = useTranslation("common");
 
   const onCancel = useCallback(
     (id: string) => {
@@ -28,7 +30,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
       axios
         .delete(`/api/reservations/${id}`)
         .then(() => {
-          toast.success("Reservation cancelled");
+          toast.success(t("reservation_cancelled"));
           router.refresh();
         })
         .catch((error) => {
@@ -38,14 +40,11 @@ const TripsClient: React.FC<TripsClientProps> = ({
           setDeletingId("");
         });
     },
-    [router]
+    [router, t]
   );
   return (
     <Container>
-      <Heading
-        title="Trips"
-        subtitle="Where you've been and where you're going"
-      ></Heading>
+      <Heading title={t("trips")} subtitle={t("trips_subtitle")}></Heading>
       <div
         className="
       mt-10
@@ -58,18 +57,59 @@ const TripsClient: React.FC<TripsClientProps> = ({
       2xl:grid-cols-6
       gap-8"
       >
-        {reservations.map((reservation) => (
-          <ListingCard
-            key={reservation.id}
-            data={reservation.listing}
-            reservation={reservation}
-            actionId={reservation.id}
-            onAction={onCancel}
-            disabled={deletingId === reservation.id}
-            actionLabel="Cancel Reservation"
-            currentUser={currentUser}
-          />
-        ))}
+        {reservations.map((reservation) => {
+          // Determine payment type and status
+          const isCashPayment = reservation.payment?.paymentMethod === "cash";
+          const isPaid = reservation.payment?.status === "SUCCESS";
+          
+          // For cash payments, show pending status until host accepts
+          if (isCashPayment && !isPaid) {
+            return (
+              <ListingCard
+                key={reservation.id}
+                data={reservation.listing}
+                reservation={reservation}
+                actionId={reservation.id}
+                onAction={onCancel}
+                disabled={deletingId === reservation.id}
+                actionLabel={t("cancel_reservation")}
+                currentUser={currentUser}
+                showCashPendingStatus={true}
+              />
+            );
+          }
+          
+          // For paid reservations (any payment method), show paid status
+          if (isPaid) {
+            return (
+              <ListingCard
+                key={reservation.id}
+                data={reservation.listing}
+                reservation={reservation}
+                actionId={reservation.id}
+                onAction={onCancel}
+                disabled={deletingId === reservation.id}
+                actionLabel={t("cancel_reservation")}
+                currentUser={currentUser}
+                showPaidStatus={true}
+              />
+            );
+          }
+          
+          // Default case
+          return (
+            <ListingCard
+              key={reservation.id}
+              data={reservation.listing}
+              reservation={reservation}
+              actionId={reservation.id}
+              onAction={onCancel}
+              disabled={deletingId === reservation.id}
+              actionLabel={t("cancel_reservation")}
+              currentUser={currentUser}
+            />
+          );
+        })}
       </div>
     </Container>
   );

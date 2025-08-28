@@ -11,61 +11,63 @@ import {
 import { MdOutlineVilla } from "react-icons/md";
 import CategoryBox from "../CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 export const categories = [
   {
-    label: "شقق",
+    label: "Apartments",
     icon: TbHome,
-    description: "شقق للإيجار اليومي أو الشهري",
+    description: "Daily or monthly rental apartments",
   },
   {
-    label: "فلل",
+    label: "Villas",
     icon: MdOutlineVilla,
-    description: "فلل فاخرة أو عائلية",
+    description: "Luxury or family villas",
   },
   {
-    label: "بيوت شعبية",
+    label: "Traditional Houses",
     icon: GiFamilyHouse,
-    description: "منازل تقليدية في الأحياء الشعبية",
+    description: "Traditional houses in local neighborhoods",
   },
   {
-    label: "مزارع",
+    label: "Farms",
     icon: GiFarmTractor,
-    description: "مزارع للإيجار مع مساحات خضراء",
+    description: "Farms for rent with green spaces",
   },
   {
-    label: "قاعات مناسبات",
+    label: "Event Halls",
     icon: GiPartyPopper,
-    description: "قاعات للأعراس والمناسبات",
+    description: "Halls for weddings and events",
   },
   {
-    label: "استراحات",
+    label: "Resorts",
     icon: TbPool,
-    description: "استراحات مع مسبح أو جلسات خارجية",
+    description: "Resorts with pools or outdoor seating",
   },
   {
-    label: "شاليهات",
+    label: "Chalets",
     icon: GiIsland,
-    description: "شاليهات على البحر أو قربه",
+    description: "Chalets by or near the sea",
   },
   {
-    label: "مخيمات",
+    label: "Camps",
     icon: GiForestCamp,
-    description: "مخيمات صحراوية ورحلات سفاري",
+    description: "Desert camps and safari trips",
   },
   {
-    label: "محلات تجارية",
+    label: "Commercial Stores",
     icon: TbBuildingStore,
-    description: "محلات للإيجار التجاري",
+    description: "Stores for commercial rent",
   },
   {
-    label: "مكاتب",
+    label: "Offices",
     icon: TbBuilding,
-    description: "مكاتب إدارية للإيجار",
+    description: "Administrative offices for rent",
   },
 ];
 
 const Categories = () => {
   const params = useSearchParams();
+  const { t } = useTranslation("common"); // إضافة i18n
   const category = params?.get("category");
   const pathname = usePathname();
   const isMainPage = pathname == "/";
@@ -75,23 +77,14 @@ const Categories = () => {
 
   return (
     <Container>
-      <div
-        className="
-      pt-4
-      flex 
-      flex-row
-      items-center
-      justify-between
-      overflow-x-auto
-      "
-      >
+      <div className="pt-4 flex flex-row items-center justify-between overflow-x-auto">
         {categories.map((item) => (
           <CategoryBox
             key={item.label}
-            label={item.label}
-            selected={category == item.label}
+            label={t(`categories.${item.label}.label`)}
+            selected={category === item.label}
             icon={item.icon}
-          ></CategoryBox>
+          />
         ))}
       </div>
     </Container>

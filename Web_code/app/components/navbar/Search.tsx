@@ -6,11 +6,13 @@ import { differenceInDays } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { BiSearch } from "react-icons/bi";
+import { useTranslation } from "react-i18next";
 
 const Search = () => {
   const searchModal = useSearchModal();
   const params = useSearchParams();
   const { getByValue } = useCountries();
+  const { t } = useTranslation("common");
 
   const locationValue = params?.get("locationValue");
   const startDate = params?.get("startDate");
@@ -21,8 +23,8 @@ const Search = () => {
     if (locationValue) {
       return getByValue(locationValue as string)?.label;
     }
-    return "AnyWhere";
-  }, [locationValue, getByValue]);
+    return t("anywhere");
+  }, [locationValue, getByValue, t]);
 
   const durationLabel = useMemo(() => {
     if (startDate && endDate) {
@@ -34,17 +36,17 @@ const Search = () => {
         diff = 1;
       }
 
-      return `${diff} Days`;
+      return `${diff} ${t("days")}`;
     }
-    return "Any Week";
-  }, [startDate, endDate]);
+    return t("any_week");
+  }, [startDate, endDate, t]);
 
   const guestLabel = useMemo(() => {
     if (guestCount) {
-      return `${guestCount} Guests`;
+      return `${guestCount} ${t("guests")}`;
     }
-    return "Add Guests";
-  }, [guestCount]);
+    return t("add_guests");
+  }, [guestCount, t]);
 
   return (
     <div

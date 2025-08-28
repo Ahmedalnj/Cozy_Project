@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { FaCheck, FaHome, FaMapMarkerAlt, FaInfoCircle, FaImage, FaEdit, FaDollarSign, FaStar } from "react-icons/fa";
 
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
@@ -164,12 +165,12 @@ const RentModal = () => {
 
   const actionLabel = useMemo(() => {
     if (isLoading) {
-      return step === STEPS.PRICE ? "Creating..." : "Loading...";
+      return step === STEPS.PRICE ? "Creating Listing..." : "Loading...";
     }
     if (step === STEPS.PRICE) {
-      return "Create";
+      return "🎉 Create Listing";
     }
-    return "NEXT";
+    return "Continue →";
   }, [step, isLoading]);
 
   const secondaryActionLabel = useMemo(() => {
@@ -179,13 +180,112 @@ const RentModal = () => {
     return "Back";
   }, [step]);
 
+  // خطوات التقدم
+  const steps = [
+    { label: "Category", icon: FaHome, completed: !!category },
+    { label: "Offers", icon: FaStar, completed: Offers.length > 0 },
+    { label: "Location", icon: FaMapMarkerAlt, completed: !!location },
+    { label: "Info", icon: FaInfoCircle, completed: guestCount > 0 && roomCount > 0 && bathroomCount > 0 },
+    { label: "Images", icon: FaImage, completed: localImages.length > 0 },
+    { label: "Description", icon: FaEdit, completed: false }, // سيتم التحقق من العنوان والوصف
+    { label: "Price", icon: FaDollarSign, completed: false }, // سيتم التحقق من السعر
+  ];
+
+  // حساب النسبة المئوية للتقدم
+  const progressPercentage = Math.round(((step + 1) / steps.length) * 100);
+
+  // الحصول على عنوان الخطوة الحالية
+  const getCurrentStepTitle = () => {
+    const stepTitles = [
+      "Choose Category",
+      "Select Amenities", 
+      "Set Location",
+      "Property Details",
+      "Upload Photos",
+      "Add Description",
+      "Set Pricing"
+    ];
+    return stepTitles[step];
+  };
+
+  // مكون خطوات التقدم
+  const StepIndicator = () => (
+    <div className="mb-8">
+      {/* شريط التقدم */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-gray-700">Progress</span>
+          <span className="text-sm font-medium text-rose-500">{progressPercentage}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-gradient-to-r from-rose-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        {steps.map((stepItem, index) => {
+          const Icon = stepItem.icon;
+          const isCurrentStep = index === step;
+          const isCompleted = stepItem.completed;
+          const isPast = index < step;
+
+          return (
+            <div key={index} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isCurrentStep
+                      ? "bg-rose-500 text-white shadow-lg scale-110"
+                      : isCompleted || isPast
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <FaCheck className="w-5 h-5" />
+                  ) : (
+                    <Icon className="w-5 h-5" />
+                  )}
+                </div>
+                <span
+                  className={`text-xs mt-2 font-medium transition-colors duration-300 ${
+                    isCurrentStep
+                      ? "text-rose-500"
+                      : isCompleted || isPast
+                      ? "text-green-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {stepItem.label}
+                </span>
+              </div>
+              {index < steps.length - 1 && (
+                <div
+                  className={`w-16 h-0.5 mx-2 transition-colors duration-300 ${
+                    isCompleted || isPast ? "bg-green-500" : "bg-gray-200"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   let bodyContent = (
     <div className="flex flex-col gap-8">
-      <Heading
-        title="Which of these best describes your place?"
-        subtitle="Pick a category"
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+      <div className="text-center">
+        <Heading
+          title="Which of these best describes your place?"
+          subtitle="Pick a category"
+        />
+        <p className="text-gray-500 mt-2">Choose the category that best fits your property</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto p-2">
         {categories.map((item) => (
           <div key={item.label} className="col-span-1">
             <CategoryInput
@@ -199,14 +299,18 @@ const RentModal = () => {
       </div>
     </div>
   );
+
   if (step === STEPS.OFFERS) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Which of these best describes your place?"
-          subtitle="Pick a category"
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+        <div className="text-center">
+          <Heading
+            title="What amenities does your place offer?"
+            subtitle="Select all that apply"
+          />
+          <p className="text-gray-500 mt-2">Help guests know what to expect</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto p-2">
           {offers.map((item) => (
             <CategoryInput
               key={item.label}
@@ -229,21 +333,43 @@ const RentModal = () => {
             />
           ))}
         </div>
+        {Offers.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-800 text-sm">
+              <strong>Selected:</strong> {Offers.join(", ")}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
+
   if (step === STEPS.LOCATION) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Where is your place located"
-          subtitle="Help guests find you!"
-        />
-        <CountrySelect
-          value={location}
-          onChange={(value) => setCustomValue("location", value)}
-        />
-        <Map center={location?.latlng || [32.8872, 13.191]} />
+        <div className="text-center">
+          <Heading
+            title="Where is your place located?"
+            subtitle="Help guests find you!"
+          />
+          <p className="text-gray-500 mt-2">Choose the location of your property</p>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <CountrySelect
+            value={location}
+            onChange={(value) => setCustomValue("location", value)}
+          />
+        </div>
+        {location && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-blue-800 text-sm">
+              <strong>Selected location:</strong> {location.label}, {location.region}
+            </p>
+          </div>
+        )}
+        <div className="bg-gray-50 rounded-lg p-4">
+          <Map center={location?.latlng || [32.8872, 13.191]} />
+        </div>
       </div>
     );
   }
@@ -251,31 +377,48 @@ const RentModal = () => {
   if (step === STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Share some basic about your place"
-          subtitle="What amenities do you have?"
-        />
+        <div className="text-center">
+          <Heading
+            title="Share some basics about your place"
+            subtitle="What amenities do you have?"
+          />
+          <p className="text-gray-500 mt-2">Tell guests about your property's capacity</p>
+        </div>
 
-        <Counter
-          title="Guests"
-          subtitle="How many guests do you allow?"
-          value={guestCount}
-          onChange={(value) => setCustomValue("guestCount", value)}
-        />
-        <hr />
-        <Counter
-          title="Rooms"
-          subtitle="How many Rooms do you have?"
-          value={roomCount}
-          onChange={(value) => setCustomValue("roomCount", value)}
-        />
-        <hr />
-        <Counter
-          title="Bathrooms"
-          subtitle="How many Bathrooms do you have?"
-          value={bathroomCount}
-          onChange={(value) => setCustomValue("bathroomCount", value)}
-        />
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <Counter
+              title="Guests"
+              subtitle="How many guests do you allow?"
+              value={guestCount}
+              onChange={(value) => setCustomValue("guestCount", value)}
+            />
+          </div>
+          
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <Counter
+              title="Rooms"
+              subtitle="How many Rooms do you have?"
+              value={roomCount}
+              onChange={(value) => setCustomValue("roomCount", value)}
+            />
+          </div>
+          
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <Counter
+              title="Bathrooms"
+              subtitle="How many Bathrooms do you have?"
+              value={bathroomCount}
+              onChange={(value) => setCustomValue("bathroomCount", value)}
+            />
+          </div>
+        </div>
+
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 text-sm">
+            <strong>Property capacity:</strong> {guestCount} guests, {roomCount} rooms, {bathroomCount} bathrooms
+          </p>
+        </div>
       </div>
     );
   }
@@ -283,15 +426,27 @@ const RentModal = () => {
   if (step === STEPS.IMAGE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Add a photo of your place"
-          subtitle="Show guests what your place looks like"
-        />
-        <ImageUpload
-          images={localImages}
-          addImage={addImage}
-          removeImage={removeImage}
-        />
+        <div className="text-center">
+          <Heading
+            title="Add photos of your place"
+            subtitle="Show guests what your place looks like"
+          />
+          <p className="text-gray-500 mt-2">High-quality photos help attract more guests</p>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <ImageUpload
+            images={localImages}
+            addImage={addImage}
+            removeImage={removeImage}
+          />
+        </div>
+        {localImages.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-800 text-sm">
+              <strong>Uploaded:</strong> {localImages.length} photo{localImages.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -299,27 +454,42 @@ const RentModal = () => {
   if (step === STEPS.DESCRIPTION) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="How would you describe your place?"
-          subtitle="Short and sweet works best!"
-        />
-        <Input
-          id="title"
-          label="Title"
-          disabled={isLoading}
-          register={register}
-          errors={errors}
-          required
-        />
-        <hr />
-        <Input
-          id="description"
-          label="Description"
-          disabled={isLoading}
-          register={register}
-          errors={errors}
-          required
-        />
+        <div className="text-center">
+          <Heading
+            title="How would you describe your place?"
+            subtitle="Short and sweet works best!"
+          />
+          <p className="text-gray-500 mt-2">Help guests understand what makes your place special</p>
+        </div>
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <Input
+              id="title"
+              label="Title"
+              disabled={isLoading}
+              register={register}
+              errors={errors}
+              required
+            />
+            <p className="text-xs text-gray-500 mt-2">Keep it short and catchy (e.g., "Cozy Beachfront Villa")</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <Input
+              id="description"
+              label="Description"
+              disabled={isLoading}
+              register={register}
+              errors={errors}
+              required
+            />
+            <p className="text-xs text-gray-500 mt-2">Describe what makes your place unique and special</p>
+          </div>
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-blue-800 text-sm">
+            💡 <strong>Tip:</strong> Be specific about amenities, location highlights, and what guests can expect
+          </p>
+        </div>
       </div>
     );
   }
@@ -327,26 +497,36 @@ const RentModal = () => {
   if (step === STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Now, set your price"
-          subtitle="How much do you charge per night?"
-        />
-        <Input
-          id="price"
-          label="Price"
-          formatPrice
-          type="number"
-          disabled={isLoading}
-          register={register}
-          errors={errors}
-          required
-          validation={{
-            min: {
-              value: 1,
-              message: "Price must be at least 1",
-            },
-          }}
-        />
+        <div className="text-center">
+          <Heading
+            title="Now, set your price"
+            subtitle="How much do you charge per night?"
+          />
+          <p className="text-gray-500 mt-2">Set a competitive price to attract guests</p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <Input
+            id="price"
+            label="Price"
+            formatPrice
+            type="number"
+            disabled={isLoading}
+            register={register}
+            errors={errors}
+            required
+            validation={{
+              min: {
+                value: 1,
+                message: "Price must be at least 1",
+              },
+            }}
+          />
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-blue-800 text-sm">
+            💡 <strong>Tip:</strong> Research similar properties in your area to set a competitive price
+          </p>
+        </div>
       </div>
     );
   }
@@ -359,8 +539,20 @@ const RentModal = () => {
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
-      title="Cozy Your Home"
-      body={bodyContent}
+      title={`${getCurrentStepTitle()} - Step ${step + 1} of ${steps.length}`}
+      body={
+        <div className="space-y-6">
+                  <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mb-4">
+            <FaHome className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Listing</h2>
+          <p className="text-gray-600">Let's get your property ready for guests</p>
+        </div>
+          <StepIndicator />
+          {bodyContent}
+        </div>
+      }
     />
   );
 };

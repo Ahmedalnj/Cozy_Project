@@ -31,6 +31,7 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
+          include: { accounts: true },
         });
 
         if (!user || !user.hashedPassword) {
@@ -61,39 +62,98 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        let dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
+        try {
+          // البحث عن حساب جوجل المرتبط بـ providerAccountId
+          const existingAccount = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId!,
+              },
+            },
+            include: { user: true },
+          });
 
-        if (!dbUser) {
-          // إذا المستخدم جديد → أنشئه برول افتراضي USER
-          dbUser = await prisma.user.create({
+          if (existingAccount) {
+            // إذا وجد الحساب، تحديث التوكنات
+            await prisma.account.update({
+              where: { id: existingAccount.id },
+              data: {
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                session_state: account.session_state,
+              },
+            });
+            return true;
+          }
+
+          // البحث عن مستخدم موجود بنفس البريد الإلكتروني
+          let dbUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+          });
+
+          if (!dbUser) {
+            // إنشاء مستخدم جديد إذا لم يوجد
+            dbUser = await prisma.user.create({
+              data: {
+                email: user.email!,
+                name: user.name || "",
+                image: user.image || "",
+                role: "USER",
+                emailVerified: new Date(),
+              },
+            });
+          }
+
+          // إنشاء حساب جديد مرتبط بالمستخدم
+          await prisma.account.create({
             data: {
-              email: user.email!,
-              name: user.name || "",
-              image: user.image || "",
-              role: "USER",
+              userId: dbUser.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId!,
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
+              scope: account.scope,
+              id_token: account.id_token,
+              session_state: account.session_state,
             },
           });
-          console.log("New Google user created with role:", dbUser.role);
-        } else {
-          console.log("Existing Google user role:", dbUser.role);
+
+          return true;
+        } catch (error) {
+          console.error("Error in Google signIn callback:", error);
+          return false;
         }
       }
       return true;
     },
 
-    async jwt({ token, user }) {
-      if (user?.email) {
+    async jwt({ token, user, trigger, session }) {
+      // عند تسجيل الدخول الأولي
+      if (user) {
         const dbUser = await prisma.user.findUnique({
-          where: { email: user.email },
+          where: { email: user.email! },
           select: { id: true, role: true },
         });
+
         if (dbUser) {
           token.id = dbUser.id;
           token.role = dbUser.role || "USER";
         }
       }
+
+      // عند تحديث الجلسة
+      if (trigger === "update" && session) {
+        token = { ...token, ...session };
+      }
+
       return token;
     },
 
@@ -111,6 +171,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 يوم
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

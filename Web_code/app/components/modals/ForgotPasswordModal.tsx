@@ -10,19 +10,7 @@ import toast from "react-hot-toast";
 import useForgotPasswordModal from "@/app/hooks/useForgotPasswordModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useResetPasswordModal from "@/app/hooks/useResetPasswordModal";
-
-// 1. تعريف Schemas باستخدام Zod
-const emailSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-});
-
-const codeSchema = z.object({
-  code: z.string().length(6, "Code must be 6 digits"),
-});
-
-// 2. استخراج الأنواع
-type EmailFormData = z.infer<typeof emailSchema>;
-type CodeFormData = z.infer<typeof codeSchema>;
+import { useTranslation } from "react-i18next";
 
 const ForgotPasswordModal = () => {
   const forgotPasswordModal = useForgotPasswordModal();
@@ -31,8 +19,19 @@ const ForgotPasswordModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
+  const { t } = useTranslation("common");
 
-  // نموذج البريد الإلكتروني
+  const emailSchema = z.object({
+    email: z.string().email(t("invalid_email")),
+  });
+
+  const codeSchema = z.object({
+    code: z.string().length(6, t("code_must_be_6")),
+  });
+
+  type EmailFormData = z.infer<typeof emailSchema>;
+  type CodeFormData = z.infer<typeof codeSchema>;
+
   const {
     register: registerEmail,
     handleSubmit: handleEmailSubmit,
@@ -42,7 +41,6 @@ const ForgotPasswordModal = () => {
     resolver: zodResolver(emailSchema),
   });
 
-  // نموذج كود التحقق
   const {
     register: registerCode,
     handleSubmit: handleCodeSubmit,
@@ -67,10 +65,10 @@ const ForgotPasswordModal = () => {
       resetEmailForm();
       resetCodeForm({ code: "" });
       setStep("code");
-      toast.success("Verification code sent to your email");
+      toast.success(t("we_sent_verification"));
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Something went wrong"
+        error instanceof Error ? error.message : t("check_your_email")
       );
     } finally {
       setIsLoading(false);
@@ -88,13 +86,13 @@ const ForgotPasswordModal = () => {
 
       if (!res.ok) throw new Error(await res.text());
 
-      toast.success("Code verified successfully");
+      toast.success(t("code_verified"));
       forgotPasswordModal.onClose();
-      resetPasswordModal.onOpen(email); // تخزين البريد
-
-      // يمكنك توجيه المستخدم لصفحة إعادة تعيين كلمة المرور هنا
+      resetPasswordModal.onOpen(email);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Invalid code");
+      toast.error(
+        error instanceof Error ? error.message : t("invalid_verification_code")
+      );
     } finally {
       setIsLoading(false);
     }
@@ -116,11 +114,11 @@ const ForgotPasswordModal = () => {
 
       if (!res.ok) throw new Error(await res.text());
 
-      toast.success("New verification code sent");
+      toast.success(t("new_verification_code_sent"));
       resetCodeForm({ code: "" });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to resend code"
+        error instanceof Error ? error.message : t("failed_resend_code")
       );
     } finally {
       setIsLoading(false);
@@ -129,26 +127,25 @@ const ForgotPasswordModal = () => {
 
   const actionLabel = useMemo(() => {
     if (isLoading) {
-      return step === "code" ? "Loading..." : "Sending Code...";
+      return step === "code" ? t("loading") : t("sending_code");
     }
     if (step === "email") {
-      return "Send Code";
+      return t("send_code");
     }
     if (step === "code") {
-      return "Verify";
+      return t("verify");
     }
-  }, [step, isLoading]);
+  }, [step, isLoading, t]);
 
-  // محتوى مرحلة إدخال البريد الإلكتروني
   const emailBodyContent = (
     <div className="flex flex-col gap-4">
       <Heading
-        title="Forgot your password?"
-        subtitle="Enter your email to receive a verification code"
+        title={t("forgot_your_password")}
+        subtitle={t("enter_email_to_receive_code")}
       />
       <Input
         id="email"
-        label="Email"
+        label={t("email")}
         disabled={isLoading}
         register={registerEmail}
         errors={emailErrors}
@@ -157,16 +154,15 @@ const ForgotPasswordModal = () => {
     </div>
   );
 
-  // محتوى مرحلة إدخال كود التحقق
   const codeBodyContent = (
     <div className="flex flex-col gap-4">
       <Heading
-        title="Enter Verification Code"
-        subtitle={`We sent a 6-digit code to ${email}`}
+        title={t("enter_verification_code")}
+        subtitle={t("sent_code_to", { email })}
       />
       <Input
         id="code"
-        label="Verification Code"
+        label={t("verification_code")}
         disabled={isLoading}
         register={registerCode}
         errors={codeErrors}
@@ -182,22 +178,22 @@ const ForgotPasswordModal = () => {
       <div className="text-neutral-500 text-center mt-4 font-light">
         {step === "code" ? (
           <p>
-            You don not get code?{" "}
+            {t("did_not_get_code")}{" "}
             <span
               onClick={handleResendCode}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Resend Code
+              {t("resend_code")}
             </span>
           </p>
         ) : (
           <p>
-            Remember your password?{" "}
+            {t("remember_password")}{" "}
             <span
               onClick={handleBackToLogin}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Sign in
+              {t("sign_in")}
             </span>
           </p>
         )}
@@ -209,7 +205,7 @@ const ForgotPasswordModal = () => {
     <Modal
       disabled={isLoading}
       isOpen={forgotPasswordModal.isOpen}
-      title={step === "email" ? "Reset Password" : "Verify Code"}
+      title={step === "email" ? t("reset_password") : t("verify_code")}
       actionLabel={actionLabel || ""}
       onClose={forgotPasswordModal.onClose}
       onSubmit={
@@ -220,7 +216,7 @@ const ForgotPasswordModal = () => {
       body={step === "email" ? emailBodyContent : codeBodyContent}
       footer={footerContent}
       secondaryAction={step === "code" ? () => setStep("email") : undefined}
-      secondaryActionLabel={step === "code" ? "Change Email" : undefined}
+      secondaryActionLabel={step === "code" ? t("change_email") : undefined}
     />
   );
 };

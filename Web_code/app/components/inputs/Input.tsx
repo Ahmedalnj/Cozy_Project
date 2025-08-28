@@ -48,7 +48,8 @@ const Input = <T extends FieldValues>({
             text-neutral-700
             absolute
             top-5
-            left-2
+            left-3
+            z-10
           "
         />
       )}
@@ -69,43 +70,54 @@ const Input = <T extends FieldValues>({
           font-light
           bg-white
           border-2
-          rounded-md
+          rounded-lg
           outline-none
-          transition
+          transition-all
+          duration-200
           disabled:opacity-70
           disabled:cursor-not-allowed
-          ${formatPrice ? "pl-9" : "pl-4"}
-          ${errors[id] ? "border-rose-500" : "border-neutral-300"}
-          ${errors[id] ? "focus:border-rose-500" : "focus:border-black"}
+          shadow-sm
+          ${formatPrice ? "pl-10" : "pl-4"}
+          ${errors[id] 
+            ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200" 
+            : "border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+          }
+          hover:border-gray-400
         `}
       />
       {errors[id] && (
-        <p className="text-rose-500 text-sm mt-1">
+        <p className="text-rose-500 text-sm mt-2 flex items-center">
+          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
           {errors[id]?.message as string}
         </p>
       )}
       <label
         className={`
           absolute
-          text-md
-          duration-150
+          text-sm
+          font-medium
+          duration-200
           transform
           -translate-y-3
           top-5
           z-10
           origin-[0]
-          ${formatPrice ? "left-9" : "left-4"}
+          ${formatPrice ? "left-10" : "left-4"}
           peer-placeholder-shown:scale-100
           peer-placeholder-shown:translate-y-0
           peer-focus:scale-75
           peer-focus:-translate-y-4
-          ${errors[id] ? "text-rose-500" : "text-zinc-400"}
-          ${errors[id] ? "peer-focus:text-rose-500" : "peer-focus:text-black"}
-          ${disabled ? "text-neutral-400" : "text-zinc-400"}
-          ${disabled ? "peer-focus:text-neutral-400" : "peer-focus:text-black"}
+          ${errors[id] 
+            ? "text-rose-500 peer-focus:text-rose-500" 
+            : "text-gray-500 peer-focus:text-rose-500"
+          }
+          ${disabled ? "text-gray-400 peer-focus:text-gray-400" : ""}
         `}
       >
         {label}
+        {required && <span className="text-rose-500 ml-1">*</span>}
       </label>
     </div>
   );

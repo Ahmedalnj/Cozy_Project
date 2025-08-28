@@ -24,6 +24,7 @@ model User {
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
+  payments       Payment[]     @relation("UserPayments")
 }
 
 model Account {
@@ -50,7 +51,6 @@ model Listing {
   description   String
   createdAt     DateTime      @default(now())
   category      String
-  offers        String[]      @db.Text
   roomCount     Int
   bathroomCount Int
   guestCount    Int
@@ -58,19 +58,50 @@ model Listing {
   price         Int
   userId        String        @map("user_id") @db.Uuid
   imageSrc      String[]
+  offers        String[]
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations  Reservation[]
+  payments      Payment[]     @relation("ListingPayments")
 }
 
 model Reservation {
-  id         String   @id @default(uuid()) @map("_id") @db.Uuid
-  listingId  String   @map("listing_id") @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
+  id         String    @id @default(uuid()) @map("_id") @db.Uuid
+  listingId  String    @map("listing_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
   startDate  DateTime
   endDate    DateTime
   totalPrice Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  SessionId  String?   @unique @map("session_id")
+  listing    Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments   Payment[] @relation("ReservationPayments")
+}
+
+model Payment {
+  id            String        @id @default(uuid()) @map("_id") @db.Uuid
+  reservationId String?       @map("reservation_id") @db.Uuid
+  userId        String        @map("user_id") @db.Uuid
+  listingId     String        @map("listing_id") @db.Uuid
+  stripeSession String
+  transactionId String?
+  paymentMethod String?
+  status        PaymentStatus @default(PENDING)
+  amount        Float
+  currency      String        @default("usd")
+  expiresAt     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  listing       Listing       @relation("ListingPayments", fields: [listingId], references: [id], onDelete: Cascade)
+  reservation   Reservation?  @relation("ReservationPayments", fields: [reservationId], references: [id])
+  user          User          @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }

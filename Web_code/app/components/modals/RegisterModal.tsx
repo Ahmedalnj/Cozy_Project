@@ -14,11 +14,13 @@ import { signIn } from "next-auth/react";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
 import zxcvbn from "zxcvbn";
+import { useTranslation } from "react-i18next";
 
 const RegisterModal = () => {
+  const { t } = useTranslation("common");
   const registerModal = useRegisterModal();
   const router = useRouter();
-  const LoginModal = useLoginModal();
+  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<number | null>(null);
 
@@ -36,80 +38,74 @@ const RegisterModal = () => {
     mode: "onChange",
   });
 
-  // دالة إرسال البيانات
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
     axios
       .post("/api/register", data)
       .then(() => {
-        toast.success("Account created successfully!");
+        toast.success(t("registers.success"));
         router.refresh();
         registerModal.onClose();
-        LoginModal.onOpen();
+        loginModal.onOpen();
       })
       .catch((error) => {
-        console.error("Error creating account:", error);
-
-        // تحقق من إذا كان الخطأ هو "Email already exists"
         if (
           error.response &&
           error.response.data.error === "Email already exists"
         ) {
-          toast.error(
-            "This email is already registered. Please use a different one."
-          );
+          toast.error(t("registers.email_exists"));
         } else {
-          toast.error("An error occurred while creating your account.");
+          toast.error(t("registers.error"));
         }
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   };
 
   const handlePasswordValidation = (password: string): boolean | string => {
     const result = zxcvbn(password);
-    setPasswordStrength(result.score); // تخزين درجة القوة (من 0 إلى 4)
-    return result.score >= 3 || "Password is too weak"; // إرجاع true إذا كانت كلمة المرور قوية أو رسالة خطأ
+    setPasswordStrength(result.score);
+    return result.score >= 3 || t("registers.password_weak");
   };
-  // محتوى جسم المودال
+
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading title="Welcome to Cozy" subtitle="Create an account!" />
+      <Heading
+        title={t("registers.welcome")}
+        subtitle={t("registers.subtitle")}
+      />
       <Input
         id="name"
-        label="Name"
+        label={t("registers.name")}
         disabled={isLoading}
         register={register}
         errors={errors}
         required
         validation={{
           pattern: {
-            value: /^[A-Za-z\s]+$/, // فقط حروف ومسافات
-            message: "Name must not contain symbols or numbers",
+            value: /^[A-Za-z\s]+$/,
+            message: t("registers.name_invalid"),
           },
         }}
       />
       <Input
         id="email"
-        label="Email"
+        label={t("registers.email")}
         disabled={isLoading}
         register={register}
         errors={errors}
         required
         validation={{
           pattern: {
-            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, // نمط إيميل صحيح
-            message: "Please enter a valid email address",
+            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+            message: t("registers.email_invalid"),
           },
         }}
       />
-
       <div>
         <Input
           id="password"
-          label="Password"
+          label={t("registers.password")}
           type="password"
           disabled={isLoading}
           register={register}
@@ -119,14 +115,14 @@ const RegisterModal = () => {
             validate: handlePasswordValidation,
             minLength: {
               value: 8,
-              message: "Password must be at least 8 characters",
+              message: t("registers.password_min"),
             },
           }}
         />
         {passwordStrength !== null && (
           <div>
             <p>
-              Password Strength:{" "}
+              {t("registers.password_strength")}:{" "}
               {["Weak", "Fair", "Good", "Strong"][passwordStrength]}
             </p>
             <progress value={passwordStrength} max={4}></progress>
@@ -135,7 +131,7 @@ const RegisterModal = () => {
       </div>
       <Input
         id="confirmPassword"
-        label="Confirm Password"
+        label={t("registers.confirm_password")}
         type="password"
         disabled={isLoading}
         register={register}
@@ -143,56 +139,49 @@ const RegisterModal = () => {
         required
         validation={{
           validate: (value) =>
-            value === getValues("password") || "Passwords do not match",
+            value === getValues("password") || t("registers.password_mismatch"),
         }}
       />
     </div>
   );
 
-  // محتوى التذييل (footer) للمودال
   const footerContent = (
     <div className="flex flex-col gap-4 mt-3">
       <hr />
       <div className="flex flex-col gap-4">
         <Button
           outline
-          label="Continue with Google"
+          label={t("registers.continue_google")}
           icon={FcGoogle}
           onClick={() => signIn("google")}
         />
         <Button
           outline
-          label="Continue with Facebook"
+          label={t("registers.continue_facebook")}
           icon={AiFillFacebook}
           onClick={() => signIn("facebook")}
         />
         <div className="text-neutral-500 text-center mt-4 font-light">
           <div>
-            Already have an account?
+            {t("registers.already_have_account")}
             <span
               onClick={() => {
-                LoginModal.onOpen();
+                loginModal.onOpen();
                 registerModal.onClose();
               }}
               className="text-neutral-800 cursor-pointer hover:underline"
             >
-              Log in
+              {t("registers.login")}
             </span>
           </div>
           <div>
-            By continuing, you agree to Cozy
-            <span
-              onClick={() => {}}
-              className="text-neutral-800 cursor-pointer hover:underline"
-            >
-              Terms of Service
+            {t("registers.agree_text")}
+            <span className="text-neutral-800 cursor-pointer hover:underline">
+              {t("registers.terms")}
             </span>
-            and
-            <span
-              onClick={() => {}}
-              className="text-neutral-800 cursor-pointer hover:underline"
-            >
-              Privacy Policy
+            {t("registers.and")}
+            <span className="text-neutral-800 cursor-pointer hover:underline">
+              {t("registers.privacy")}
             </span>
           </div>
         </div>
@@ -200,13 +189,12 @@ const RegisterModal = () => {
     </div>
   );
 
-  // إرجاع المودال مع محتوياته
   return (
     <Modal
       disabled={isLoading}
       isOpen={registerModal.isOpen}
-      title="Create account"
-      actionLabel="Continue"
+      title={t("registers.title")}
+      actionLabel={t("registers.action")}
       onClose={registerModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
