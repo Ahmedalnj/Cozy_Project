@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-07-30.basil",
-});
+// Initialize Stripe only if the secret key is available
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-07-30.basil",
+  });
+};
 
 export async function POST(req: Request) {
   try {
@@ -55,6 +61,7 @@ export async function POST(req: Request) {
     let session;
     try {
       console.log("Retrieving Stripe session:", sessionId);
+      const stripe = getStripe();
       session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: ["payment_intent", "line_items"],
       });
