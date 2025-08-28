@@ -245,6 +245,13 @@ export async function POST(req: Request) {
     try {
       console.log("Sending automatic invoice...");
       
+      // التحقق من وجود URL التطبيق
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+      if (!appUrl) {
+        console.log("⚠️ NEXT_PUBLIC_APP_URL not configured, skipping invoice");
+        return;
+      }
+      
       // جلب بيانات المستخدم لإرسال الفاتورة
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -253,7 +260,7 @@ export async function POST(req: Request) {
 
       if (user?.email) {
         // إرسال الفاتورة
-        const invoiceResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/payments/send-invoice`, {
+        const invoiceResponse = await fetch(`${appUrl}/api/payments/send-invoice`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
