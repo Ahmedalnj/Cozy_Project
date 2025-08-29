@@ -103,6 +103,8 @@ const SearchModal = () => {
     dateRange,
     onNext,
     params,
+    minPrice,
+    maxPrice,
   ]);
 
   const actionLabel = useMemo(() => {

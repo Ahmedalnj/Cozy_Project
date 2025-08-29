@@ -26,7 +26,8 @@ import {
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
-import { offers } from "../offers";
+import { useOffers } from "../offers";
+import { useTranslation } from "react-i18next";
 
 enum STEPS {
   CATEGORY = 0,
@@ -41,6 +42,8 @@ enum STEPS {
 const RentModal = () => {
   const router = useRouter();
   const rentmodal = useRentModal();
+  const offers = useOffers();
+  const { t } = useTranslation("common");
 
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,11 +122,11 @@ const RentModal = () => {
 
   const onNext = () => {
     if (step === STEPS.CATEGORY && !category) {
-      toast.error("Category is required");
+      toast.error(t("rent_modal.category_required"));
       return;
     }
     if (step === STEPS.OFFERS && Offers.length === 0) {
-      toast("Select at least 1 offer!", {
+      toast(t("rent_modal.offers_required"), {
         icon: "ℹ️",
         style: {
           backgroundColor: "#fff",
@@ -141,7 +144,7 @@ const RentModal = () => {
       return;
     }
     if (step === STEPS.LOCATION && !location) {
-      toast.error("Location is required");
+      toast.error(t("rent_modal.location_required"));
       return;
     }
     setStep((value) => value + 1);
@@ -293,12 +296,12 @@ const RentModal = () => {
 
   let bodyContent = (
     <div className="flex flex-col gap-4">
-      <div className="text-center">
-        <Heading
-          title="Which of these best describes your place?"
-          subtitle="Pick a category"
-        />
-      </div>
+              <div className="text-center">
+          <Heading
+            title={t("rent_modal.category_title")}
+            subtitle={t("rent_modal.category_subtitle")}
+          />
+        </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh]  p-1">
         {categories.map((item) => (
           <div key={item.label} className="col-span-1">
@@ -319,28 +322,28 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="What amenities does your place offer?"
-            subtitle="Select all that apply"
+            title={t("rent_modal.offers_title")}
+            subtitle={t("rent_modal.offers_subtitle")}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh]  p-1">
           {offers.map((item) => (
             <CategoryInput
-              key={item.label}
-              onClick={(label) => {
+              key={item.englishLabel}
+              onClick={() => {
                 const selected = Offers;
-                if (selected.includes(label)) {
+                if (selected.includes(item.englishLabel)) {
                   // remove from list
                   setCustomValue(
                     "offers",
-                    selected.filter((o: string) => o !== label)
+                    selected.filter((o: string) => o !== item.englishLabel)
                   );
                 } else {
                   // add to list
-                  setCustomValue("offers", [...selected, label]);
+                  setCustomValue("offers", [...selected, item.englishLabel]);
                 }
               }}
-              selected={Offers.includes(item.label)}
+              selected={Offers.includes(item.englishLabel)}
               label={item.label}
               icon={item.icon}
             />
@@ -349,7 +352,7 @@ const RentModal = () => {
         {Offers.length > 0 && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <p className="text-green-800 text-xs">
-              <strong>Selected:</strong> {Offers.join(", ")}
+              <strong>{t("rent_modal.selected")}</strong> {Offers.join(", ")}
             </p>
           </div>
         )}
@@ -362,8 +365,8 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="Where is your place located?"
-            subtitle="Help guests find you!"
+            title={t("rent_modal.location_title")}
+            subtitle={t("rent_modal.location_subtitle")}
           />
         </div>
         <div className="bg-gray-50 rounded-b-sm p-4">
@@ -375,7 +378,7 @@ const RentModal = () => {
         {location && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-xs">
-              <strong>Selected location:</strong> {location.label},{" "}
+              <strong>{t("rent_modal.selected_location")}</strong> {location.label},{" "}
               {location.region}
             </p>
           </div>
@@ -392,16 +395,16 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="Share some basics about your place"
-            subtitle="Tell guests about your property's capacity?"
+            title={t("rent_modal.info_title")}
+            subtitle={t("rent_modal.info_subtitle")}
           />
         </div>
 
         <div className="space-y-4">
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Counter
-              title="Guests"
-              subtitle="How many guests do you allow?"
+              title={t("rent_modal.guests_title")}
+              subtitle={t("rent_modal.guests_subtitle")}
               value={guestCount}
               onChange={(value) => setCustomValue("guestCount", value)}
             />
@@ -409,8 +412,8 @@ const RentModal = () => {
 
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Counter
-              title="Rooms"
-              subtitle="How many Rooms do you have?"
+              title={t("rent_modal.rooms_title")}
+              subtitle={t("rent_modal.rooms_subtitle")}
               value={roomCount}
               onChange={(value) => setCustomValue("roomCount", value)}
             />
@@ -418,8 +421,8 @@ const RentModal = () => {
 
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Counter
-              title="Bathrooms"
-              subtitle="How many Bathrooms do you have?"
+              title={t("rent_modal.bathrooms_title")}
+              subtitle={t("rent_modal.bathrooms_subtitle")}
               value={bathroomCount}
               onChange={(value) => setCustomValue("bathroomCount", value)}
             />
@@ -441,8 +444,8 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="Add photos of your place"
-            subtitle="Show guests what your place looks like"
+            title={t("rent_modal.images_title")}
+            subtitle={t("rent_modal.images_subtitle")}
           />
           <p className="text-gray-500 mt-1 text-sm">
             High-quality photos help attract more guests
@@ -472,8 +475,8 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="How would you describe your place?"
-            subtitle="Short and sweet works best!"
+            title={t("rent_modal.description_title")}
+            subtitle={t("rent_modal.description_subtitle")}
           />
         </div>
         <div className="space-y-4">
@@ -519,8 +522,8 @@ const RentModal = () => {
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <Heading
-            title="Now, set your price"
-            subtitle="How much do you charge per night?"
+            title={t("rent_modal.price_title")}
+            subtitle={t("rent_modal.price_subtitle")}
           />
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-4">

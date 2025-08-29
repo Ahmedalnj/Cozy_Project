@@ -310,3 +310,4 @@ npx prisma migrate deploy
 3. **العلاقات** محمية بـ Foreign Key Constraints
 4. **الحذف** يتم بـ Cascade Delete للحفاظ على سلامة البيانات
 5. **البيانات الحساسة** مشفرة دائماً
+

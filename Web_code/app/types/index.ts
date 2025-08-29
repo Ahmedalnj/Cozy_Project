@@ -1,4 +1,4 @@
-import type { Listing, Reservation, User } from "@prisma/client";
+import type { Listing, Reservation, User, Review } from "@prisma/client";
 
 export type SafeListing = Omit<Listing, "createdAt"> & {
   createdAt: string;
@@ -28,6 +28,16 @@ export type SaveReservation = Omit<
     paymentMethod: string | null; // السماح بالقيمة null
     amount: number;
   } | null;
+};
+
+export type SafeReview = Omit<Review, "createdAt" | "updatedAt"> & {
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    name: string | null;
+    email: string | null;
+    image?: string | null;
+  };
 };
 
 // تعريف نوع SafeUser مع الحقول المناسبة

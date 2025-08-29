@@ -7,7 +7,7 @@ export async function getSession() {
   return await getServerSession(authOptions);
 }
 
-export default async function getCurrentUser() {
+export async function getCurrentUser() {
   try {
     const session = await getSession();
 
@@ -33,7 +33,7 @@ export default async function getCurrentUser() {
     };
   } catch (error: unknown) {
     return null;
-  } finally {
-    await prisma.$disconnect();
   }
 }
+
+export default getCurrentUser;

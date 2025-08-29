@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 // import { useRouter } from "next/navigation";
 import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 interface ListingsTableProps {
   listings: SafeListing[];
@@ -26,6 +27,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
   listings,
   onRefresh,
 }) => {
+  const { t } = useTranslation("common");
   const [localListings, setLocalListings] = useState(listings);
 
   // Update local state when props change (dashboard refresh)
@@ -228,7 +230,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
             {paginatedListings.map((listing) => (
               <tr key={listing.id} className="border-t hover:bg-gray-50">
                 <td className="py-2 px-4">{listing.title}</td>
-                <td className="py-2 px-4">{listing.category}</td>
+                <td className="py-2 px-4">{t(`categories.${listing.category}.label`)}</td>
                 <td className="py-2 px-4">{listing.locationValue}</td>
                 <td className="py-2 px-4">${listing.price}</td>
                 <td className="py-2 px-4">

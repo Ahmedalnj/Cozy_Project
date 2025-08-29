@@ -69,3 +69,4 @@ const PriceRange = ({ minPrice, maxPrice, onChange }: PriceRangeProps) => {
 };
 
 export default PriceRange;
+

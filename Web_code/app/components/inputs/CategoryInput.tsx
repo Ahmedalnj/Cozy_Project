@@ -1,6 +1,7 @@
 "use client";
 
 import { IconType } from "react-icons";
+import { useTranslation } from "react-i18next";
 
 interface CategoryProps {
   icon: IconType;
@@ -15,6 +16,8 @@ const CategoryInput: React.FC<CategoryProps> = ({
   selected,
   onClick,
 }) => {
+  const { t } = useTranslation("common");
+  
   return (
     <div
       onClick={() => onClick(label)}
@@ -57,7 +60,7 @@ const CategoryInput: React.FC<CategoryProps> = ({
         ${selected ? "text-rose-700" : "text-gray-700"}
         transition-colors duration-300
       `}>
-        {label}
+        {t(`categories.${label}.label`)}
       </div>
       {selected && (
         <div className="absolute top-1 right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center">

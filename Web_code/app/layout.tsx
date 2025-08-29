@@ -15,6 +15,7 @@ import NavbarWrapper from "./components/NavbarWrapper";
 import ForgotPasswordModal from "./components/modals/ForgotPasswordModal";
 import ResetPasswordModal from "./components/modals/ResetPasswordModal";
 import I18NProvider from "./Providers/I18nProvider";
+import LanguageInitializer from "./components/LanguageInitializer";
 
 const font = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -31,10 +32,11 @@ export default async function RootLayout({
   const currentUser = await getCurrentUser();
 
   return (
-    <html lang="en" dir="ltr">
+    <html>
       <body className={font.className}>
         <I18NProvider>
           <ClientOnly>
+            <LanguageInitializer />
             <ToasterProvider />
             <SearchModal />
             <LoginModal />

@@ -14,7 +14,9 @@ export default function LanguageSwitcher({
   const [currentLang, setCurrentLang] = useState("en");
 
   useEffect(() => {
-    setCurrentLang(i18n.language);
+    // Get saved language from localStorage
+    const savedLanguage = localStorage.getItem("language") || localStorage.getItem("i18nextLng") || "en";
+    setCurrentLang(savedLanguage);
 
     const handleLanguageChange = (lng: string) => {
       setCurrentLang(lng);
@@ -29,7 +31,9 @@ export default function LanguageSwitcher({
   const toggleLanguage = () => {
     const newLang = currentLang === "en" ? "ar" : "en";
     i18n.changeLanguage(newLang);
+    // Save to both keys for compatibility
     localStorage.setItem("language", newLang);
+    localStorage.setItem("i18nextLng", newLang);
     document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = newLang;
     setCurrentLang(newLang);

@@ -73,9 +73,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       py-3
       px-4
       rounded-full
-      hover:bg-neutral-100
+      
       transition
       cursor-pointer
+      border-[1px]
+      border-neutral-200
+      hover:shadow-md
     "
         >
           {t("cozy_my_home")}

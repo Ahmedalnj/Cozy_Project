@@ -11,6 +11,8 @@ import Button from "../Button";
 import Avatar from "../Avatar";
 import { useTranslation } from "react-i18next";
 
+import ReviewSummary from "../ReviewSummary";
+
 interface ListingCardProps {
   data: SafeListing;
   reservation?: SaveReservation;
@@ -161,6 +163,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
           In {""}
           {location?.label}
         </div>
+
+        {/* Reviews Summary */}
+        <ReviewSummary listingId={data.id} size="sm" />
 
         <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
           <div className="font-semibold">${price}</div>

@@ -1,14 +1,16 @@
 "use client";
 import Container from "../Container";
-import { TbBuilding, TbBuildingStore, TbHome, TbPool } from "react-icons/tb";
+import { TbBuilding, TbBuildingStore, TbHome, TbPool, TbBeach } from "react-icons/tb";
 import {
   GiFamilyHouse,
   GiFarmTractor,
   GiForestCamp,
   GiIsland,
   GiPartyPopper,
+  GiHouse,
+  GiGraduateCap,
 } from "react-icons/gi";
-import { MdOutlineVilla } from "react-icons/md";
+import { MdOutlineVilla, MdHotel, MdApartment } from "react-icons/md";
 import CategoryBox from "../CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -62,6 +64,31 @@ export const categories = [
     label: "Offices",
     icon: TbBuilding,
     description: "Administrative offices for rent",
+  },
+  {
+    label: "Hotel Apartments",
+    icon: MdHotel,
+    description: "Luxury hotel-style apartments with full services",
+  },
+  {
+    label: "Beach Houses",
+    icon: TbBeach,
+    description: "Houses located directly on the beach",
+  },
+  {
+    label: "Studios",
+    icon: MdApartment,
+    description: "Compact single-room apartments",
+  },
+  {
+    label: "Family Houses",
+    icon: GiHouse,
+    description: "Large houses suitable for families",
+  },
+  {
+    label: "Student Apartments",
+    icon: GiGraduateCap,
+    description: "Affordable apartments for students",
   },
 ];
 

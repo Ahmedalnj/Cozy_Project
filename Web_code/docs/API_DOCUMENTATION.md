@@ -280,3 +280,4 @@ curl -X POST "http://localhost:3000/api/reservations" \
     "totalPrice": 750
   }'
 ```
+

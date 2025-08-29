@@ -237,9 +237,6 @@
   "reservation_only_note": "سيتم تأكيد حجزك ويمكنك الدفع لاحقاً أو عند الوصول",
   "confirm_reservation_only": "تأكيد الحجز فقط",
   "confirm_payment": "تأكيد الحجز والدفع",
-  "loading_reservation_details": "جاري تحميل تفاصيل الحجز...",
-  "please_wait": "يرجى الانتظار بينما نقوم بجلب تفاصيل حجزك",
-  "cash_payment_success_note": "تم تأكيد حجزك النقدي بنجاح",
   "guest_details": "تفاصيل الضيف",
   "paid": "مدفوع",
   "accept_cash_on_arrival": "قبول الدفع النقدي",
@@ -247,13 +244,6 @@
   "cash_payment_accepted": "تم قبول الدفع النقدي بنجاح",
   "cash_pending": "الدفع النقدي معلق",
   "cash_pending_note": "يرجى الدفع نقداً عند وصولك",
-  "review": "مراجعة",
-  "reviewing": "جاري المراجعة...",
-  "reservation_pending": "الحجز معلق",
-  "reservation_pending_review": "هذا الحجز يحتاج إلى مراجعتك للتأكيد",
-  "reservation_pending_note": "يرجى مراجعة وتأكيد هذا الحجز",
-  "waiting_for_host_approval": "الضيف ينتظر منك قبول الحجز",
-  "waiting_for_host_to_approve": "في انتظار موافقة المضيف",
   "reject_reservation": "رفض الحجز",
   "rejecting_reservation": "جاري الرفض...",
   "reservation_rejected": "تم رفض الحجز بنجاح",
@@ -267,7 +257,6 @@
   "characters": "حرف",
   "note": "ملاحظة",
   "rejection_note": "سيؤدي هذا الإجراء إلى حذف الحجز نهائياً وإرسال بريد إلكتروني إشعار للضيف.",
-  "cancel": "إلغاء",
   "categories": {
     "Apartments": {
       "label": "شقق",
@@ -308,13 +297,32 @@
     "Offices": {
       "label": "مكاتب",
       "description": "مكاتب إدارية للإيجار"
+    },
+    "Hotel Apartments": {
+      "label": "شقق فندقية",
+      "description": "شقق فاخرة بنمط الفندق مع خدمات كاملة"
+    },
+    "Beach Houses": {
+      "label": "منازل شاطئية",
+      "description": "منازل تقع مباشرة على الشاطئ"
+    },
+    "Studios": {
+      "label": "استوديوهات",
+      "description": "شقق مدمجة بغرفة واحدة"
+    },
+    "Family Houses": {
+      "label": "منازل عائلية",
+      "description": "منازل كبيرة مناسبة للعائلات"
+    },
+    "Student Apartments": {
+      "label": "شقق طلابية",
+      "description": "شقق بأسعار معقولة للطلاب"
     }
   },
   "payment_confirmed": "تم تأكيد الدفع",
   "confirm_accept_reservation": "تأكيد قبول الحجز",
   "confirm_accept_description": "يرجى مراجعة تفاصيل الحجز قبل القبول",
   "guest": "الضيف",
-  "property": "العقار",
   "dates": "التواريخ",
   "cash_payment": "الدفع النقدي",
   "important_note": "ملاحظة مهمة",
@@ -557,5 +565,121 @@
     "minimum_one_night": "مطلوب إقامة ليلة واحدة على الأقل",
     "owner_warning_title": "⚠️ لا يمكنك حجز إعلانك الخاص",
     "owner_warning_message": "إذا كنت صاحب هذا العقار، فلست بحاجة إلى إجراء حجز"
-  }
+  },
+  "listing_info": {
+    "hosted_by": "مستضيف بواسطة",
+    "guests": "ضيوف",
+    "rooms": "غرف",
+    "bathrooms": "حمامات",
+    "description": "الوصف"
+  },
+  "listing_reservation": {
+    "nights_in": "ليالي في",
+    "night_in": "ليلة في",
+    "check_in": "تسجيل الوصول",
+    "check_out": "تسجيل المغادرة",
+    "add_date": "أضف تاريخ",
+    "price_per_night": "× ليالي",
+    "total": "المجموع",
+    "select_at_least_one_night": "يرجى اختيار إقامة ليلة واحدة على الأقل",
+    "reserve": "احجز",
+    "wont_be_charged": "لن يتم خصم المبلغ بعد",
+    "report_listing": "الإبلاغ عن هذا الإعلان"
+  },
+  "listing_offer": {
+    "what_this_place_offers": "ما يوفره هذا المكان"
+  },
+  "listing_map": {
+    "where_youll_be": "أين ستكون",
+    "listing_located_at": "يقع هذا الإعلان في",
+    "find_on_map": "يمكنك العثور عليه على الخريطة أدناه."
+  },
+  "offers": {
+    "wifi": "واي فاي",
+    "wifi_description": "إنترنت لاسلكي مجاني",
+    "parking": "موقف سيارات",
+    "parking_description": "موقف سيارات مجاني",
+    "tv": "تلفاز",
+    "tv_description": "تلفاز بشاشة مسطحة",
+    "air_conditioning": "مكيف هواء",
+    "air_conditioning_description": "نظام تبريد متاح",
+    "kitchen": "مطبخ",
+    "kitchen_description": "مطبخ مجهز",
+    "swimming_pool": "مسبح",
+    "swimming_pool_description": "مسبح خارجي أو داخلي"
+  },
+  "rent_modal": {
+    "category_title": "أي من هذه يصف مكانك بشكل أفضل؟",
+    "category_subtitle": "اختر فئة",
+    "offers_title": "ما هي المرافق التي يوفرها مكانك؟",
+    "offers_subtitle": "اختر كل ما ينطبق",
+    "location_title": "أين يقع مكانك؟",
+    "location_subtitle": "ساعد الضيوف في العثور عليك!",
+    "info_title": "شارك بعض الأساسيات حول مكانك",
+    "info_subtitle": "أخبر الضيوف عن سعة عقارك؟",
+    "guests_title": "الضيوف",
+    "guests_subtitle": "كم ضيف تسمح لهم؟",
+    "rooms_title": "الغرف",
+    "rooms_subtitle": "كم غرفة لديك؟",
+    "bathrooms_title": "الحمامات",
+    "bathrooms_subtitle": "كم حمام لديك؟",
+    "images_title": "أضف صور لمكانك",
+    "images_subtitle": "أظهر للضيوف كيف يبدو مكانك",
+    "description_title": "كيف تصف مكانك؟",
+    "description_subtitle": "القصير واللطيف يعمل بشكل أفضل!",
+    "price_title": "الآن، حدد سعرك",
+    "price_subtitle": "كم تفرض في الليلة الواحدة؟",
+    "selected": "المختار:",
+    "selected_location": "الموقع المختار:",
+    "category_required": "الفئة مطلوبة",
+    "offers_required": "مطلوب عرض واحد على الأقل",
+    "location_required": "الموقع مطلوب"
+  },
+  "reviews": {
+    "title": "التقييمات",
+    "no_reviews": "لا توجد تقييمات بعد",
+    "be_first": "كن أول من يقيم هذا المكان",
+    "average_rating": "متوسط التقييم",
+    "total_reviews": "إجمالي التقييمات",
+    "write_review": "أضف تقييماً",
+    "edit_review": "عدل تقييمك",
+    "rating": "التقييم",
+    "comment": "التعليق",
+    "submit_review": "إرسال التقييم",
+    "update_review": "تحديث التقييم",
+    "delete_review": "حذف التقييم",
+    "review_submitted": "تم إرسال التقييم بنجاح",
+    "review_updated": "تم تحديث التقييم بنجاح",
+    "review_deleted": "تم حذف التقييم بنجاح",
+    "submit_error": "فشل في إرسال التقييم",
+    "load_error": "فشل في تحميل التقييمات",
+    "delete_error": "فشل في حذف التقييم",
+    "rating_required": "التقييم مطلوب",
+    "comment_placeholder": "شارك تجربتك مع هذا المكان...",
+    "comment_min_length": "يجب أن يكون التعليق 10 أحرف على الأقل",
+    "stars": "نجوم",
+    "star": "نجمة",
+    "excellent": "ممتاز",
+    "very_good": "جيد جداً",
+    "good": "جيد",
+    "fair": "مقبول",
+    "poor": "ضعيف"
+  },
+  "review_categories": {
+    "cleanliness": "النظافة",
+    "accuracy": "الدقة",
+    "check_in": "تسجيل الدخول",
+    "communication": "التواصل",
+    "location": "الموقع",
+    "value": "القيمة",
+    "overall": "التقييم العام"
+  },
+  "guest_favourite": {
+    "title": "المفضلة لدى الضيوف",
+    "description": "هذا المنزل هو المفضل لدى الضيوف بناءً على التقييمات والمراجعات والموثوقية"
+  },
+  "delete_confirmation": "هل أنت متأكد من حذف هذا التقييم؟",
+  "your_review": "تقييمك",
+  "login_to_review": "يرجى تسجيل الدخول لكتابة تقييم",
+  "change_language": "تغيير اللغة"
 }

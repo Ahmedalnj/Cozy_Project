@@ -13,10 +13,11 @@ import toast from "react-hot-toast";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import { Range } from "react-date-range";
 import useCountries from "@/app/hooks/useCountry";
-import { offers as allOffers } from "@/app/components/offers";
+import { useOffers } from "@/app/components/offers";
 import { IconType } from "react-icons";
 import ListingMap from "@/app/components/listings/ListingMap";
 import { useTranslation } from "react-i18next";
+import ReviewsSection from "@/app/components/ReviewsSection";
 
 const initialDateRange: Range = {
   startDate: new Date(),
@@ -41,6 +42,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const router = useRouter();
   const { getByValue } = useCountries();
   const { t } = useTranslation("common");
+  const allOffers = useOffers();
   const location = getByValue(listing.locationValue);
 
   const isOwner = useMemo(() => {
@@ -155,13 +157,33 @@ const ListingClient: React.FC<ListingClientProps> = ({
     if (!listing.offers || listing.offers.length === 0) return [];
 
     return listing.offers
-      .map((label) => allOffers.find((o) => o.label === label))
+      .map((label) => {
+        // Try exact match first
+        let found = allOffers.find((o) => o.englishLabel === label);
+        
+        // If not found, try case-insensitive match
+        if (!found) {
+          found = allOffers.find((o) => 
+            o.englishLabel.toLowerCase() === label.toLowerCase()
+          );
+        }
+        
+        // If still not found, try partial match
+        if (!found) {
+          found = allOffers.find((o) => 
+            o.englishLabel.toLowerCase().includes(label.toLowerCase()) ||
+            label.toLowerCase().includes(o.englishLabel.toLowerCase())
+          );
+        }
+        
+        return found;
+      })
       .filter(Boolean) as {
       icon: IconType;
       label: string;
       description: string;
     }[];
-  }, [listing.offers]);
+  }, [listing.offers, allOffers]);
 
   return (
     <Container>
@@ -206,6 +228,15 @@ const ListingClient: React.FC<ListingClientProps> = ({
               )}
             </div>
           </div>
+          {/* Reviews Section */}
+          <div className="mt-8">
+            <ReviewsSection
+              listingId={listing.id}
+              currentUser={currentUser}
+              isOwner={isOwner}
+            />
+          </div>
+          
           <div>
             <ListingMap
               locationValue={listing.locationValue}

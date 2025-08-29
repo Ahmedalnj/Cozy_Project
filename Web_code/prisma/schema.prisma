@@ -25,6 +25,7 @@ model User {
   listings       Listing[]
   reservations   Reservation[]
   payments       Payment[]     @relation("UserPayments")
+  reviews        Review[]
 }
 
 model Account {
@@ -62,6 +63,7 @@ model Listing {
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations  Reservation[]
   payments      Payment[]     @relation("ListingPayments")
+  reviews       Review[]
 }
 
 model Reservation {
@@ -98,6 +100,30 @@ model Payment {
   user          User          @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+model Review {
+  id        String  @id @default(uuid()) @map("_id") @db.Uuid
+  listingId String  @map("listing_id") @db.Uuid
+  userId    String  @map("user_id") @db.Uuid
+  rating    Int
+  comment   String?
+
+  // Detailed ratings by category
+  cleanliness   Int? // النظافة
+  accuracy      Int? // الدقة
+  checkIn       Int? // تسجيل الدخول
+  communication Int? // التواصل
+  location      Int? // الموقع
+  value         Int? // القيمة
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, userId])
+  @@map("reviews")
 }
 
 enum PaymentStatus {

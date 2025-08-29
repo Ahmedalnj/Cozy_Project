@@ -5,6 +5,7 @@ import Calendar from "../inputs/Calender";
 import Button from "../Button";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ListingReservationProps {
   price: number;
@@ -30,6 +31,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
   days,
   locationLabel,
 }) => {
+  const { t } = useTranslation("common");
   const [showDayCountHint, setShowDayCountHint] = useState(false);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       {dateRange.startDate && dateRange.endDate && (
         <div className="mb-4">
           <h3 className="text-lg font-semibold">
-            {days} night{days && days > 1 ? "s" : ""} in {locationLabel}
+            {days} {days && days > 1 ? t("listing_reservation.nights_in") : t("listing_reservation.night_in")} {locationLabel}
           </h3>
         </div>
       )}
@@ -50,19 +52,19 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       {/* Date and Guest Inputs */}
       <div className="grid grid-cols-2 gap-2 mb-4">
         <div className="border rounded-lg p-3">
-          <div className="text-xs font-medium text-gray-500">CHECK IN</div>
+          <div className="text-xs font-medium text-gray-500">{t("listing_reservation.check_in")}</div>
           <div className="text-sm">
             {dateRange.startDate
               ? format(dateRange.startDate, "MMM d, yyyy")
-              : "Add date"}
+              : t("listing_reservation.add_date")}
           </div>
         </div>
         <div className="border rounded-lg p-3">
-          <div className="text-xs font-medium text-gray-500">CHECKOUT</div>
+          <div className="text-xs font-medium text-gray-500">{t("listing_reservation.check_out")}</div>
           <div className="text-sm">
             {dateRange.endDate
               ? format(dateRange.endDate, "MMM d, yyyy")
-              : "Add date"}
+              : t("listing_reservation.add_date")}
           </div>
         </div>
       </div>
@@ -80,31 +82,31 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       <div className="mb-4 p-4 border rounded-lg">
         <div className="flex justify-between font-semibold">
           <span>
-            ${price} × {days} nights
+            ${price} {t("listing_reservation.price_per_night")} {days}
           </span>
-          <span>Total $ {totalPrice}</span>
+          <span>{t("listing_reservation.total")} $ {totalPrice}</span>
         </div>
       </div>
 
       {/* Day Count Hint */}
       {showDayCountHint && days === 0 && (
         <div className="mb-2 text-sm text-rose-500 text-center">
-          Please select at least 1 night stay
+          {t("listing_reservation.select_at_least_one_night")}
         </div>
       )}
 
       {/* Reserve Button */}
       <div className="mb-2">
-        <Button disabled={disabled} label="Reserve" onClick={onSubmit} />
+        <Button disabled={disabled} label={t("listing_reservation.reserve")} onClick={onSubmit} />
       </div>
 
       <p className="text-center text-sm text-gray-500 mb-4">
-        You won't be charged yet
+        {t("listing_reservation.wont_be_charged")}
       </p>
 
       <div className="text-center">
         <button className="text-sm underline text-gray-500">
-          Report this listing
+          {t("listing_reservation.report_listing")}
         </button>
       </div>
     </div>
