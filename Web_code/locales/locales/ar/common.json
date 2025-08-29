@@ -457,16 +457,25 @@
     "discover_new_places": "اكتشف أماكن جديدة"
   },
   "footer": {
-    "company_info": "معلومات الشركة",
-    "quick_links": "روابط سريعة",
+    "companyDescription": "منصة رائدة في مجال حجز العقارات السياحية في ليبيا. نقدم أفضل تجربة إقامة لعملائنا الكرام.",
+    "quickLinks": "روابط سريعة",
+    "allProperties": "جميع العقارات",
+    "favorites": "المفضلة",
+    "myTrips": "رحلاتي",
+    "reservations": "الحجوزات",
     "support": "الدعم",
+    "helpCenter": "مركز المساعدة",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الخدمة",
+    "reportIssue": "الإبلاغ عن مشكلة",
+    "contactUs": "اتصل بنا",
+    "address": "طرابلس، ليبيا",
+    "copyright": "© 2024 كوزي ليبيا. جميع الحقوق محفوظة.",
+    "company_info": "معلومات الشركة",
     "contact": "اتصل بنا",
     "about_cozy": "عن كوزي",
     "how_it_works": "كيف يعمل",
-    "help_center": "مركز المساعدة",
     "contact_support": "اتصل بالدعم",
-    "privacy_policy": "سياسة الخصوصية",
-    "terms_of_service": "شروط الخدمة",
     "cancellation_policy": "سياسة الإلغاء",
     "all_rights_reserved": "جميع الحقوق محفوظة"
   },
@@ -681,5 +690,8 @@
   "delete_confirmation": "هل أنت متأكد من حذف هذا التقييم؟",
   "your_review": "تقييمك",
   "login_to_review": "يرجى تسجيل الدخول لكتابة تقييم",
-  "change_language": "تغيير اللغة"
+  "change_language": "تغيير اللغة",
+  "Added_to_Favorites": "تمت الإضافة إلى المفضلة",
+  "Add_to_Favorites": "أضف إلى المفضلة",
+  "Removed_from_favorites": "تمت الإزالة من المفضلة"
 }

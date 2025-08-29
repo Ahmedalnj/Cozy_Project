@@ -3,6 +3,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { SafeUser } from "../types";
 import useFavorite from "../hooks/useFavorite";
 import { useState, MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 interface HeartButtonProps {
   listingId: string;
@@ -22,6 +23,8 @@ const HeartButton: React.FC<HeartButtonProps> = ({
     currentUser,
   });
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const { t } = useTranslation("common");
 
   const handleClick = async (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -68,7 +71,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
           group-hover:text-rose-500
           ${hasFavorited ? "text-rose-500 font-medium" : "text-gray-600"}`}
         >
-          {hasFavorited ? "Added to Favorites" : label}
+          {hasFavorited ? t("Added_to_Favorites") : label}
         </span>
       )}
     </div>

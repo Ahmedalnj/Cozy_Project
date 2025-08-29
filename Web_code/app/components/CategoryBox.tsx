@@ -7,12 +7,14 @@ interface CategoryBoxProps {
   icon: IconType;
   label: string;
   selected?: boolean;
+  value?: string;
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({
   icon: Icon,
   label,
   selected,
+  value,
 }) => {
   const router = useRouter();
   const params = useSearchParams();
@@ -21,6 +23,7 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
     if (params) {
       currentQuery = qs.parse(params.toString());
     }
+    const categoryValue = value || label;
     const updatedQuery: Record<string, string> = {
       ...Object.entries(currentQuery).reduce<Record<string, string>>(
         (acc, [key, value]) => {
@@ -29,9 +32,9 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
         },
         {}
       ),
-      category: label,
+      category: categoryValue,
     };
-    if (params?.get("category") == label) {
+    if (params?.get("category") == categoryValue) {
       delete updatedQuery.category;
     }
     const url = qs.stringifyUrl(
@@ -43,7 +46,7 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
     );
 
     router.push(url);
-  }, [label, params, router]);
+  }, [label, value, params, router]);
   return (
     <div
       onClick={handleClick}
@@ -56,8 +59,11 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
     p-3
     border-b-2
     hover:text-neutral-800
-    transition
+    hover:scale-105
+    transition-all
+    duration-200
     cursor-pointer
+    transform
     ${selected ? "border-b-neutral-800" : "border-transparent"}
     ${selected ? "text-neutral-800" : "text-neutral-500"}
     `}

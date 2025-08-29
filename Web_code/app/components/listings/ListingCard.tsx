@@ -92,18 +92,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
   return (
     <div
       onClick={() => router.push(`/listings/${data.id}`)}
-      className="col-span-1 cursor-pointer group p-2 sm:p-0"
+      className="col-span-1 cursor-pointer group p-2 sm:p-0 transform hover:-translate-y-1 transition-all duration-300 ease-out"
     >
       <div className="flex flex-col gap-1 sm:gap-2 xs:w-auto">
-        <div className="aspect-square w-full relative overflow-hidden rounded-lg">
+        <div className="aspect-square w-full relative overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-all duration-300 ease-out">
           <Image
             fill
             alt="Listing"
             src={imageSrc}
-            className="object-cover h-full w-full group-hover:scale-110 transition"
+            className="object-cover h-full w-full group-hover:scale-110 transition-transform duration-500 ease-out"
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           />
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 transform group-hover:scale-110 transition-transform duration-200">
             <HeartButton
               listingId={data.id}
               currentUser={currentUser}
@@ -157,7 +157,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
-        <div className="font-semibold sm:font-bold text-sm sm:text-base">
+        <div className="font-semibold sm:font-bold text-sm sm:text-base group-hover:text-blue-600 transition-colors duration-200">
           {reservationDate ||
             t(`categories.${data.category}.label`).slice(0, -1)}{" "}
           In {""}
@@ -168,7 +168,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
         <ReviewSummary listingId={data.id} size="sm" />
 
         <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
-          <div className="font-semibold">${price}</div>
+          <div className="font-semibold group-hover:text-green-600 transition-colors duration-200">${price}</div>
           {!reservation && (
             <div className="font-light text-xs sm:text-sm">
               {t("per_night")}

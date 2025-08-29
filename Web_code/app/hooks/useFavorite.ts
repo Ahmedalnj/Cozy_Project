@@ -2,66 +2,63 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo} from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-hot-toast";
 
 import { SafeUser } from "../types";
 
 import useLoginModal from "./useLoginModal";
+import { useTranslation } from "react-i18next";
 
-interface IUseFavorite{
-    listingId:string;
-    currentUser?:SafeUser| null;
+interface IUseFavorite {
+  listingId: string;
+  currentUser?: SafeUser | null;
 }
 
-const useFavorite =({
-    listingId,
-    currentUser
-}:IUseFavorite)=>{
-    const router =useRouter();
-    const loginModal =useLoginModal();
+const useFavorite = ({ listingId, currentUser }: IUseFavorite) => {
+  const router = useRouter();
+  const loginModal = useLoginModal();
 
-    const hasFavorited =useMemo(()=>{
-        const list = currentUser?.favoriteIds || [];
+  const { t } = useTranslation("common");
 
-        return list.includes(listingId);
-    },[currentUser,listingId]);
+  const hasFavorited = useMemo(() => {
+    const list = currentUser?.favoriteIds || [];
 
-    const toggleFavorite =useCallback(async(
-        e:React.MouseEvent<HTMLDivElement>
-    ) => {
-        e.stopPropagation();
+    return list.includes(listingId);
+  }, [currentUser, listingId]);
 
-        if(!currentUser){
-            return loginModal.onOpen();
+  const toggleFavorite = useCallback(
+    async (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+
+      if (!currentUser) {
+        return loginModal.onOpen();
+      }
+
+      try {
+        let request;
+        if (hasFavorited) {
+          request = () => axios.delete(`/api/favorites/${listingId}`);
+        } else {
+          request = () => axios.post(`/api/favorites/${listingId}`);
         }
 
-        try {
-    let request;
-    if (hasFavorited) {
-        request = () => axios.delete(`/api/favorites/${listingId}`);
-    } else {
-        request = () => axios.post(`/api/favorites/${listingId}`);
-    }
-
-    await request();
-    router.refresh();
-    toast.success(hasFavorited ? "Removed from favorites" : "Added to favorites");
-} catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-    toast.error(errorMessage);
-}
+        await request();
+        router.refresh();
+        toast.success(
+          hasFavorited ? t("Removed_from_favorites") : t("Added_to_Favorites")
+        );
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Something went wrong";
+        toast.error(errorMessage);
+      }
     },
-    [
-        currentUser,
-        hasFavorited,
-        listingId,
-        loginModal,
-        router
-    ]);
-    return{
-        hasFavorited,
-        toggleFavorite
-    }
-}
+    [currentUser, hasFavorited, listingId, loginModal, router, t]
+  );
+  return {
+    hasFavorited,
+    toggleFavorite,
+  };
+};
 export default useFavorite;

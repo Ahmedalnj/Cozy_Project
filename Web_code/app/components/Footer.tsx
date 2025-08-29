@@ -1,9 +1,12 @@
 "use client";
 
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import Logo from "./navbar/Logo";
 
 const Footer = () => {
+  const { t } = useTranslation("common");
+
   return (
     <footer className="bg-gray-900 text-white w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -12,7 +15,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Logo />
             <p className="text-gray-400 text-sm leading-relaxed">
-              منصة رائدة في مجال حجز العقارات السياحية في ليبيا. نقدم أفضل تجربة إقامة لعملائنا الكرام.
+              {t("footer.companyDescription")}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -32,26 +35,26 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">روابط سريعة</h3>
+            <h3 className="text-lg font-semibold">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2">
               <li>
                 <a href="/properties" className="text-gray-400 hover:text-white transition-colors">
-                  جميع العقارات
+                  {t("footer.allProperties")}
                 </a>
               </li>
               <li>
                 <a href="/favorites" className="text-gray-400 hover:text-white transition-colors">
-                  المفضلة
+                  {t("footer.favorites")}
                 </a>
               </li>
               <li>
                 <a href="/trips" className="text-gray-400 hover:text-white transition-colors">
-                  رحلاتي
+                  {t("footer.myTrips")}
                 </a>
               </li>
               <li>
                 <a href="/reservations" className="text-gray-400 hover:text-white transition-colors">
-                  الحجوزات
+                  {t("footer.reservations")}
                 </a>
               </li>
             </ul>
@@ -59,26 +62,26 @@ const Footer = () => {
 
           {/* Support */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">الدعم</h3>
+            <h3 className="text-lg font-semibold">{t("footer.support")}</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  مركز المساعدة
+                  {t("footer.helpCenter")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  سياسة الخصوصية
+                  {t("footer.privacyPolicy")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  شروط الاستخدام
+                  {t("footer.termsOfService")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  الإبلاغ عن مشكلة
+                  {t("footer.reportIssue")}
                 </a>
               </li>
             </ul>
@@ -86,7 +89,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">تواصل معنا</h3>
+            <h3 className="text-lg font-semibold">{t("footer.contactUs")}</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-400">
                 <FaPhone className="w-4 h-4" />
@@ -98,7 +101,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <FaMapMarkerAlt className="w-4 h-4" />
-                <span className="text-sm">طرابلس، ليبيا</span>
+                <span className="text-sm">{t("footer.address")}</span>
               </div>
             </div>
           </div>
@@ -107,16 +110,8 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 Cozy Libya. جميع الحقوق محفوظة.
+              {t("footer.copyright")}
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
-                العربية
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
-                English
-              </a>
-            </div>
           </div>
         </div>
       </div>

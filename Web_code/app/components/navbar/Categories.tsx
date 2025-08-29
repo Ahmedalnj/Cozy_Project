@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import Container from "../Container";
 import { TbBuilding, TbBuildingStore, TbHome, TbPool, TbBeach } from "react-icons/tb";
 import {
@@ -94,27 +95,54 @@ export const categories = [
 
 const Categories = () => {
   const params = useSearchParams();
-  const { t } = useTranslation("common"); // إضافة i18n
+  const { t } = useTranslation("common");
   const category = params?.get("category");
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  
   const isMainPage = pathname == "/";
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // إخفاء عند التمرير للأسفل بعد 150px، إظهار عند التمرير للأعلى
+      if (currentScrollY > lastScrollY && currentScrollY > 150) {
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   if (!isMainPage) {
     return null;
   }
 
   return (
-    <Container>
-      <div className="pt-4 flex flex-row items-center justify-between overflow-x-auto">
-        {categories.map((item) => (
-          <CategoryBox
-            key={item.label}
-            label={t(`categories.${item.label}.label`)}
-            selected={category === item.label}
-            icon={item.icon}
-          />
-        ))}
-      </div>
-    </Container>
+    <div className={`transition-all duration-500 ease-in-out transform ${
+      isVisible ? 'translate-y-0 opacity-100 max-h-32' : '-translate-y-full opacity-0 max-h-0'
+    } overflow-hidden`}>
+      <Container>
+        <div className="pt-4 flex flex-row items-center justify-between">
+          {categories.map((item) => (
+            <CategoryBox
+              key={item.label}
+              label={t(`categories.${item.label}.label`)}
+              selected={category === item.label}
+              icon={item.icon}
+              value={item.label}
+            />
+          ))}
+        </div>
+      </Container>
+    </div>
   );
 };
 

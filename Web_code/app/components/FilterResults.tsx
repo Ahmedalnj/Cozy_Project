@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { FaTimes, FaSearch } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 interface FilterResultsProps {
   totalResults: number;
@@ -13,6 +14,13 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
   const params = useSearchParams();
   const router = useRouter();
   const { t } = useTranslation("common");
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation when component mounts
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const hasActiveFilters =
     params &&
@@ -35,16 +43,22 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
   }
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+    <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 transition-all duration-1000 ease-out transform ${
+      isVisible ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Main Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Results Info */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full shadow-lg">
+            <div className={`flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full shadow-lg transition-all duration-500 ease-out transform ${
+              isVisible ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
+            }`}>
               <FaSearch className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className={`transition-all duration-700 ease-out transform ${
+              isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+            }`}>
               <h2 className="text-lg font-bold text-gray-900">
                 {t("filter_results.title")}
               </h2>
@@ -57,7 +71,10 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
           {/* Clear Filters Button */}
           <button
             onClick={clearAllFilters}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md"
+            className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-105 ${
+              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
+            style={{ transitionDelay: '200ms' }}
           >
             <FaTimes className="w-4 h-4" />
             <span className="font-medium">{t("filter_results.clear_filters")}</span>
@@ -65,59 +82,61 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
         </div>
 
         {/* Active Filters */}
-        <div className="mt-4">
+        <div className={`mt-4 transition-all duration-1000 ease-out transform ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        }`} style={{ transitionDelay: '400ms' }}>
           <div className="flex flex-wrap gap-2">
             {params.get("locationValue") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-blue-200">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-blue-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {params.get("locationValue")}
                 </span>
               </div>
             )}
             {params.get("category") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-green-200">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-green-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {params.get("category")}
                 </span>
               </div>
             )}
             {params.get("guestCount") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-purple-200">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-purple-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {params.get("guestCount")} {t("filter_results.guest_single")}
                 </span>
               </div>
             )}
             {params.get("roomCount") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-yellow-200">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-yellow-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {params.get("roomCount")} {t("filter_results.room_single")}
                 </span>
               </div>
             )}
             {params.get("bathroomCount") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-orange-200">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-orange-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {params.get("bathroomCount")} {t("filter_results.bathroom_single")}
                 </span>
               </div>
             )}
             {params.get("minPrice") && params.get("maxPrice") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-red-200">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-red-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   ${params.get("minPrice")} - ${params.get("maxPrice")}
                 </span>
               </div>
             )}
             {params.get("startDate") && params.get("endDate") && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-indigo-200">
-                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-indigo-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
                   {t("filter_results.specific_dates")}
                 </span>

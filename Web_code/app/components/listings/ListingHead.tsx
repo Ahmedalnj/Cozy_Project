@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import { useTranslation } from "react-i18next";
 
 interface ListingHeadProps {
   title: string;
@@ -30,6 +31,7 @@ const ListingHead: React.FC<ListingHeadProps> = ({
   const location = getByValue(locationValue);
   const [openLightbox, setOpenLightbox] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const { t } = useTranslation("common");
 
   const handleImageClick = useCallback((index: number) => {
     setPhotoIndex(index);
@@ -116,7 +118,7 @@ const ListingHead: React.FC<ListingHeadProps> = ({
           listingId={id}
           currentUser={currentUser}
           showLabel={true}
-          label="Add to Favorites"
+          label={t("Add_to_Favorites")}
         />
       </div>
 

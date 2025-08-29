@@ -34,15 +34,6 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     (review) => review.userId === currentUser?.id
   );
 
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-      : 0;
-
-  useEffect(() => {
-    fetchReviews();
-  }, [listingId]);
-
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
@@ -55,6 +46,15 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
       setLoading(false);
     }
   }, [listingId, t]);
+
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+      : 0;
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const handleSubmitReview = async (
     rating: number,

@@ -9,7 +9,6 @@ import FilterResults from "./components/FilterResults";
 import FilteredListings from "./components/FilteredListings";
 import Footer from "./components/Footer";
 
-
 interface HomeProps {
   searchParams: Promise<IListingsParams>;
 }
@@ -19,54 +18,46 @@ const Home = async (props: HomeProps) => {
   const listings = await getListings(searchParams);
   const currentUser = await getCurrentUser();
 
+  // Helper function to check if any filters are applied
+  const hasActiveFilters = () => {
+    return !!(
+      searchParams.locationValue ||
+      searchParams.category ||
+      searchParams.guestCount ||
+      searchParams.roomCount ||
+      searchParams.bathroomCount ||
+      searchParams.minPrice ||
+      searchParams.maxPrice ||
+      searchParams.startDate ||
+      searchParams.endDate
+    );
+  };
+
+  const showDefaultContent = !hasActiveFilters();
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Main Content */}
       <div className="flex-1 pt-16">
-        {/* Hero Section - Show only when no filters are applied */}
-        {!searchParams.locationValue &&
-          !searchParams.category &&
-          !searchParams.guestCount &&
-          !searchParams.roomCount &&
-          !searchParams.bathroomCount &&
-          !searchParams.minPrice &&
-          !searchParams.maxPrice &&
-          !searchParams.startDate &&
-          !searchParams.endDate && <HeroSection />}
+        {/* Hero Section */}
+        {showDefaultContent && <HeroSection />}
 
-        {/* Filter Results - Show only when there are active filters */}
+        {/* Filter Results */}
         <FilterResults totalResults={listings.length} />
 
-        {/* Featured Listings - Show only when no filters are applied */}
-        {!searchParams.locationValue &&
-          !searchParams.category &&
-          !searchParams.guestCount &&
-          !searchParams.roomCount &&
-          !searchParams.bathroomCount &&
-          !searchParams.minPrice &&
-          !searchParams.maxPrice &&
-          !searchParams.startDate &&
-          !searchParams.endDate && (
-            <Container>
-              <div className="pt-8 pb-12">
-                <FeaturedListings
-                  listings={listings}
-                  currentUser={currentUser}
-                />
-              </div>
-            </Container>
-          )}
+        {/* Featured Listings */}
+        {showDefaultContent && (
+          <Container>
+            <div className="pt-8 pb-12">
+              <FeaturedListings
+                listings={listings}
+                currentUser={currentUser}
+              />
+            </div>
+          </Container>
+        )}
 
-        {/* Filtered Results - Show when filters are applied */}
-        {(searchParams.locationValue ||
-          searchParams.category ||
-          searchParams.guestCount ||
-          searchParams.roomCount ||
-          searchParams.bathroomCount ||
-          searchParams.minPrice ||
-          searchParams.maxPrice ||
-          searchParams.startDate ||
-          searchParams.endDate) && (
+        {/* Filtered Results */}
+        {hasActiveFilters() && (
           <Container>
             <div className="pt-8 pb-16">
               <FilteredListings listings={listings} currentUser={currentUser} />
@@ -74,43 +65,26 @@ const Home = async (props: HomeProps) => {
           </Container>
         )}
 
-        {/* More Listings Slider - Show only when no filters are applied */}
-        {!searchParams.locationValue &&
-          !searchParams.category &&
-          !searchParams.guestCount &&
-          !searchParams.roomCount &&
-          !searchParams.bathroomCount &&
-          !searchParams.minPrice &&
-          !searchParams.maxPrice &&
-          !searchParams.startDate &&
-          !searchParams.endDate &&
-          listings.length > 0 && (
-            <Container>
-              <div className="pt-8 pb-16">
-                                 <ListingSlider
-                   listings={listings}
-                   currentUser={currentUser}
-                 />
-              </div>
-            </Container>
-          )}
+        {/* More Listings Slider */}
+        {showDefaultContent && listings.length > 0 && (
+          <Container>
+            <div className="pt-8 pb-16">
+              <ListingSlider
+                listings={listings}
+                currentUser={currentUser}
+              />
+            </div>
+          </Container>
+        )}
 
-        {/* Empty State - Show when no listings and no filters */}
-        {listings.length === 0 &&
-          !searchParams.locationValue &&
-          !searchParams.category &&
-          !searchParams.guestCount &&
-          !searchParams.roomCount &&
-          !searchParams.bathroomCount &&
-          !searchParams.minPrice &&
-          !searchParams.maxPrice &&
-          !searchParams.startDate &&
-          !searchParams.endDate && (
-            <EmptyState showReset />
-          )}
+        {/* Empty State */}
+        {listings.length === 0 && showDefaultContent && (
+          <EmptyState showReset />
+        )}
       </div>
       <Footer />
     </div>
   );
 };
+
 export default Home;

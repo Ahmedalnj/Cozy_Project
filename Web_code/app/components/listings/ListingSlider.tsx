@@ -6,6 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 import { useTranslation } from "react-i18next";
+import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 import ListingCard from "./ListingCard";
 import { SafeListing, SafeUser } from "@/app/types";
@@ -24,25 +25,31 @@ export default function ListingSlider({
   title,
 }: ListingSliderProps) {
   const { t } = useTranslation("common");
+  const { elementRef: sliderRef, isVisible: isSliderVisible } = useScrollAnimation({
+    threshold: 0.2,
+    rootMargin: "-50px",
+  });
   const defaultTitle = t("listing_slider.discover_new_places");
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div ref={sliderRef} className={`relative w-full ${className}`}>
       {/* Header with title on right and arrows on left */}
-      <div className="flex items-center justify-between mb-4">
+      <div className={`flex items-center justify-between mb-4 transition-all duration-1000 ease-out transform ${
+        isSliderVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+      }`}>
         {/* Navigation Buttons (left side) */}
         <div className="flex gap-2">
           <button
             aria-label="previous"
-            className="swiper-button-prev-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 transition-colors flex items-center justify-center"
+            className="swiper-button-prev-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
-            <HiOutlineChevronLeft className="w-4 h-4 text-black " />
+            <HiOutlineChevronLeft className="w-4 h-4 text-black" />
           </button>
           <button
             aria-label="next"
-            className="swiper-button-next-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100  transition-colors flex items-center justify-center"
+            className="swiper-button-next-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
-            <HiOutlineChevronRight className="w-4 h-4 text-black " />
+            <HiOutlineChevronRight className="w-4 h-4 text-black" />
           </button>
         </div>
 
@@ -68,9 +75,16 @@ export default function ListingSlider({
           1536: { slidesPerView: 5.3, spaceBetween: 32 },
         }}
       >
-        {listings.map((listing) => (
+        {listings.map((listing, index) => (
           <SwiperSlide key={listing.id}>
-            <div className="px-1 pb-4 h-full">
+            <div className={`px-1 pb-4 h-full transition-all duration-700 ease-out transform ${
+              isSliderVisible 
+                ? 'translate-y-0 opacity-100 scale-100' 
+                : 'translate-y-12 opacity-0 scale-95'
+            }`}
+            style={{
+              transitionDelay: `${index * 100}ms`
+            }}>
               <ListingCard data={listing} currentUser={currentUser} />
             </div>
           </SwiperSlide>
