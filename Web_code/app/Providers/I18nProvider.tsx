@@ -51,6 +51,7 @@ export default function I18nProvider({ children }: I18nProviderProps) {
           "Arabic welcome:",
           i18n.t("welcome", { ns: "common", lng: "ar" })
         );
+        
         setIsInitialized(true);
       })
       .catch((error) => {

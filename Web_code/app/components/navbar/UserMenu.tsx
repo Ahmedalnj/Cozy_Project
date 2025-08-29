@@ -98,10 +98,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       transition
     "
         >
+          <AiOutlineMenu className="block" />
           <div className="md:hidden">
             <Avatar src={currentUser?.image} />
           </div>
-          <AiOutlineMenu className="hidden md:block" />
           <div className="hidden md:block">
             <Avatar src={currentUser?.image} />
           </div>

@@ -16,6 +16,7 @@ import useCountries from "@/app/hooks/useCountry";
 import { offers as allOffers } from "@/app/components/offers";
 import { IconType } from "react-icons";
 import ListingMap from "@/app/components/listings/ListingMap";
+import { useTranslation } from "react-i18next";
 
 const initialDateRange: Range = {
   startDate: new Date(),
@@ -39,6 +40,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const LoginModal = useLoginModal();
   const router = useRouter();
   const { getByValue } = useCountries();
+  const { t } = useTranslation("common");
   const location = getByValue(listing.locationValue);
 
   const isOwner = useMemo(() => {
@@ -74,12 +76,12 @@ const ListingClient: React.FC<ListingClientProps> = ({
       return LoginModal.onOpen();
     }
     if (isOwner) {
-      toast.error("You cannot reserve your own listing.");
+      toast.error(t("listing_client.cannot_reserve_own_listing"));
       return;
     }
 
     if (!dateRange.startDate || !dateRange.endDate) {
-      toast.error("Please select valid check-in and checkout dates.");
+      toast.error(t("listing_client.select_valid_dates"));
       return;
     }
 
@@ -88,7 +90,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
       dateRange.startDate
     );
     if (days <= 0) {
-      toast.error("Minimum 1 night stay required");
+      toast.error(t("listing_client.minimum_one_night"));
       return;
     }
     console.log("Listing imageSrc:", listing.imageSrc);
@@ -130,6 +132,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
     currentUser,
     LoginModal,
     isOwner,
+    t,
   ]);
 
   useEffect(() => {
@@ -196,8 +199,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
               {isOwner && (
                 <div className="mt-4 rounded-xl border-l-4 border-rose-700 bg-rose-100 p-4 shadow-sm">
                   <p className="text-sm text-red-600 font-medium">
-                    ⚠️ لا يمكنك حجز إعلانك الخاص. إذا كنت صاحب هذا العقار، فلست
-                    بحاجة إلى إجراء حجز.
+                    {t("listing_client.owner_warning_title")}.{" "}
+                    {t("listing_client.owner_warning_message")}.
                   </p>
                 </div>
               )}

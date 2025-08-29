@@ -5,6 +5,7 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
+import { useTranslation } from "react-i18next";
 
 import ListingCard from "./ListingCard";
 import { SafeListing, SafeUser } from "@/app/types";
@@ -20,8 +21,11 @@ export default function ListingSlider({
   listings,
   currentUser,
   className = "",
-  title = "عروض في ليبيا",
+  title,
 }: ListingSliderProps) {
+  const { t } = useTranslation("common");
+  const defaultTitle = t("listing_slider.discover_new_places");
+
   return (
     <div className={`relative w-full ${className}`}>
       {/* Header with title on right and arrows on left */}
@@ -43,7 +47,7 @@ export default function ListingSlider({
         </div>
 
         {/* Title (right side) */}
-        <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+        <h2 className="text-xl font-bold text-gray-800">{title || defaultTitle}</h2>
       </div>
 
       <Swiper

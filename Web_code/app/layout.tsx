@@ -15,6 +15,7 @@ import NavbarWrapper from "./components/NavbarWrapper";
 import ForgotPasswordModal from "./components/modals/ForgotPasswordModal";
 import ResetPasswordModal from "./components/modals/ResetPasswordModal";
 import I18NProvider from "./Providers/I18nProvider";
+
 const font = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {

@@ -1,0 +1,121 @@
+/* Dubai Font Definitions */
+
+@font-face {
+    font-family: 'Dubai';
+    src: url('/fonts/dubai/Dubai-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Dubai';
+    src: url('/fonts/dubai/Dubai-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* CSS Variables for font usage */
+:root {
+    --font-dubai: 'Dubai', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Apply Dubai font to everything */
+* {
+    font-family: var(--font-dubai) !important;
+}
+
+/* Base font size for general text */
+body {
+    font-size: 1rem !important;
+}
+
+/* Preserve Tailwind text sizes */
+.text-xs {
+    font-size: 0.75rem !important;
+}
+
+.text-sm {
+    font-size: 0.875rem !important;
+}
+
+.text-base {
+    font-size: 1rem !important;
+}
+
+.text-lg {
+    font-size: 1.125rem !important;
+}
+
+.text-xl {
+    font-size: 1.25rem !important;
+}
+
+.text-2xl {
+    font-size: 1.5rem !important;
+}
+
+.text-3xl {
+    font-size: 1.875rem !important;
+}
+
+.text-4xl {
+    font-size: 2.25rem !important;
+}
+
+.text-5xl {
+    font-size: 3rem !important;
+}
+
+.text-6xl {
+    font-size: 3.75rem !important;
+}
+
+.text-7xl {
+    font-size: 4.5rem !important;
+}
+
+.text-8xl {
+    font-size: 6rem !important;
+}
+
+.text-9xl {
+    font-size: 8rem !important;
+}
+
+/* Utility classes for Dubai font */
+.font-dubai {
+    font-family: var(--font-dubai) !important;
+}
+
+.font-dubai-regular {
+    font-family: var(--font-dubai) !important;
+    font-weight: 400 !important;
+}
+
+.font-dubai-bold {
+    font-family: var(--font-dubai) !important;
+    font-weight: 700 !important;
+}
+
+/* أحجام إضافية للخطوط */
+.text-dubai-sm {
+    font-size: 0.875rem !important;
+}
+
+.text-dubai-base {
+    font-size: 1rem !important;
+}
+
+.text-dubai-lg {
+    font-size: 1.125rem !important;
+}
+
+.text-dubai-xl {
+    font-size: 1.25rem !important;
+}
+
+.text-dubai-2xl {
+    font-size: 1.5rem !important;
+}

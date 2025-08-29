@@ -380,5 +380,149 @@
   "cash_payment": "Cash Payment",
   "important_note": "Important Note",
   "accept_cash_note": "By accepting this reservation, you confirm that the guest will pay in cash upon arrival",
-  "accept_reservation": "Accept Reservation"
+  "accept_reservation": "Accept Reservation",
+  "hero": {
+    "title": "Discover Amazing Places",
+    "subtitle": "to Stay in Libya",
+    "description": "Find unique accommodations, apartments, villas, and homes throughout Libya",
+    "search_button": "Start Searching",
+    "rent_button": "List Your Property"
+  },
+  "filter_results": {
+    "title": "Search Results",
+    "found_properties": "Found {{count}} properties available",
+    "clear_filters": "Clear Filters",
+    "guest_single": "guest",
+    "guest_plural": "guests",
+    "room_single": "room",
+    "room_plural": "rooms",
+    "bathroom_single": "bathroom",
+    "bathroom_plural": "bathrooms",
+    "specific_dates": "Specific Dates"
+  },
+  "featured_listings": {
+    "title": "Featured Properties",
+    "description": "Discover the best properties carefully selected to ensure an exceptional stay experience",
+    "featured_badge": "Featured",
+    "view_all_properties": "View All Properties"
+  },
+  "filtered_listings": {
+    "title": "Available Properties",
+    "found_count": "Found {{count}} properties available",
+    "no_results_title": "No Properties Found",
+    "no_results_description": "Try changing your search criteria or clearing filters"
+  },
+  "listing_slider": {
+    "discover_new_places": "Discover New Places"
+  },
+  "footer": {
+    "company_info": "Company Info",
+    "quick_links": "Quick Links",
+    "support": "Support",
+    "contact": "Contact Us",
+    "about_cozy": "About Cozy",
+    "how_it_works": "How It Works",
+    "help_center": "Help Center",
+    "contact_support": "Contact Support",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "cancellation_policy": "Cancellation Policy",
+    "all_rights_reserved": "All Rights Reserved"
+  },
+  "search_modal": {
+    "title": "Filters",
+    "location_step": {
+      "title": "Where do you wanna go?",
+      "subtitle": "Find the perfect location!"
+    },
+    "date_step": {
+      "title": "When do you plan to go?",
+      "subtitle": "Make sure everyone is free!"
+    },
+    "info_step": {
+      "title": "More Information",
+      "subtitle": "Find your perfect places",
+      "guests": "Guests",
+      "guests_subtitle": "How many guests are coming?",
+      "rooms": "Rooms",
+      "rooms_subtitle": "How many rooms do you need?",
+      "bathrooms": "Bathrooms",
+      "bathrooms_subtitle": "How many bathrooms do you need?"
+    },
+    "price_step": {
+      "title": "Price Range",
+      "subtitle": "Set your budget"
+    },
+    "next": "Next",
+    "back": "Back",
+    "search": "Search"
+  },
+  "filters_panel": {
+    "title": "Filters",
+    "location": "Location",
+    "property_type": "Property Type",
+    "price_range": "Price Range",
+    "guests": "Number of Guests",
+    "rooms": "Number of Rooms",
+    "bathrooms": "Number of Bathrooms",
+    "clear_filters": "Clear Filters",
+    "apply_filters": "Apply Filters"
+  },
+  "price_range": {
+    "title": "Price Range",
+    "min_price": "Minimum Price",
+    "max_price": "Maximum Price"
+  },
+  "counter": {
+    "guests": "Guests",
+    "rooms": "Rooms",
+    "bathrooms": "Bathrooms"
+  },
+  "country_select": {
+    "placeholder": "Select a country",
+    "no_options": "No options available"
+  },
+  "calendar": {
+    "select_dates": "Select dates",
+    "check_in": "Check-in",
+    "check_out": "Check-out"
+  },
+  "listing_card": {
+    "per_night": "per night",
+    "guests": "guests",
+    "bedrooms": "bedrooms",
+    "bathrooms": "bathrooms"
+  },
+  "empty_state": {
+    "no_listings": "No properties available",
+    "no_listings_description": "Try changing your search criteria or adding a new property",
+    "reset_filters": "Reset Filters"
+  },
+  "loading_states": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "updating": "Updating..."
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "password_min": "Password must be at least 8 characters",
+    "password_match": "Passwords do not match",
+    "invalid_phone": "Invalid phone number"
+  },
+  "notifications": {
+    "success": "Success!",
+    "error": "Error!",
+    "warning": "Warning!",
+    "info": "Information"
+  },
+  "listing_client": {
+    "cannot_reserve_own_listing": "You cannot reserve your own listing",
+    "select_valid_dates": "Please select valid check-in and checkout dates",
+    "minimum_one_night": "Minimum 1 night stay required",
+    "owner_warning_title": "⚠️ You cannot reserve your own listing",
+    "owner_warning_message": "If you are the owner of this property, you don't need to make a reservation"
+  }
 }

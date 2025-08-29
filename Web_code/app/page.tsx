@@ -5,7 +5,10 @@ import EmptyState from "./components/EmptyState";
 import ListingSlider from "./components/listings/ListingSlider";
 import HeroSection from "./components/HeroSection";
 import FeaturedListings from "./components/FeaturedListings";
+import FilterResults from "./components/FilterResults";
+import FilteredListings from "./components/FilteredListings";
 import Footer from "./components/Footer";
+
 
 interface HomeProps {
   searchParams: Promise<IListingsParams>;
@@ -19,43 +22,95 @@ const Home = async (props: HomeProps) => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Main Content */}
-      <div className="flex-1">
-        {/* Hero Section */}
-        <HeroSection />
+      <div className="flex-1 pt-16">
+        {/* Hero Section - Show only when no filters are applied */}
+        {!searchParams.locationValue &&
+          !searchParams.category &&
+          !searchParams.guestCount &&
+          !searchParams.roomCount &&
+          !searchParams.bathroomCount &&
+          !searchParams.minPrice &&
+          !searchParams.maxPrice &&
+          !searchParams.startDate &&
+          !searchParams.endDate && <HeroSection />}
 
-        {/* Featured Listings */}
-        <Container>
-          <div className="pt-8 pb-12">
-            <FeaturedListings listings={listings} currentUser={currentUser} />
-          </div>
-        </Container>
+        {/* Filter Results - Show only when there are active filters */}
+        <FilterResults totalResults={listings.length} />
 
-        {/* More Listings Slider */}
-        {listings.length > 0 && (
+        {/* Featured Listings - Show only when no filters are applied */}
+        {!searchParams.locationValue &&
+          !searchParams.category &&
+          !searchParams.guestCount &&
+          !searchParams.roomCount &&
+          !searchParams.bathroomCount &&
+          !searchParams.minPrice &&
+          !searchParams.maxPrice &&
+          !searchParams.startDate &&
+          !searchParams.endDate && (
+            <Container>
+              <div className="pt-8 pb-12">
+                <FeaturedListings
+                  listings={listings}
+                  currentUser={currentUser}
+                />
+              </div>
+            </Container>
+          )}
+
+        {/* Filtered Results - Show when filters are applied */}
+        {(searchParams.locationValue ||
+          searchParams.category ||
+          searchParams.guestCount ||
+          searchParams.roomCount ||
+          searchParams.bathroomCount ||
+          searchParams.minPrice ||
+          searchParams.maxPrice ||
+          searchParams.startDate ||
+          searchParams.endDate) && (
           <Container>
             <div className="pt-8 pb-16">
-              <ListingSlider
-                listings={listings}
-                currentUser={currentUser}
-                title="اكتشف أماكن جديدة"
-              />
+              <FilteredListings listings={listings} currentUser={currentUser} />
             </div>
           </Container>
         )}
 
-        {listings.length === 0 && (
-          <Container>
-            <div className="pt-8 pb-16">
-              <EmptyState showReset />
-            </div>
-          </Container>
-        )}
+        {/* More Listings Slider - Show only when no filters are applied */}
+        {!searchParams.locationValue &&
+          !searchParams.category &&
+          !searchParams.guestCount &&
+          !searchParams.roomCount &&
+          !searchParams.bathroomCount &&
+          !searchParams.minPrice &&
+          !searchParams.maxPrice &&
+          !searchParams.startDate &&
+          !searchParams.endDate &&
+          listings.length > 0 && (
+            <Container>
+              <div className="pt-8 pb-16">
+                                 <ListingSlider
+                   listings={listings}
+                   currentUser={currentUser}
+                 />
+              </div>
+            </Container>
+          )}
+
+        {/* Empty State - Show when no listings and no filters */}
+        {listings.length === 0 &&
+          !searchParams.locationValue &&
+          !searchParams.category &&
+          !searchParams.guestCount &&
+          !searchParams.roomCount &&
+          !searchParams.bathroomCount &&
+          !searchParams.minPrice &&
+          !searchParams.maxPrice &&
+          !searchParams.startDate &&
+          !searchParams.endDate && (
+            <EmptyState showReset />
+          )}
       </div>
-
-      {/* Footer - Always at bottom */}
       <Footer />
     </div>
   );
 };
-
 export default Home;

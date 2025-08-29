@@ -30,12 +30,12 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
           <div className="flex items-center justify-center gap-2 mb-4">
             <FaStar className="text-yellow-400 w-6 h-6" />
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              عقارات مميزة
+              {t("featured_listings.title")}
             </h2>
             <FaStar className="text-yellow-400 w-6 h-6" />
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            اكتشف أفضل العقارات المختارة بعناية لضمان تجربة إقامة استثنائية
+            {t("featured_listings.description")}
           </p>
         </div>
 
@@ -47,7 +47,7 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
               <div className="absolute top-4 right-4 z-10">
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-md">
                   <FaStar className="w-3 h-3" />
-                  مميز
+                  {t("featured_listings.featured_badge")}
                 </div>
               </div>
 
@@ -61,10 +61,10 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
         {listings.length > 6 && (
           <div className="text-center mt-12">
             <button
-              onClick={() => router.push("/properties")}
+              onClick={() => router.push("/")}
               className="inline-flex items-center px-8 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 transform hover:scale-105"
             >
-              عرض جميع العقارات
+              {t("featured_listings.view_all_properties")}
             </button>
           </div>
         )}

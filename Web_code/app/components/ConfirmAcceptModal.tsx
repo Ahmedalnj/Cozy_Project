@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "./modal";
+import Modal from "./modals/modal";
 import { useTranslation } from "react-i18next";
 import { FaCheckCircle, FaMoneyBillWave, FaUser } from "react-icons/fa";
 

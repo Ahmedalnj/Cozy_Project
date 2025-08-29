@@ -413,5 +413,149 @@
   "loading_reservation_details": "جاري تحميل تفاصيل الحجز...",
   "please_wait": "يرجى الانتظار بينما نقوم بجلب تفاصيل حجزك",
   "cash_payment_success_note": "تم تأكيد حجزك النقدي بنجاح",
-  "cash_on_arrival": "الدفع عند الوصول"
+  "cash_on_arrival": "الدفع عند الوصول",
+  "hero": {
+    "title": "اكتشف أماكن رائعة",
+    "subtitle": "للإقامة في ليبيا",
+    "description": "ابحث عن أماكن إقامة فريدة، شقق، فيلات، ومنازل في جميع أنحاء ليبيا",
+    "search_button": "ابدأ البحث",
+    "rent_button": "اعرض عقارك"
+  },
+  "filter_results": {
+    "title": "نتائج البحث",
+    "found_properties": "تم العثور على {{count}} عقار متاح",
+    "clear_filters": "مسح الفلاتر",
+    "guest_single": "ضيف",
+    "guest_plural": "ضيوف",
+    "room_single": "غرفة",
+    "room_plural": "غرف",
+    "bathroom_single": "حمام",
+    "bathroom_plural": "حمامات",
+    "specific_dates": "تواريخ محددة"
+  },
+  "featured_listings": {
+    "title": "عقارات مميزة",
+    "description": "اكتشف أفضل العقارات المختارة بعناية لضمان تجربة إقامة استثنائية",
+    "featured_badge": "مميز",
+    "view_all_properties": "عرض جميع العقارات"
+  },
+  "filtered_listings": {
+    "title": "العقارات المتاحة",
+    "found_count": "تم العثور على {{count}} عقار متاح",
+    "no_results_title": "لم يتم العثور على عقارات",
+    "no_results_description": "جرب تغيير معايير البحث أو مسح الفلاتر"
+  },
+  "listing_slider": {
+    "discover_new_places": "اكتشف أماكن جديدة"
+  },
+  "footer": {
+    "company_info": "معلومات الشركة",
+    "quick_links": "روابط سريعة",
+    "support": "الدعم",
+    "contact": "اتصل بنا",
+    "about_cozy": "عن كوزي",
+    "how_it_works": "كيف يعمل",
+    "help_center": "مركز المساعدة",
+    "contact_support": "اتصل بالدعم",
+    "privacy_policy": "سياسة الخصوصية",
+    "terms_of_service": "شروط الخدمة",
+    "cancellation_policy": "سياسة الإلغاء",
+    "all_rights_reserved": "جميع الحقوق محفوظة"
+  },
+  "search_modal": {
+    "title": "الفلاتر",
+    "location_step": {
+      "title": "إلى أين تريد الذهاب؟",
+      "subtitle": "اعثر على الموقع المثالي!"
+    },
+    "date_step": {
+      "title": "متى تخطط للذهاب؟",
+      "subtitle": "تأكد من أن الجميع متاحون!"
+    },
+    "info_step": {
+      "title": "معلومات إضافية",
+      "subtitle": "اعثر على أماكنك المثالية",
+      "guests": "الضيوف",
+      "guests_subtitle": "كم ضيف سيحضر؟",
+      "rooms": "الغرف",
+      "rooms_subtitle": "كم غرفة تحتاج؟",
+      "bathrooms": "الحمامات",
+      "bathrooms_subtitle": "كم حمام تحتاج؟"
+    },
+    "price_step": {
+      "title": "نطاق السعر",
+      "subtitle": "حدد ميزانيتك"
+    },
+    "next": "التالي",
+    "back": "رجوع",
+    "search": "بحث"
+  },
+  "filters_panel": {
+    "title": "الفلاتر",
+    "location": "الموقع",
+    "property_type": "نوع العقار",
+    "price_range": "نطاق السعر",
+    "guests": "عدد الضيوف",
+    "rooms": "عدد الغرف",
+    "bathrooms": "عدد الحمامات",
+    "clear_filters": "مسح الفلاتر",
+    "apply_filters": "تطبيق الفلاتر"
+  },
+  "price_range": {
+    "title": "نطاق السعر",
+    "min_price": "السعر الأدنى",
+    "max_price": "السعر الأقصى"
+  },
+  "counter": {
+    "guests": "الضيوف",
+    "rooms": "الغرف",
+    "bathrooms": "الحمامات"
+  },
+  "country_select": {
+    "placeholder": "اختر بلداً",
+    "no_options": "لا توجد خيارات"
+  },
+  "calendar": {
+    "select_dates": "اختر التواريخ",
+    "check_in": "تسجيل الوصول",
+    "check_out": "تسجيل المغادرة"
+  },
+  "listing_card": {
+    "per_night": "لليلة الواحدة",
+    "guests": "ضيوف",
+    "bedrooms": "غرف نوم",
+    "bathrooms": "حمامات"
+  },
+  "empty_state": {
+    "no_listings": "لا توجد عقارات متاحة",
+    "no_listings_description": "جرب تغيير معايير البحث أو إضافة عقار جديد",
+    "reset_filters": "إعادة تعيين الفلاتر"
+  },
+  "loading_states": {
+    "loading": "جاري التحميل...",
+    "processing": "جاري المعالجة...",
+    "saving": "جاري الحفظ...",
+    "deleting": "جاري الحذف...",
+    "updating": "جاري التحديث..."
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalid_email": "البريد الإلكتروني غير صحيح",
+    "password_min": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+    "password_match": "كلمات المرور غير متطابقة",
+    "invalid_phone": "رقم الهاتف غير صحيح"
+  },
+  "notifications": {
+    "success": "تم بنجاح!",
+    "error": "حدث خطأ!",
+    "warning": "تحذير!",
+    "info": "معلومات"
+  },
+  "listing_client": {
+    "cannot_reserve_own_listing": "لا يمكنك حجز إعلانك الخاص",
+    "select_valid_dates": "يرجى اختيار تواريخ صحيحة لتسجيل الوصول والمغادرة",
+    "minimum_one_night": "مطلوب إقامة ليلة واحدة على الأقل",
+    "owner_warning_title": "⚠️ لا يمكنك حجز إعلانك الخاص",
+    "owner_warning_message": "إذا كنت صاحب هذا العقار، فلست بحاجة إلى إجراء حجز"
+  }
 }

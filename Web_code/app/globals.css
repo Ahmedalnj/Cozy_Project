@@ -1,5 +1,16 @@
 @import "tailwindcss";
 @import 'keen-slider/keen-slider.min.css';
+@import './dubai-font.css';
+
+/* Hero section specific styles */
+.hero-title {
+  font-size: clamp(2.5rem, 6vw, 4rem) !important;
+  font-weight: bold !important;
+}
+
+.hero-description {
+  font-size: clamp(1.125rem, 3vw, 1.5rem) !important;
+}
 
 /* تثبيت مشكلة z-index لـ Leaflet */
 .leaflet-bottom,
@@ -41,20 +52,24 @@
 
 /* تخصيص أيام النطاق */
 .rdrDayInRange {
-  background: #6a6a6a !important; /* لون النطاق: برتقالي دافئ */
-  color: #000000 !important;      /* نص أزرق داكن */
+  background: #6a6a6a !important;
+  /* لون النطاق: برتقالي دافئ */
+  color: #000000 !important;
+  /* نص أزرق داكن */
 }
 
 /* تخصيص أيام البداية والنهاية */
 .rdrStartEdge,
 .rdrEndEdge {
-  background: #000000 !important; /* لون أغمق قليلاً للحدود */
+  background: #000000 !important;
+  /* لون أغمق قليلاً للحدود */
   color: white !important;
 }
 
 /* إصلاح مشكلة عدم ظهور النطاق */
 .rdrInRange {
-  background: #7d7d7d !important; /* لون أفتح للنطاق */
+  background: #7d7d7d !important;
+  /* لون أفتح للنطاق */
   color: #000000 !important;
 }
 
@@ -89,7 +104,8 @@
   line-height: 24px !important;
   box-shadow: none !important;
 }
-.swiper-button-next:after, 
+
+.swiper-button-next:after,
 .swiper-button-prev:after {
   font-size: 1rem;
   font-weight: bold;
@@ -100,8 +116,10 @@
 }
 
 .swiper-button-next {
-  left: 30px !important; /* 40px button width + 12px gap */
+  left: 30px !important;
+  /* 40px button width + 12px gap */
 }
+
 .image-gallery-slide img {
   object-fit: contain !important;
   height: 60vh !important;

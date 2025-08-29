@@ -14,12 +14,19 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
   return (
-    <div className="fixed w-full bg-white z-999 shadow-sm">
-      <div className="py-2 border-b-[1]">
+    <div className="fixed w-full bg-white z-50 shadow-sm">
+      <div className="py-2 border-b-[1px] relative">
         <Container>
-          <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
+          <div className="flex items-center justify-between w-full relative">
+            {/* الشعار */}
             <Logo />
-            <Search />
+
+            {/* Search في منتصف Navbar مع حجم responsive */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-4">
+              <Search />
+            </div>
+
+            {/* عناصر المستخدم واللغة */}
             <div className="flex items-center gap-2">
               <div className="hidden md:block">
                 <LanguageSwitcher />

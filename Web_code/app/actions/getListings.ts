@@ -10,6 +10,8 @@ export interface IListingsParams {
   endDate?: string;
   locationValue?: string;
   category?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export default async function getListings(params: IListingsParams) {
@@ -22,6 +24,8 @@ export default async function getListings(params: IListingsParams) {
     endDate,
     locationValue,
     category,
+    minPrice,
+    maxPrice,
   } = params;
 
   const query: Prisma.ListingWhereInput = {};
@@ -32,6 +36,13 @@ export default async function getListings(params: IListingsParams) {
   if (roomCount) query.roomCount = { gte: +roomCount };
   if (bathroomCount) query.bathroomCount = { gte: +bathroomCount };
   if (guestCount) query.guestCount = { gte: +guestCount };
+  if (minPrice && maxPrice) {
+    query.price = { gte: +minPrice, lte: +maxPrice };
+  } else if (minPrice) {
+    query.price = { gte: +minPrice };
+  } else if (maxPrice) {
+    query.price = { lte: +maxPrice };
+  }
 
   if (startDate && endDate) {
     const start = new Date(startDate);

@@ -11,10 +11,12 @@ import { formatISO } from "date-fns";
 import Heading from "../Heading";
 import Calendar from "../inputs/Calender";
 import Counter from "../inputs/Counter";
+import PriceRange from "../inputs/PriceRange";
 enum STEPS {
   LOCATION = 0,
   DATE = 1,
   INFO = 2,
+  PRICE = 3,
 }
 const SearchModal = () => {
   const router = useRouter();
@@ -26,6 +28,8 @@ const SearchModal = () => {
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
   const [bathroomCount, setBathroomCount] = useState(1);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
 
   const [dateRange, setDateRAnge] = useState<Range>({
     startDate: new Date(),
@@ -49,7 +53,7 @@ const SearchModal = () => {
   }, []);
 
   const onSubmit = useCallback(async () => {
-    if (step !== STEPS.INFO) {
+    if (step !== STEPS.PRICE) {
       return onNext();
     }
 
@@ -65,6 +69,8 @@ const SearchModal = () => {
       guestCount,
       roomCount,
       bathroomCount,
+      minPrice,
+      maxPrice,
     };
 
     if (dateRange.startDate) {
@@ -100,7 +106,7 @@ const SearchModal = () => {
   ]);
 
   const actionLabel = useMemo(() => {
-    if (step == STEPS.INFO) {
+    if (step == STEPS.PRICE) {
       return "Search";
     }
     return "Next";
@@ -170,6 +176,22 @@ const SearchModal = () => {
           subtitle="How Many BathRooms Are You Need?"
           value={bathroomCount}
           onChange={(value) => setBathroomCount(value)}
+        />
+      </div>
+    );
+  }
+
+  if (step == STEPS.PRICE) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading title="Price Range" subtitle="Set your budget" />
+        <PriceRange
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onChange={(min, max) => {
+            setMinPrice(min);
+            setMaxPrice(max);
+          }}
         />
       </div>
     );

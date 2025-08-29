@@ -17,6 +17,9 @@ module.exports = {
         accent: "#FFBA76",
         neutralGray: "#6B7280",
       },
+      fontFamily: {
+        'dubai': ['Dubai', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+      },
     },
   },
   plugins: [],
