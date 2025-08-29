@@ -13,15 +13,15 @@ import { useTranslation } from "react-i18next";
 
 //icons imports
 import {
-  AiOutlineHome,
   AiOutlineHeart,
   AiOutlineCalendar,
   AiOutlineDashboard,
   AiOutlineLogout,
   AiOutlineLogin,
   AiOutlineUserAdd,
+  AiOutlineMenu,
+  AiOutlineHome,
 } from "react-icons/ai";
-import { AiOutlineMenu } from "react-icons/ai";
 import { FiKey } from "react-icons/fi";
 import { PiAirplaneTiltFill } from "react-icons/pi";
 import { TbHome } from "react-icons/tb";
@@ -31,15 +31,10 @@ interface UserMenuProps {
   currentUser: SafeUser | null;
 }
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
-  // Translation hook
   const { t } = useTranslation("common");
-
   const router = useRouter();
-
   const registerModal = useRegisterModal();
-
   const loginModal = useLoginModal();
-
   const rentModal = useRentModal();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -57,48 +52,26 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-    // open rent modal
     rentModal.onOpen();
   }, [currentUser, loginModal, rentModal]);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
+        {/* زر اعرض عقارك */}
         <div
           onClick={onRent}
-          className="
-      hidden
-      md:block
-      text-sm
-      font-semibold
-      py-3
-      px-4
-      rounded-full
-      hover:bg-neutral-100
-      transition
-      cursor-pointer
-    "
+          className="hidden md:block text-sm font-semibold py-2 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
         >
           {t("cozy_my_home")}
         </div>
+
+        {/* زر القائمة / Avatar */}
         <div
           onClick={toggleOpen}
-          className="
-      p-0.5
-      md:py-1
-      md:px-2
-      border-[1px]
-      border-neutral-200
-      flex
-      flex-row    
-      items-center
-      gap-3
-      rounded-full
-      cursor-pointer
-      hover:shadow-md
-      transition
-    "
+          className="p-1 md:py-1 md:px-2 border-[1px] border-neutral-200 flex items-center gap-2 rounded-full cursor-pointer hover:shadow-md transition"
         >
-          <AiOutlineMenu className="block" />
+          <AiOutlineMenu className="hidden md:block" />
           <div className="md:hidden">
             <Avatar src={currentUser?.image} />
           </div>
@@ -107,22 +80,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
           </div>
         </div>
       </div>
+
       {isOpen && (
-        <div
-          className="
-            absolute
-            rounded
-            shadow-md
-            w-[40vw]
-            md:w-3/4
-            bg-white
-            overflow-hidden
-            right-0
-            top-12
-            text-sm
-            "
-        >
-          <div className=" flex flex-col cursor-pointer">
+        <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg w-full sm:w-72 md:w-3/4 text-sm overflow-hidden z-50">
+          <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
                 <MenuItem
