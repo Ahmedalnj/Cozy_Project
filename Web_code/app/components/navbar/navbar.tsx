@@ -14,16 +14,16 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
   return (
-    <div className="fixed w-full bg-white z-10 shadow-sm">
+    <div className="fixed w-full bg-white z-999 shadow-sm">
       <div className="py-2 border-b-[1]">
         <Container>
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
             <Logo />
             <Search />
-
-            {/* وضع UserMenu و LanguageSwitcher بجانب بعضهما */}
             <div className="flex items-center gap-2">
-              <LanguageSwitcher />
+              <div className="hidden md:block">
+                <LanguageSwitcher />
+              </div>
               <UserMenu currentUser={currentUser ?? null} />
             </div>
           </div>

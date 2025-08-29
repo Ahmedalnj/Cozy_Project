@@ -70,7 +70,7 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <>
       <div className="fixed inset-0 z-50 flex justify-center items-center overflow-x-hidden bg-neutral-800/70 outline-none focus:outline-none">
-        <div className="relative w-full sm:w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] mx-auto max-h-[80vh]">
+        <div className="relative w-full sm:w-[80%] md:w-[60%] lg:w-[50%] xl:w-[40%] mx-auto h-[100vh]">
           <div
             className={`translate duration-300 max-h-[80vh] ${
               showModal ? "translate-y-0" : "translate-y-full"
@@ -88,7 +88,7 @@ const Modal: React.FC<ModalProps> = ({
                 <div className="text-lg font-semibold">{title}</div>
               </div>
               {/* جسم المودال مع تمرير عمودي */}
-              <div className="relative p-6 flex-auto overflow-y-auto max-h-[60vh]">
+              <div className="relative p-6 flex-auto overflow-y-auto h-[70vh]">
                 {body}
               </div>
               {/* التذييل */}

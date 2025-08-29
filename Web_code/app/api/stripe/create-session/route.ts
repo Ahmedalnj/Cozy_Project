@@ -51,16 +51,6 @@ export async function POST(request: NextRequest) {
       reservationId ||
       `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // Validate environment variables
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-    if (!appUrl) {
-      console.error("NEXT_PUBLIC_APP_URL is not configured");
-      return NextResponse.json(
-        { success: false, error: "Application URL is not configured" },
-        { status: 500 }
-      );
-    }
-
     // Create Stripe checkout session
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
@@ -85,8 +75,10 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${appUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}&timestamp=${Date.now()}`,
-      cancel_url: `${appUrl}/payment/cancel`,
+      success_url: `${
+        process.env.NEXT_PUBLIC_APP_URL
+      }/payment/success?session_id={CHECKOUT_SESSION_ID}&timestamp=${Date.now()}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
       customer_email: customerEmail,
       // ✅ إضافة إعدادات لمنع التوجيه المزدوج
       allow_promotion_codes: false,

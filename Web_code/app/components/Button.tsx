@@ -9,8 +9,10 @@ interface ButtonProps {
   disabled?: boolean;
   outline?: boolean;
   small?: boolean;
+  large?: boolean;
   icon?: IconType;
   isLoading?: boolean;
+  className?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -19,8 +21,10 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   outline,
   small,
+  large,
   icon: Icon,
   isLoading,
+  className = "",
 }) => {
   return (
     <button
@@ -41,11 +45,19 @@ const Button: React.FC<ButtonProps> = ({
         font-semibold
         shadow-sm
         hover:shadow-md
-        ${outline 
-          ? "bg-white border-2 border-gray-300 text-gray-700 hover:border-rose-400 hover:text-rose-600" 
-          : "bg-gradient-to-r from-rose-500 to-pink-500 border-2 border-rose-500 text-white hover:from-rose-600 hover:to-pink-600"
+        ${
+          outline
+            ? "bg-white border-2 border-gray-300 text-gray-700 hover:border-rose-400 hover:text-rose-600"
+            : "bg-gradient-to-r from-rose-500 to-pink-500 border-2 border-rose-500 text-white hover:from-rose-600 hover:to-pink-600"
         }
-        ${small ? "py-2 px-4 text-sm" : "py-4 px-6 text-lg"}
+        ${
+          small
+            ? "py-2 px-4 text-sm sm:py-2.5 sm:px-5 sm:text-sm"
+            : large
+            ? "py-3 px-5 text-base sm:py-4 sm:px-6 sm:text-lg lg:py-5 lg:px-8 lg:text-xl"
+            : "py-2.5 px-5 text-sm sm:py-3 sm:px-6 sm:text-base md:py-4 md:px-7 md:text-lg"
+        }
+        ${className}
       `}
     >
       {isLoading ? (
@@ -53,7 +65,12 @@ const Button: React.FC<ButtonProps> = ({
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
         </div>
       ) : (
-        Icon && <Icon size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2" />
+        Icon && (
+          <Icon
+            size={20}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2"
+          />
+        )
       )}
       <span className={`${Icon ? "ml-8" : ""} ${isLoading ? "invisible" : ""}`}>
         {label}

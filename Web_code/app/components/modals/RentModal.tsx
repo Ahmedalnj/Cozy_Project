@@ -381,7 +381,7 @@ const RentModal = () => {
           </div>
         )}
         <div className="bg-gray-50 rounded-lg p-2">
-          <Map center={location?.latlng || [32.8872, 13.191]} />
+          <Map center={location?.latlng || [32.8872, 13.191]} zoom={4} />
         </div>
       </div>
     );

@@ -7,9 +7,9 @@ import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-// @ts-expect-error: _getIconUrl is a private property not exposed in types, but we need to override it for custom marker icons
 
 // إعداد أيقونة Marker مخصصة
+// @ts-expect-error: _getIconUrl is private
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
@@ -20,6 +20,7 @@ L.Icon.Default.mergeOptions({
 interface MapProps {
   center?: [number, number];
   locationLabel?: string;
+  zoom?: number; // 👈 إضافة prop للتحكم بالزوم
 }
 
 // لإعادة تركيز الخريطة عند تغيير المركز
@@ -31,12 +32,12 @@ const Recenter: React.FC<{ center: [number, number] }> = ({ center }) => {
   return null;
 };
 
-const Map: React.FC<MapProps> = ({ center, locationLabel }) => {
+const Map: React.FC<MapProps> = ({ center, locationLabel, zoom }) => {
   return (
     <div className="relative w-full h-[450px] md:h-[600px] rounded-lg overflow-hidden">
       <MapContainer
         center={(center as L.LatLngExpression) || [51, -0.09]}
-        zoom={center ? 8 : 2}
+        zoom={zoom ?? (center ? 8 : 2)} // 👈 إذا ما حددت zoom بياخذ القيمة الافتراضية
         scrollWheelZoom={true}
         className="w-full h-full"
         style={{
