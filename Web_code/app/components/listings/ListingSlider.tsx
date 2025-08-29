@@ -25,10 +25,12 @@ export default function ListingSlider({
   title,
 }: ListingSliderProps) {
   const { t } = useTranslation("common");
-  const { elementRef: sliderRef, isVisible: isSliderVisible } = useScrollAnimation({
+  const scrollAnimation = useScrollAnimation({
     threshold: 0.2,
     rootMargin: "-50px",
   });
+  const sliderRef = scrollAnimation.elementRef as React.RefObject<HTMLDivElement>;
+  const isSliderVisible = scrollAnimation.isVisible;
   const defaultTitle = t("listing_slider.discover_new_places");
 
   return (
