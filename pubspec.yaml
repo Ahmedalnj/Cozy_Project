@@ -17,6 +17,14 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   provider: ^6.1.1
+  flutter_secure_storage: ^9.0.0
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
+  flutter_rating_bar: ^4.0.1
+  date_picker_timeline: ^1.2.6
+  url_launcher: ^6.2.4
 
 dev_dependencies:
   flutter_test:
@@ -29,4 +37,15 @@ flutter:
   
   assets:
     - assets/images/
+  
+  # fonts:
+  #   - family: Dubai
+  #     fonts:
+  #       - asset: assets/fonts/Dubai-Regular.ttf
+  #       - asset: assets/fonts/Dubai-Bold.ttf
+  #         weight: 700
+  #       - asset: assets/fonts/Dubai-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Dubai-Light.ttf
+  #         weight: 300
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
+import '../../services/auth_service.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,7 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool _loading = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,57 +24,80 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      debugPrint('Attempting login with email: ${_email.text}');
-      final response = await ApiService.login(_email.text, _password.text);
+      // تسجيل الدخول باستخدام Supabase
+      await AuthService.signInWithEmail(
+        email: _email.text.trim(),
+        password: _password.text,
+      );
 
-      // Save token and user data
-      await TokenManager.saveToken(response['token']);
-      await TokenManager.saveUser(response['user']);
-
-      setState(() => _loading = false);
-      debugPrint('Login successful! User ID: ${response['user']['id']}');
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful')),
+          const SnackBar(
+            content: Text('تم تسجيل الدخول بنجاح'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pushReplacementNamed(context, '/');
       }
-    } catch (e) {
-      setState(() => _loading = false);
-      debugPrint('Login error: $e');
+    } catch (error) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $e')),
+          SnackBar(
+            content: Text(error.toString()),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
   }
 
   Future<void> _signInWithGoogle() async {
-    setState(() => _loading = true);
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      debugPrint('Attempting Google sign in...');
-      final response = await ApiService.googleSignIn();
+      // تسجيل الدخول بـ Google (سيتم إضافته لاحقاً)
+      await Future.delayed(const Duration(seconds: 2));
 
-      // Save token and user data
-      await TokenManager.saveToken(response['token']);
-      await TokenManager.saveUser(response['user']);
-
-      setState(() => _loading = false);
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Google sign in successful')),
+          const SnackBar(
+            content: Text('تم تسجيل الدخول بـ Google بنجاح'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pushReplacementNamed(context, '/');
       }
-    } catch (e) {
-      setState(() => _loading = false);
-      debugPrint('Google sign in error: $e');
+    } catch (error) {
       if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google sign in failed: $e')),
+          SnackBar(
+            content: Text(error.toString()),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -109,60 +132,34 @@ class _LoginScreenState extends State<LoginScreen> {
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.grey),
                       onPressed: () => Navigator.of(context).maybePop(),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
                     ),
                     const Expanded(
-                      child: Center(
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                            color: Colors.black87,
-                          ),
+                      child: Text(
+                        'تسجيل الدخول',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 40), // Balance the close button
+                    const SizedBox(width: 48), // Balance the close button
                   ],
                 ),
-                const SizedBox(height: 16),
-                // Welcome section
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Welcome back to Cozy",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Login to your account!",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 32),
-                // Form section
+
+                // Login Form
                 Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      // Email field
+                      // Email Field
                       TextFormField(
                         controller: _email,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: "Email",
+                          labelText: 'البريد الإلكتروني',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -176,21 +173,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide: BorderSide(color: Colors.pink.shade400),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          filled: true,
-                          fillColor: Colors.white,
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Required' : null,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'يرجى إدخال البريد الإلكتروني';
+                          }
+                          if (!AuthService.isValidEmail(value)) {
+                            return 'يرجى إدخال بريد إلكتروني صحيح';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 20),
-                      // Password field
+                      const SizedBox(height: 16),
+
+                      // Password Field
                       TextFormField(
                         controller: _password,
                         obscureText: true,
                         decoration: InputDecoration(
-                          hintText: "Password",
+                          labelText: 'كلمة المرور',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -204,133 +208,163 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide: BorderSide(color: Colors.pink.shade400),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          filled: true,
-                          fillColor: Colors.white,
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Required' : null,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'يرجى إدخال كلمة المرور';
+                          }
+                          if (value.length < 6) {
+                            return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 8),
-                      // Forgot password link
+
+                      // Forgot Password Link
                       Align(
-                        alignment: Alignment.centerRight,
+                        alignment: Alignment.centerLeft,
                         child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.pink.shade400,
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: const Text(
-                            "Forgot Password?",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'نسيت كلمة المرور؟',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
+                              color: Colors.pink.shade400,
+                              fontSize: 14,
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Continue button
+
+                      // Login Button
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.pink.shade400,
+                            foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
                           ),
-                          onPressed: _loading ? null : _submit,
-                          child: _loading
+                          child: _isLoading
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
                                   ),
                                 )
-                              : const Text("Continue"),
+                              : const Text(
+                                  'تسجيل الدخول',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Google button
+
+                      // Divider
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'أو',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Google Sign In Button
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
+                        height: 48,
                         child: OutlinedButton.icon(
+                          onPressed: _isLoading ? null : _signInWithGoogle,
+                          icon: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(
+                              Icons.g_mobiledata,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                          ),
+                          label: Text(
+                            'تسجيل الدخول بـ Google',
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                           style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.grey.shade300),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            side: BorderSide(color: Colors.grey.shade300),
-                            backgroundColor: Colors.white,
                           ),
-                          icon: Image.asset(
-                            'assets/images/google_icon.png',
-                            height: 22,
-                            width: 22,
-                            errorBuilder: (c, e, s) => Container(
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade600,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Icon(
-                                Icons.g_mobiledata,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                          label: const Text(
-                            "Continue with Google",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
-                            ),
-                          ),
-                          onPressed: _loading ? null : _signInWithGoogle,
                         ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Sign Up Link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'ليس لديك حساب؟ ',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.pushReplacementNamed(
+                                context, '/signup'),
+                            child: Text(
+                              "إنشاء حساب",
+                              style: TextStyle(
+                                color: Colors.pink.shade400,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 32),
-                // Footer - Create account link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account? ",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () =>
-                          Navigator.pushReplacementNamed(context, '/signup'),
-                      child: Text(
-                        "Create account",
-                        style: TextStyle(
-                          color: Colors.pink.shade400,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13.5,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),

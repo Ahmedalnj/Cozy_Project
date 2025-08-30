@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
 import '../../shared/widgets/listing_card.dart';
 
@@ -12,48 +10,57 @@ class MyListingsScreen extends StatefulWidget {
 }
 
 class _MyListingsScreenState extends State<MyListingsScreen> {
-  List<Map<String, dynamic>> _myListings = [];
+  int _selectedIndex = 3;
+  List<PropertyListing> _myListings = [];
   bool _isLoading = true;
-  String? _currentUserId;
-  int _selectedIndex = 3; // My Listings tab
+  String? _currentUserId = "user123"; // Mock user ID
 
   @override
   void initState() {
     super.initState();
-    _getCurrentUser();
     _loadMyListings();
   }
 
-  Future<void> _getCurrentUser() async {
-    final user = await TokenManager.getUser();
-    if (user != null) {
-      setState(() {
-        _currentUserId = user['id'];
-      });
-    }
-  }
-
   Future<void> _loadMyListings() async {
-    if (_currentUserId == null) return;
-
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      // Get listings created by the current user
-      final listingsData = await ApiService.getMyListings();
+    // Simulate loading data
+    await Future.delayed(const Duration(seconds: 2));
 
-      setState(() {
-        _myListings = List<Map<String, dynamic>>.from(listingsData);
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading my listings: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    // Mock data
+    final mockListings = [
+      PropertyListing(
+        id: "5",
+        title: "فيلا خاصة في العين",
+        location: "جبل حفيت",
+        price: 800,
+        rating: 4.9,
+        distance: "5 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400",
+        isFavorite: false,
+      ),
+      PropertyListing(
+        id: "6",
+        title: "شقة في دبي هيلز",
+        location: "دبي هيلز إستيت",
+        price: 600,
+        rating: 4.7,
+        distance: "3 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
+        isFavorite: false,
+      ),
+    ];
+
+    setState(() {
+      _myListings = mockListings;
+      _isLoading = false;
+    });
   }
 
   void _onNavBarTap(int index) {
@@ -84,40 +91,62 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text(
-          'My Listings',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        title: const Text(
+          'عقاراتي',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.black),
+            onPressed: () {
+              Navigator.pushNamed(context, '/new-listing');
+            },
+          ),
+        ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.pink,
+              ),
+            )
           : _myListings.isEmpty
               ? _buildEmptyState()
-              : _buildListingsList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to new listing screen
-          Navigator.pushNamed(context, '/new-listing').then((_) {
-            // Refresh the list when returning from new listing screen
-            _loadMyListings();
-          });
-        },
-        backgroundColor: Colors.pink,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _myListings.length,
+                  itemBuilder: (context, index) {
+                    final property = _myListings[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: ListingCard(
+                        property: property,
+                        onFavoriteToggle: () {
+                          // Handle favorite toggle
+                        },
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/detail',
+                            arguments: property,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
@@ -130,216 +159,40 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: Icon(
-              Icons.home_outlined,
-              size: 60,
-              color: Colors.grey[400],
-            ),
+          Icon(
+            Icons.home_outlined,
+            size: 80,
+            color: Colors.grey.shade400,
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'No listings yet',
+          const SizedBox(height: 16),
+          Text(
+            'لا توجد عقارات',
             style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Start by adding your first property listing',
-            textAlign: TextAlign.center,
+          Text(
+            'أضف عقارك الأول ليظهر هنا',
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
+              fontSize: 14,
+              color: Colors.grey.shade500,
             ),
           ),
-          const SizedBox(height: 32),
-          FilledButton(
+          const SizedBox(height: 24),
+          ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/new-listing').then((_) {
-                _loadMyListings();
-              });
+              Navigator.pushNamed(context, '/new-listing');
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.pink,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.shade400,
+              foregroundColor: Colors.white,
             ),
-            child: const Text(
-              'Add Your First Listing',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: const Text('إضافة عقار جديد'),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildListingsList() {
-    return RefreshIndicator(
-      onRefresh: _loadMyListings,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _myListings.length,
-        itemBuilder: (context, index) {
-          final listing = _myListings[index];
-          return _buildListingCard(listing);
-        },
-      ),
-    );
-  }
-
-  Widget _buildListingCard(Map<String, dynamic> listing) {
-    // Determine listing status (you can add a status field to your database)
-    final isListed = listing['isActive'] ?? true; // Default to listed
-    final status = isListed ? 'Listed' : 'Unlisted';
-
-    // Get listing details
-    final title = listing['title'] ?? 'Untitled Listing';
-    final guestCount = listing['guestCount'] ?? 0;
-    final roomCount = listing['roomCount'] ?? 0;
-    final bathroomCount = listing['bathroomCount'] ?? 0;
-    final imageUrl = listing['imageSrc']?.isNotEmpty == true
-        ? listing['imageSrc'][0]
-        : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop';
-
-    return GestureDetector(
-      onTap: () {
-        // Create PropertyListing object and navigate to detail screen
-        final property = PropertyListing(
-          id: listing['_id']?.toString() ?? '',
-          title: title,
-          location: listing['locationValue'] ?? 'Unknown location',
-          rating: 4.5, // Default rating
-          distance: 'My Property',
-          dates: 'Available',
-          price: listing['price'] ?? 0,
-          imageUrl: imageUrl,
-          isFavorite: false,
-        );
-
-        Navigator.pushNamed(
-          context,
-          '/detail',
-          arguments: property,
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Left side - Text content
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Status
-                  Text(
-                    status,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Title
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Details
-                  Text(
-                    '$guestCount guests · $roomCount bedrooms · $roomCount beds · $bathroomCount bath',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Edit button
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      // Navigate to edit listing screen (you can reuse new listing screen)
-                      Navigator.pushNamed(
-                        context,
-                        '/new-listing',
-                        arguments: listing, // Pass listing data for editing
-                      ).then((_) {
-                        _loadMyListings();
-                      });
-                    },
-                    icon: const Icon(Icons.edit, size: 16),
-                    label: const Text('Edit Listing'),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey[300]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            // Right side - Image
-            Expanded(
-              flex: 1,
-              child: Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

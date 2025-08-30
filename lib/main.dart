@@ -1,34 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:provider/provider.dart';
-import 'core/token_manager.dart';
 import 'core/theme.dart';
 import 'core/app_router.dart';
 import 'core/supabase_config.dart';
-import 'providers/user_provider.dart';
-import 'providers/listings_provider.dart';
-import 'providers/trips_provider.dart';
+import 'services/auth_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
+  // تهيئة Supabase
   await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => ListingsProvider()),
-        ChangeNotifierProvider(create: (_) => TripsProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -48,10 +35,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkAuthState() async {
-    final hasToken = await TokenManager.hasToken();
-    if (hasToken) {
+    // التحقق من وجود مستخدم مسجل دخول
+    final user = AuthService.getCurrentUser();
+    if (user != null) {
       setState(() {
         _initialRoute = AppRouter.home;
+      });
+    } else {
+      setState(() {
+        _initialRoute = AppRouter.welcome;
       });
     }
   }

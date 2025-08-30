@@ -1,654 +1,591 @@
 import 'package:flutter/material.dart';
 import '../../shared/widgets/listing_card.dart';
-import '../../core/api_service.dart';
 
 class DetailScreen extends StatefulWidget {
   final PropertyListing property;
 
-  const DetailScreen({super.key, required this.property});
+  const DetailScreen({
+    super.key,
+    required this.property,
+  });
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  bool _isLoading = false;
   bool _isFavorite = false;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _isFavorite = widget.property.isFavorite;
-    _loadPropertyDetails();
-  }
-
-  Future<void> _loadPropertyDetails() async {
-    try {
-      await ApiService.getListingById(widget.property.id);
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading property details: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
   Future<void> _toggleFavorite() async {
-    try {
-      final success = await ApiService.toggleFavorite(widget.property.id);
-      if (success) {
-        setState(() {
-          _isFavorite = !_isFavorite;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error toggling favorite: $e');
-    }
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate API call
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    setState(() {
+      _isFavorite = !_isFavorite;
+      _isLoading = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isFavorite
+            ? 'تم إضافة العقار إلى المفضلة'
+            : 'تم إزالة العقار من المفضلة'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                // App Bar with Image
-                SliverAppBar(
-                  expandedHeight: 300,
-                  pinned: true,
-                  backgroundColor: Colors.white,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: Icon(
-                        _isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorite ? Colors.red : Colors.white,
-                      ),
-                      onPressed: _toggleFavorite,
-                    ),
-                  ],
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      children: [
-                        // Main Image
-                        Container(
-                          width: double.infinity,
-                          height: 300,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(widget.property.imageUrl),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        // Gradient Overlay
-                        Container(
-                          width: double.infinity,
-                          height: 300,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.3),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Image Indicators
-                        Positioned(
-                          bottom: 20,
-                          left: 0,
-                          right: 0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(5, (index) {
-                              return Container(
-                                width: 8,
-                                height: 8,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: index == 0
-                                      ? Colors.white
-                                      : Colors.white.withValues(alpha: 0.5),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+      backgroundColor: Colors.grey.shade50,
+      body: CustomScrollView(
+        slivers: [
+          // App Bar with Image
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-
-                // Content
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title and Location
-                        Text(
-                          widget.property.title,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.property.location,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Rating Section
-                        Row(
-                          children: [
-                            // Main Rating
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${widget.property.rating}',
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                Row(
-                                  children: List.generate(5, (index) {
-                                    return Icon(
-                                      Icons.star,
-                                      size: 20,
-                                      color:
-                                          index < widget.property.rating.toInt()
-                                              ? Colors.amber
-                                              : Colors.grey[300],
-                                    );
-                                  }),
-                                ),
-                                const Text(
-                                  '120 reviews',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 40),
-
-                            // Rating Breakdown
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  _buildRatingBar(5, 0.7),
-                                  _buildRatingBar(4, 0.2),
-                                  _buildRatingBar(3, 0.02),
-                                  _buildRatingBar(2, 0.02),
-                                  _buildRatingBar(1, 0.02),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Description
-                        const Text(
-                          'Experience luxury living in this stunning beachfront villa. Enjoy breathtaking ocean views, private beach access, and world-class amenities. Perfect for a family vacation or a romantic getaway.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Features
-                        _buildFeatureRow('Guests', '4'),
-                        _buildFeatureRow('Rooms', '3'),
-                        _buildFeatureRow('Bathrooms', '3'),
-                        const SizedBox(height: 24),
-
-                        // Availability Section
-                        const Text(
-                          'Availability',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // July Calendar
-                        _buildCalendar('July 2024', 1),
-                        const SizedBox(height: 16),
-
-                        // August Calendar
-                        _buildCalendar('August 2024', 7),
-                        const SizedBox(height: 24),
-
-                        // Book Now Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: FilledButton(
-                            onPressed: () {
-                              // TODO: Implement booking functionality
-                            },
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF667eea),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Book Now',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Total price will be calculated after selecting dates.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Reviews Section
-                        const Text(
-                          'Reviews',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Review 1
-                        _buildReview(
-                          'Sophia Sanum',
-                          'May 2024',
-                          5,
-                          'Absolutely stunning villa! The views were incredible, and the villa had everything we needed for a perfect vacation. Highly recommend!',
-                          11,
-                          2,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Review 2
-                        _buildReview(
-                          'Ethan Walker',
-                          'April 2024',
-                          4,
-                          'The villa was beautiful and well-maintained. We had a great time, but the beach access was a bit further than expected.',
-                          1,
-                          1,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Review 3
-                        _buildReview(
-                          'Olivia Carter',
-                          'March 2024',
-                          5,
-                          'Amazing experience! The villa was luxurious, and the staff was very helpful. We will definitely be back.',
-                          20,
-                          1,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Add Review Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              // TODO: Implement add review functionality
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.grey[300]!),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Add Review',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 100), // Bottom padding
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-
-  Widget _buildRatingBar(int stars, double percentage) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Text(
-            '$stars stars',
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Container(
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(2),
+                child: const Icon(Icons.arrow_back_ios,
+                    color: Colors.black, size: 16),
               ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: percentage,
-                child: Container(
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(2),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite ? Colors.red : Colors.black,
+                          size: 16,
+                        ),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '${(percentage * 100).toInt()}%',
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
-          Row(
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 12,
-                color: Colors.grey[400],
+                onPressed: _isLoading ? null : _toggleFavorite,
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCalendar(String month, int selectedDay) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                month,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              Row(
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.chevron_left, color: Colors.grey[600]),
-                    onPressed: () {},
+                  Image.network(
+                    widget.property.imageUrl,
+                    fit: BoxFit.cover,
                   ),
-                  IconButton(
-                    icon: Icon(Icons.chevron_right, color: Colors.grey[600]),
-                    onPressed: () {},
+                  // Gradient overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.3),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Days of week
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-                .map((day) => Text(
-                      day,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ))
-                .toList(),
-          ),
-          const SizedBox(height: 8),
-          // Calendar grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1,
             ),
-            itemCount: 31,
-            itemBuilder: (context, index) {
-              final day = index + 1;
-              final isSelected = day == selectedDay;
-              final isDisabled = day <= 3; // First 3 days are disabled
+          ),
 
-              return Container(
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      isSelected ? const Color(0xFF667eea) : Colors.transparent,
-                ),
-                child: Center(
-                  child: Text(
-                    '$day',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isSelected
-                          ? Colors.white
-                          : isDisabled
-                              ? Colors.grey[300]
-                              : Colors.black87,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+          // Content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title and Rating
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.property.title,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 20),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.property.rating.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Location
+                  Row(
+                    children: [
+                      Icon(Icons.location_on,
+                          size: 16, color: Colors.grey.shade600),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.property.location,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Price
+                  Text(
+                    '${widget.property.price} درهم لليوم',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                ),
-              );
-            },
+                  const SizedBox(height: 24),
+
+                  // Description Section
+                  _buildSectionTitle('الوصف'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'هذا العقار يوفر إقامة مريحة ومميزة مع جميع المرافق الأساسية. يتميز بموقع استراتيجي وإطلالة جميلة.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade700,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Amenities Section
+                  _buildSectionTitle('المرافق'),
+                  const SizedBox(height: 16),
+                  _buildAmenitiesGrid(),
+                  const SizedBox(height: 24),
+
+                  // Host Section
+                  _buildSectionTitle('المضيف'),
+                  const SizedBox(height: 16),
+                  _buildHostCard(),
+                  const SizedBox(height: 24),
+
+                  // Booking Section
+                  _buildSectionTitle('الحجز'),
+                  const SizedBox(height: 16),
+                  _buildBookingCard(),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildReview(
-    String name,
-    String date,
-    int rating,
-    String comment,
-    int thumbsUp,
-    int thumbsDown,
-  ) {
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  Widget _buildAmenitiesGrid() {
+    final amenities = [
+      'مسبح',
+      'واي فاي',
+      'مطبخ مجهز',
+      'مكيف هواء',
+      'غسالة',
+      'موقف سيارات',
+      'حديقة',
+      'تلفزيون'
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 4,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: amenities.length,
+      itemBuilder: (context, index) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                _getAmenityIcon(amenities[index]),
+                size: 16,
+                color: Colors.pink.shade400,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                amenities[index],
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getAmenityIcon(String amenity) {
+    switch (amenity) {
+      case 'مسبح':
+        return Icons.pool;
+      case 'واي فاي':
+        return Icons.wifi;
+      case 'مطبخ مجهز':
+        return Icons.kitchen;
+      case 'مكيف هواء':
+        return Icons.ac_unit;
+      case 'غسالة':
+        return Icons.local_laundry_service;
+      case 'موقف سيارات':
+        return Icons.local_parking;
+      case 'حديقة':
+        return Icons.park;
+      case 'تلفزيون':
+        return Icons.tv;
+      default:
+        return Icons.check;
+    }
+  }
+
+  Widget _buildHostCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'أحمد محمد',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'مضيف منذ 2023',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      '4.8 (120 تقييم)',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              // Handle contact host
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.pink.shade400),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'تواصل',
+              style: TextStyle(
+                color: Colors.pink.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookingCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Date Selection
           Row(
             children: [
-              // Profile Picture
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[300],
-                ),
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      date,
+                      'تاريخ الوصول',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              size: 16, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Text(
+                            'اختر التاريخ',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              // Stars
-              Row(
-                children: List.generate(5, (index) {
-                  return Icon(
-                    Icons.star,
-                    size: 16,
-                    color: index < rating ? Colors.amber : Colors.grey[300],
-                  );
-                }),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'تاريخ المغادرة',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              size: 16, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Text(
+                            'اختر التاريخ',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            comment,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
+
+          // Guest Selection
           Row(
             children: [
-              Row(
-                children: [
-                  Icon(Icons.thumb_up, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    '$thumbsUp',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              Icon(Icons.person, size: 16, color: Colors.grey.shade600),
+              const SizedBox(width: 8),
+              Text(
+                'عدد الضيوف',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
               ),
-              const SizedBox(width: 16),
-              Row(
-                children: [
-                  Icon(Icons.thumb_down, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    '$thumbsDown',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.remove, size: 16),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Text('1',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.add, size: 16),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+
+          // Total Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'السعر الإجمالي',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              Text(
+                '${widget.property.price} درهم',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Book Button
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                // Handle booking
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إرسال طلب الحجز'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pink.shade400,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'احجز الآن',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ],
       ),

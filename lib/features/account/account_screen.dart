@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -11,11 +9,10 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  String? _userName;
-  String? _userEmail;
-  String? _userImage;
-  int _selectedIndex = 4; // Account tab
-  String _selectedLanguage = 'English';
+  int _selectedIndex = 4;
+  Map<String, dynamic>? _userProfile;
+  bool _isLoading = true;
+  String? _currentUserId = "user123"; // Mock user ID
 
   @override
   void initState() {
@@ -24,18 +21,39 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _loadUserProfile() async {
-    try {
-      final user = await TokenManager.getUser();
-      if (user != null) {
-        final profile = await ApiService.getUserProfile();
-        setState(() {
-          _userName = profile?['name'] ?? 'User';
-          _userEmail = user['email'] ?? 'user@email.com';
-          _userImage = profile?['image'];
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading user profile: $e');
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate loading data
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Mock user profile
+    final mockProfile = {
+      'id': 'user123',
+      'name': 'أحمد محمد',
+      'email': 'ahmed@example.com',
+      'phone': '+971501234567',
+      'avatar':
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+      'joinDate': '2023-01-15',
+      'totalTrips': 5,
+      'totalReviews': 12,
+      'rating': 4.8,
+    };
+
+    setState(() {
+      _userProfile = mockProfile;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _logout() async {
+    // Simulate logout
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
     }
   }
 
@@ -64,241 +82,46 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  Future<void> _showLanguageDialog() async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Language'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('English'),
-              value: 'English',
-              groupValue: _selectedLanguage,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                Navigator.pop(context, value);
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('العربية'),
-              value: 'Arabic',
-              groupValue: _selectedLanguage,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                Navigator.pop(context, value);
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-
-    if (result != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Language changed to $result'),
-          backgroundColor: Colors.pink,
-        ),
-      );
-    }
-  }
-
-  void _showPrivacyPolicy() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Privacy Policy'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Cozy Privacy Policy',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Last updated: December 2024',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '1. Information We Collect',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'We collect information you provide directly to us, such as when you create an account, make a reservation, or contact us for support.',
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '2. How We Use Your Information',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'We use the information we collect to provide, maintain, and improve our services, process transactions, and communicate with you.',
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '3. Information Sharing',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.',
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '4. Data Security',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.',
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '5. Your Rights',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'You have the right to access, update, or delete your personal information. You can also opt out of certain communications.',
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showHelpDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Help & Support'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.support_agent,
-              size: 48,
-              color: Colors.pink,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Need help? Contact our support team:',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Cozy@help.ly',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.pink,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'We\'re here to help you with any questions or issues you may have.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _logout() async {
-    try {
-      await TokenManager.clearToken();
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/welcome',
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      debugPrint('Error logging out: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: const Text(
-          'Account',
+          'حسابي',
           style: TextStyle(
-            fontSize: 20,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
           ),
         ),
-        backgroundColor: Colors.grey[100],
-        elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // User Profile Section
-            _buildUserProfile(),
-            const SizedBox(height: 40),
-
-            // Settings Section
-            _buildSettingsSection(),
-            const SizedBox(height: 40),
-
-            // Logout Button
-            _buildLogoutButton(),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.pink,
+              ),
+            )
+          : _userProfile == null
+              ? _buildEmptyState()
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildProfileHeader(),
+                      const SizedBox(height: 24),
+                      _buildStatsSection(),
+                      const SizedBox(height: 24),
+                      _buildMenuSection(),
+                    ],
+                  ),
+                ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
@@ -306,180 +129,299 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildUserProfile() {
-    return Column(
-      children: [
-        // Profile Picture
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey[200],
-            image: _userImage != null
-                ? DecorationImage(
-                    image: NetworkImage(_userImage!),
-                    fit: BoxFit.cover,
-                  )
-                : null,
+  Widget _buildProfileHeader() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: _userImage == null
-              ? Icon(
-                  Icons.person,
-                  size: 50,
-                  color: Colors.grey[400],
-                )
-              : null,
-        ),
-        const SizedBox(height: 16),
-
-        // User Name
-        Text(
-          _userName ?? 'User',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        ],
+      ),
+      child: Column(
+        children: [
+          // Avatar
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(_userProfile!['avatar']),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
-        // User Email
-        Text(
-          _userEmail ?? 'user@email.com',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.pink,
+          // Name
+          Text(
+            _userProfile!['name'],
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
-        ),
-      ],
-    );
-  }
+          const SizedBox(height: 8),
 
-  Widget _buildSettingsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Settings',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+          // Email
+          Text(
+            _userProfile!['email'],
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Settings Items
-        _buildSettingsItem(
-          icon: Icons.language,
-          title: 'Change Language',
-          subtitle: _selectedLanguage,
-          onTap: _showLanguageDialog,
-        ),
-        _buildSettingsItem(
-          icon: Icons.home,
-          title: 'My Listings',
-          onTap: () => Navigator.pushNamed(context, '/my-listings'),
-        ),
-        _buildSettingsItem(
-          icon: Icons.add_home,
-          title: 'Add New Listing',
-          onTap: () => Navigator.pushNamed(context, '/new-listing'),
-        ),
-        _buildSettingsItem(
-          icon: Icons.notifications,
-          title: 'Notifications',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Coming Soon'),
-                backgroundColor: Colors.pink,
+          // Edit Profile Button
+          OutlinedButton(
+            onPressed: () {
+              // Handle edit profile
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.pink.shade400),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-            );
-          },
-        ),
-        _buildSettingsItem(
-          icon: Icons.privacy_tip,
-          title: 'Privacy',
-          onTap: _showPrivacyPolicy,
-        ),
-        _buildSettingsItem(
-          icon: Icons.help,
-          title: 'Help',
-          onTap: _showHelpDialog,
-        ),
-      ],
+            ),
+            child: Text(
+              'تعديل الملف الشخصي',
+              style: TextStyle(
+                color: Colors.pink.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildSettingsItem({
+  Widget _buildStatsSection() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.flight_takeoff,
+              title: 'الرحلات',
+              value: _userProfile!['totalTrips'].toString(),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 60,
+            color: Colors.grey.shade300,
+          ),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.star,
+              title: 'التقييمات',
+              value: _userProfile!['totalReviews'].toString(),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 60,
+            color: Colors.grey.shade300,
+          ),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.favorite,
+              title: 'التقييم',
+              value: _userProfile!['rating'].toString(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem({
     required IconData icon,
     required String title,
-    String? subtitle,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 32,
+          color: Colors.pink.shade400,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildMenuItem(
+            icon: Icons.person_outline,
+            title: 'المعلومات الشخصية',
+            onTap: () {
+              // Handle personal info
+            },
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.notifications_outlined,
+            title: 'الإشعارات',
+            onTap: () {
+              // Handle notifications
+            },
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.security,
+            title: 'الأمان والخصوصية',
+            onTap: () {
+              // Handle security
+            },
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.help_outline,
+            title: 'المساعدة والدعم',
+            onTap: () {
+              // Handle help
+            },
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.info_outline,
+            title: 'حول التطبيق',
+            onTap: () {
+              // Handle about
+            },
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            icon: Icons.logout,
+            title: 'تسجيل الخروج',
+            onTap: _logout,
+            isDestructive: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
     required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
     return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: Colors.pink,
-          size: 20,
-        ),
+      leading: Icon(
+        icon,
+        color: isDestructive ? Colors.red : Colors.grey.shade600,
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
+        style: TextStyle(
+          color: isDestructive ? Colors.red : Colors.black,
           fontWeight: FontWeight.w500,
-          color: Colors.black87,
         ),
       ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            )
-          : null,
-      trailing: const Icon(
+      trailing: Icon(
         Icons.arrow_forward_ios,
         size: 16,
-        color: Colors.grey,
+        color: Colors.grey.shade400,
       ),
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
     );
   }
 
-  Widget _buildLogoutButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: FilledButton(
-        onPressed: _logout,
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.pink,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      color: Colors.grey.shade200,
+      indent: 56,
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: 80,
+            color: Colors.grey.shade400,
           ),
-        ),
-        child: const Text(
-          'Logout',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+          const SizedBox(height: 16),
+          Text(
+            'لا توجد بيانات',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            'يرجى تسجيل الدخول لعرض الملف الشخصي',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.shade400,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('تسجيل الدخول'),
+          ),
+        ],
       ),
     );
   }

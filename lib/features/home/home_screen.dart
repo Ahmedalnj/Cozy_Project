@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
 import '../../shared/widgets/listing_card.dart';
 
@@ -15,22 +13,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   List<PropertyListing> _recommendedPlaces = [];
   bool _isLoading = true;
-  String? _currentUserId;
+  String? _currentUserId = "user123"; // Mock user ID
 
   @override
   void initState() {
     super.initState();
     _loadProperties();
-    _getCurrentUser();
-  }
-
-  Future<void> _getCurrentUser() async {
-    final user = await TokenManager.getUser();
-    if (user != null) {
-      setState(() {
-        _currentUserId = user['id'];
-      });
-    }
   }
 
   Future<void> _loadProperties() async {
@@ -38,39 +26,78 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
 
-    try {
-      final listingsData = await ApiService.getAllListings();
+    // Simulate loading data
+    await Future.delayed(const Duration(seconds: 2));
 
-      setState(() {
-        _recommendedPlaces = listingsData;
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading properties: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    // Mock data
+    final mockListings = [
+      PropertyListing(
+        id: "1",
+        title: "فيلا فاخرة في دبي",
+        location: "دبي مارينا",
+        price: 500,
+        rating: 4.8,
+        distance: "2 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400",
+        isFavorite: false,
+      ),
+      PropertyListing(
+        id: "2",
+        title: "شقة عصرية في أبو ظبي",
+        location: "كورنيش أبو ظبي",
+        price: 300,
+        rating: 4.6,
+        distance: "1 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
+        isFavorite: true,
+      ),
+      PropertyListing(
+        id: "3",
+        title: "بيت تقليدي في الشارقة",
+        location: "قلب الشارقة",
+        price: 200,
+        rating: 4.9,
+        distance: "3 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400",
+        isFavorite: false,
+      ),
+    ];
+
+    setState(() {
+      _recommendedPlaces = mockListings;
+      _isLoading = false;
+    });
   }
 
   Future<void> _toggleFavorite(PropertyListing property) async {
     if (_currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to save favorites')),
+        const SnackBar(content: Text('يرجى تسجيل الدخول لحفظ المفضلة')),
       );
       return;
     }
 
-    try {
-      final success = await ApiService.toggleFavorite(property.id);
-      if (success) {
-        setState(() {
-          property.isFavorite = !property.isFavorite;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error toggling favorite: $e');
-    }
+    // Simulate API call
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    setState(() {
+      property.isFavorite = !property.isFavorite;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(property.isFavorite
+            ? 'تم إضافة العقار إلى المفضلة'
+            : 'تم إزالة العقار من المفضلة'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _onNavBarTap(int index) {
@@ -101,14 +128,105 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade50,
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar Section
-            _buildSearchBar(),
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(
+                      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'مرحباً بك في',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const Text(
+                          'Cozy',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {
+                      // Handle notifications
+                    },
+                  ),
+                ],
+              ),
+            ),
 
-            // Main Content
+            // Search Bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'ابحث عن مكان للإقامة...',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                      onTap: () {
+                        // Handle search
+                      },
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.pink.shade400,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.tune,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Recommended Places Section
             Expanded(
               child: _isLoading
                   ? const Center(
@@ -116,28 +234,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.pink,
                       ),
                     )
-                  : _recommendedPlaces.isEmpty
-                      ? _buildEmptyState()
-                      : SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 24),
-
-                              // Recommended Places Section
-                              _buildRecommendedPlaces(),
-
-                              const SizedBox(height: 20),
-
-                              // Property Listings
-                              _buildPropertyListings(),
-
-                              const SizedBox(
-                                  height: 100), // Space for bottom navigation
-                            ],
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _recommendedPlaces.length,
+                      itemBuilder: (context, index) {
+                        final property = _recommendedPlaces[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ListingCard(
+                            property: property,
+                            onFavoriteToggle: () => _toggleFavorite(property),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/detail',
+                                arguments: property,
+                              );
+                            },
                           ),
-                        ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -145,276 +262,6 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.home_outlined,
-            size: 80,
-            color: Colors.grey.shade400,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No properties available',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for new listings',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _loadProperties,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink.shade400,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Refresh'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.search, color: Colors.grey, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Where to?',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Anywhere • Any week • Add guests',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.tune,
-              color: Colors.white,
-              size: 18,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecommendedPlaces() {
-    return const Text(
-      'Recommended places',
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: Colors.black87,
-      ),
-    );
-  }
-
-  Widget _buildPropertyListings() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _recommendedPlaces.length,
-      itemBuilder: (context, index) {
-        final property = _recommendedPlaces[index];
-        return _buildPropertyCard(property);
-      },
-    );
-  }
-
-  Widget _buildPropertyCard(PropertyListing property) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to detail screen
-        Navigator.pushNamed(
-          context,
-          '/detail',
-          arguments: property,
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image with favorite button
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    property.imageUrl,
-                    width: double.infinity,
-                    height: 250,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: double.infinity,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.image,
-                          size: 50,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: GestureDetector(
-                    onTap: () => _toggleFavorite(property),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        property.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: property.isFavorite
-                            ? Colors.pink.shade400
-                            : Colors.grey,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Property details
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    property.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      size: 16,
-                      color: Colors.black87,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      property.rating.toString(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              property.location,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              property.distance,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              '\$${property.price} / night',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

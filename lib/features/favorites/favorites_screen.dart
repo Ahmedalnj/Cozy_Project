@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
-import '../../shared/widgets/listing_card.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
+import '../../shared/widgets/listing_card.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -12,73 +10,85 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
+  int _selectedIndex = 1;
   List<PropertyListing> _favorites = [];
   bool _isLoading = true;
-  String? _currentUserId;
-  int _selectedIndex = 1; // Favorites tab
+  String? _currentUserId = "user123"; // Mock user ID
 
   @override
   void initState() {
     super.initState();
-    _getCurrentUser();
     _loadFavorites();
   }
 
-  Future<void> _getCurrentUser() async {
-    final user = await TokenManager.getUser();
-    if (user != null) {
-      setState(() {
-        _currentUserId = user['id'];
-      });
-    }
-  }
-
   Future<void> _loadFavorites() async {
-    if (_currentUserId == null) return;
-
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      final favoritesData = await ApiService.getFavorites();
+    // Simulate loading data
+    await Future.delayed(const Duration(seconds: 2));
 
-      final favorites = favoritesData;
+    // Mock data
+    final mockFavorites = [
+      PropertyListing(
+        id: "2",
+        title: "شقة عصرية في أبو ظبي",
+        location: "كورنيش أبو ظبي",
+        price: 300,
+        rating: 4.6,
+        distance: "1 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
+        isFavorite: true,
+      ),
+      PropertyListing(
+        id: "4",
+        title: "فيلا خاصة في العين",
+        location: "جبل حفيت",
+        price: 800,
+        rating: 4.9,
+        distance: "5 كم من المركز",
+        dates: "متاح",
+        imageUrl:
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400",
+        isFavorite: true,
+      ),
+    ];
 
-      setState(() {
-        _favorites = favorites;
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading favorites: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _favorites = mockFavorites;
+      _isLoading = false;
+    });
   }
 
-  Future<void> _removeFromFavorites(PropertyListing property) async {
-    if (_currentUserId == null) return;
-
-    try {
-      final success = await ApiService.toggleFavorite(property.id);
-      if (success) {
-        setState(() {
-          _favorites.removeWhere((item) => item.id == property.id);
-        });
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Removed from favorites'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error removing from favorites: $e');
+  Future<void> _toggleFavorite(PropertyListing property) async {
+    if (_currentUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى تسجيل الدخول لحفظ المفضلة')),
+      );
+      return;
     }
+
+    // Simulate API call
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    setState(() {
+      property.isFavorite = !property.isFavorite;
+      if (!property.isFavorite) {
+        _favorites.remove(property);
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(property.isFavorite
+            ? 'تم إضافة العقار إلى المفضلة'
+            : 'تم إزالة العقار من المفضلة'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _onNavBarTap(int index) {
@@ -109,51 +119,52 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Favorites',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      // Settings functionality (ignored as requested)
-                    },
-                    icon: Icon(
-                      Icons.settings,
-                      color: Colors.grey[600],
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
-            Expanded(
-              child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : _favorites.isEmpty
-                      ? _buildEmptyState()
-                      : _buildFavoritesList(),
-            ),
-          ],
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'المفضلة',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.pink,
+              ),
+            )
+          : _favorites.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _favorites.length,
+                  itemBuilder: (context, index) {
+                    final property = _favorites[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: ListingCard(
+                        property: property,
+                        onFavoriteToggle: () => _toggleFavorite(property),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/detail',
+                            arguments: property,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
@@ -166,236 +177,38 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: Icon(
-              Icons.favorite_border,
-              size: 60,
-              color: Colors.grey[400],
-            ),
+          Icon(
+            Icons.favorite_border,
+            size: 80,
+            color: Colors.grey.shade400,
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'No favorites yet',
+          const SizedBox(height: 16),
+          Text(
+            'لا توجد مفضلات',
             style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Start exploring and save your favorite places',
-            textAlign: TextAlign.center,
+          Text(
+            'أضف عقارات إلى مفضلتك لتظهر هنا',
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
+              fontSize: 14,
+              color: Colors.grey.shade500,
             ),
           ),
-          const SizedBox(height: 32),
-          FilledButton(
+          const SizedBox(height: 24),
+          ElevatedButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/');
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF667eea),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.shade400,
+              foregroundColor: Colors.white,
             ),
-            child: const Text(
-              'Explore Places',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFavoritesList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section Title
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Text(
-            'Saved properties',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Favorites List
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _loadFavorites,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _favorites.length,
-              itemBuilder: (context, index) {
-                final property = _favorites[index];
-                return _buildFavoriteCard(property);
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFavoriteCard(PropertyListing property) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Left side - Text details
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () {
-                // Navigate to detail screen
-                Navigator.pushNamed(
-                  context,
-                  '/detail',
-                  arguments: property,
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Property type and beds
-                    Text(
-                      'Entire house - ${property.rating.toInt()} beds',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Property title
-                    Text(
-                      property.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Location, price and rating
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${property.location} · \$${property.price}/night · ★ ${property.rating}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Favorite indicator
-                    GestureDetector(
-                      onTap: () {
-                        _removeFromFavorites(property);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.favorite,
-                              size: 12,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'filled',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Right side - Image thumbnail
-          Expanded(
-            flex: 1,
-            child: GestureDetector(
-              onTap: () {
-                // Navigate to detail screen
-                Navigator.pushNamed(
-                  context,
-                  '/detail',
-                  arguments: property,
-                );
-              },
-              child: Container(
-                height: 100,
-                margin: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: NetworkImage(property.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
+            child: const Text('تصفح العقارات'),
           ),
         ],
       ),
