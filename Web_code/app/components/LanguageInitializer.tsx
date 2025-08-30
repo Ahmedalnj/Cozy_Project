@@ -33,3 +33,4 @@ export default function LanguageInitializer() {
   return null; // This component doesn't render anything
 }
 
+
