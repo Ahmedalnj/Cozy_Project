@@ -92,18 +92,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
   return (
     <div
       onClick={() => router.push(`/listings/${data.id}`)}
-      className="col-span-1 cursor-pointer group p-2 sm:p-0 transform hover:-translate-y-1 transition-all duration-300 ease-out"
+      className="col-span-1 cursor-pointer group p-1 sm:p-2 md:p-0 transform hover:-translate-y-1 transition-all duration-300 ease-out"
     >
-      <div className="flex flex-col gap-1 sm:gap-2 xs:w-auto">
+      <div className="flex flex-col gap-1 sm:gap-2">
         <div className="aspect-square w-full relative overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-all duration-300 ease-out">
           <Image
             fill
             alt="Listing"
             src={imageSrc}
             className="object-cover h-full w-full group-hover:scale-110 transition-transform duration-500 ease-out"
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, 33vw"
           />
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 transform group-hover:scale-110 transition-transform duration-200">
+          <div className="absolute top-1 right-1 sm:top-2 sm:right-2 md:top-3 md:right-3 transform group-hover:scale-110 transition-transform duration-200">
             <HeartButton
               listingId={data.id}
               currentUser={currentUser}
@@ -113,10 +113,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
         </div>
 
         {reservation?.user?.name && (
-          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mt-1">
-            <span>{t("booked_by")}</span>
-            <Avatar src={reservation?.user?.image} />
-            <span className="font-medium sm:font-semibold">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs text-gray-600 mt-1">
+            <span className="text-xs">{t("booked_by")}</span>
+            <Avatar src={reservation?.user?.image} size="sm" />
+            <span className="font-medium text-xs sm:text-sm">
               {reservation.user.name}
             </span>
           </div>
@@ -124,8 +124,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
         {/* Payment Status */}
         {showPaidStatus && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-2 mt-2">
-            <div className="text-xs sm:text-sm text-green-800 font-semibold">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-1 sm:p-2 mt-1 sm:mt-2">
+            <div className="text-xs text-green-800 font-semibold">
               ✅ {t("paid")}
             </div>
           </div>
@@ -133,8 +133,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
         {/* Cash Pending Status */}
         {showCashPendingStatus && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mt-2">
-            <div className="text-xs sm:text-sm text-yellow-800 font-semibold">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1 sm:p-2 mt-1 sm:mt-2">
+            <div className="text-xs text-yellow-800 font-semibold">
               ⏳ {t("cash_pending")}
             </div>
             <div className="text-xs text-yellow-700 mt-1">
@@ -145,8 +145,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
         {/* Rejected Status */}
         {showRejectedStatus && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2">
-            <div className="text-xs sm:text-sm text-red-800 font-semibold">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-1 sm:p-2 mt-1 sm:mt-2">
+            <div className="text-xs text-red-800 font-semibold">
               ❌ {t("reservation_rejected")}
             </div>
             <div className="text-xs text-red-700 mt-1">
@@ -157,29 +157,29 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
-        <div className="font-semibold sm:font-bold text-sm sm:text-base group-hover:text-blue-600 transition-colors duration-200">
-          {reservationDate ||
-            t(`categories.${data.category}.label`).slice(0, -1)}{" "}
-          In {""}
+        <div className="font-semibold text-xs sm:text-sm md:text-base group-hover:text-blue-600 transition-colors duration-200 leading-tight line-clamp-2">
+          {reservationDate || <>{data.title}</>}
+        </div>
+        <div className="font-light text-xs sm:text-sm md:text-base group-hover:text-blue-600 transition-colors duration-200 leading-tight line-clamp-2">
           {location?.label}
         </div>
 
         {/* Reviews Summary */}
         <ReviewSummary listingId={data.id} size="sm" />
 
-        <div className="flex flex-row items-center gap-1 text-sm sm:text-base">
-          <div className="font-semibold group-hover:text-green-600 transition-colors duration-200">${price}</div>
+        <div className="flex flex-row items-center gap-1 text-xs sm:text-sm md:text-base">
+          <div className="font-semibold group-hover:text-green-600 transition-colors duration-200">
+            ${price}
+          </div>
           {!reservation && (
-            <div className="font-light text-xs sm:text-sm">
-              {t("per_night")}
-            </div>
+            <div className="font-light text-xs">{t("per_night")}</div>
           )}
         </div>
 
         {(onAction || secondaryAction) && (
-          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-1 sm:mt-2">
             {onAction && actionLabel && (
-              <div className="w-full xs:w-auto">
+              <div className="w-full">
                 <Button
                   disabled={disabled}
                   small
@@ -189,7 +189,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
               </div>
             )}
             {secondaryAction && secondaryActionLabel && (
-              <div className="w-full xs:w-auto">
+              <div className="w-full">
                 <Button
                   disabled={disabled}
                   small

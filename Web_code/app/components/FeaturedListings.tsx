@@ -47,7 +47,7 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
         </div>
 
         {/* الكروت مع Staggered Animation */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {featuredListings.map((listing, index) => (
             <div 
               key={listing.id} 
@@ -61,10 +61,11 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
               }}
             >
               {/* Badge مميز */}
-              <div className="absolute top-4 right-4 z-10">
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-md animate-pulse">
-                  <FaStar className="w-3 h-3" />
-                  {t("featured_listings.featured_badge")}
+              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1 shadow-md animate-pulse">
+                  <FaStar className="w-2 h-2 sm:w-3 sm:h-3" />
+                  <span className="hidden sm:inline">{t("featured_listings.featured_badge")}</span>
+                  <span className="sm:hidden">★</span>
                 </div>
               </div>
 

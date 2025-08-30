@@ -36,30 +36,34 @@ const HeartButton: React.FC<HeartButtonProps> = ({
   return (
     <div
       onClick={handleClick}
-      className={`flex items-center gap-2 group cursor-pointer ${
+      className={`flex items-center gap-1 sm:gap-2 group cursor-pointer ${
         !showLabel ? "justify-center" : ""
       }`}
     >
       <div className="relative">
         {/* Heart icons */}
         <AiOutlineHeart
-          size={28}
+          size={20}
           className="
             fill-white
             absolute
-            -top-[2px]
-            -right-[2px]
+            -top-[1px]
+            -right-[1px]
             transition-all
             duration-80
+            sm:w-7 sm:h-7
+            md:w-7 md:h-7
           "
         />
         <AiFillHeart
-          size={24}
+          size={16}
           className={`
             relative z-auto
             ${hasFavorited ? "fill-rose-500" : "fill-neutral-500/70"}
             transition-all duration-70 ease-out
             ${isAnimating ? "scale-110 -translate-y-1" : ""}
+            sm:w-6 sm:h-6
+            md:w-6 md:h-6
           `}
         />
       </div>
@@ -67,7 +71,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
       {showLabel && (
         <span
           className={`
-          text-sm transition-all duration-50
+          text-xs sm:text-sm transition-all duration-50
           group-hover:text-rose-500
           ${hasFavorited ? "text-rose-500 font-medium" : "text-gray-600"}`}
         >

@@ -140,7 +140,7 @@ const RentModal = () => {
       return;
     }
     if (step === STEPS.IMAGE && localImages.length === 0) {
-      toast.error("Image is required");
+      toast.error(t("rent_modal.image_required"));
       return;
     }
     if (step === STEPS.LOCATION && !location) {
@@ -160,7 +160,7 @@ const RentModal = () => {
     axios
       .post("/api/listings", data)
       .then(() => {
-        toast.success("Listing Created");
+        toast.success(t("rent_modal.listing_created"));
         router.refresh();
         reset();
         setLocalImages([]); // إعادة تعيين الصور المحلية بعد الإرسال
@@ -168,7 +168,7 @@ const RentModal = () => {
         rentmodal.onClose();
       })
       .catch(() => {
-        toast.error("Something went wrong.");
+        toast.error(t("rent_modal.something_went_wrong"));
       })
       .finally(() => {
         setIsLoading(false);
@@ -177,34 +177,60 @@ const RentModal = () => {
 
   const actionLabel = useMemo(() => {
     if (isLoading) {
-      return step === STEPS.PRICE ? "Creating Listing..." : "Loading...";
+      return step === STEPS.PRICE
+        ? t("rent_modal.creating_listing")
+        : t("rent_modal.loading");
     }
     if (step === STEPS.PRICE) {
-      return "🎉 Create Listing";
+      return t("rent_modal.create_listing_button");
     }
-    return "Continue →";
-  }, [step, isLoading]);
+    return t("rent_modal.continue");
+  }, [step, isLoading, t]);
 
   const secondaryActionLabel = useMemo(() => {
     if (step === STEPS.CATEGORY) {
       return undefined;
     }
-    return "Back";
-  }, [step]);
+    return t("rent_modal.back");
+  }, [step, t]);
 
   // خطوات التقدم
   const steps = [
-    { label: "Category", icon: FaHome, completed: !!category },
-    { label: "Offers", icon: FaStar, completed: Offers.length > 0 },
-    { label: "Location", icon: FaMapMarkerAlt, completed: !!location },
     {
-      label: "Info",
+      label: t("rent_modal.steps.category"),
+      icon: FaHome,
+      completed: !!category,
+    },
+    {
+      label: t("rent_modal.steps.offers"),
+      icon: FaStar,
+      completed: Offers.length > 0,
+    },
+    {
+      label: t("rent_modal.steps.location"),
+      icon: FaMapMarkerAlt,
+      completed: !!location,
+    },
+    {
+      label: t("rent_modal.steps.info"),
       icon: FaInfoCircle,
       completed: guestCount > 0 && roomCount > 0 && bathroomCount > 0,
     },
-    { label: "Images", icon: FaImage, completed: localImages.length > 0 },
-    { label: "Description", icon: FaEdit, completed: false }, // سيتم التحقق من العنوان والوصف
-    { label: "Price", icon: FaDollarSign, completed: false }, // سيتم التحقق من السعر
+    {
+      label: t("rent_modal.steps.images"),
+      icon: FaImage,
+      completed: localImages.length > 0,
+    },
+    {
+      label: t("rent_modal.steps.description"),
+      icon: FaEdit,
+      completed: false,
+    }, // سيتم التحقق من العنوان والوصف
+    {
+      label: t("rent_modal.steps.price"),
+      icon: FaDollarSign,
+      completed: false,
+    }, // سيتم التحقق من السعر
   ];
 
   // حساب النسبة المئوية للتقدم
@@ -213,13 +239,13 @@ const RentModal = () => {
   // الحصول على عنوان الخطوة الحالية
   const getCurrentStepTitle = () => {
     const stepTitles = [
-      "Choose Category",
-      "Select Amenities",
-      "Set Location",
-      "Property Details",
-      "Upload Photos",
-      "Add Description",
-      "Set Pricing",
+      t("rent_modal.category_title"),
+      t("rent_modal.offers_title"),
+      t("rent_modal.location_title"),
+      t("rent_modal.info_title"),
+      t("rent_modal.images_title"),
+      t("rent_modal.description_title"),
+      t("rent_modal.price_title"),
     ];
     return stepTitles[step];
   };
@@ -230,7 +256,9 @@ const RentModal = () => {
       {/* شريط التقدم */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-1">
-          <span className="text-xs font-medium text-gray-700">Progress</span>
+          <span className="text-xs font-medium text-gray-700">
+            {t("rent_modal.progress")}
+          </span>
           <span className="text-xs font-medium text-rose-500">
             {progressPercentage}%
           </span>
@@ -296,19 +324,19 @@ const RentModal = () => {
 
   let bodyContent = (
     <div className="flex flex-col gap-4">
-              <div className="text-center">
-          <Heading
-            title={t("rent_modal.category_title")}
-            subtitle={t("rent_modal.category_subtitle")}
-          />
-        </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh]  p-1">
+      <div className="text-center">
+        <Heading
+          title={t("rent_modal.category_title")}
+          subtitle={t("rent_modal.category_subtitle")}
+        />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[40vh] p-1">
         {categories.map((item) => (
           <div key={item.label} className="col-span-1">
             <CategoryInput
               onClick={(category) => setCustomValue("category", category)}
               selected={category === item.label}
-              label={item.label}
+              label={t(`categories.${item.label}.label`)}
               icon={item.icon}
             />
           </div>
@@ -326,7 +354,7 @@ const RentModal = () => {
             subtitle={t("rent_modal.offers_subtitle")}
           />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[40vh]  p-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[40vh] p-1">
           {offers.map((item) => (
             <CategoryInput
               key={item.englishLabel}
@@ -344,8 +372,9 @@ const RentModal = () => {
                 }
               }}
               selected={Offers.includes(item.englishLabel)}
-              label={item.label}
+              label={t(`offers.${item.label}`)}
               icon={item.icon}
+              type="offer"
             />
           ))}
         </div>
@@ -378,8 +407,8 @@ const RentModal = () => {
         {location && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-xs">
-              <strong>{t("rent_modal.selected_location")}</strong> {location.label},{" "}
-              {location.region}
+              <strong>{t("rent_modal.selected_location")}</strong>{" "}
+              {location.label}, {location.region}
             </p>
           </div>
         )}
@@ -431,8 +460,9 @@ const RentModal = () => {
 
         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <p className="text-green-800 text-xs">
-            <strong>Property capacity:</strong> {guestCount} guests, {roomCount}{" "}
-            rooms, {bathroomCount} bathrooms
+            <strong>{t("rent_modal.property_capacity")}</strong> {guestCount}{" "}
+            {t("rent_modal.guests")}, {roomCount} {t("rent_modal.rooms")},{" "}
+            {bathroomCount} {t("rent_modal.bathrooms")}
           </p>
         </div>
       </div>
@@ -448,7 +478,7 @@ const RentModal = () => {
             subtitle={t("rent_modal.images_subtitle")}
           />
           <p className="text-gray-500 mt-1 text-sm">
-            High-quality photos help attract more guests
+            {t("rent_modal.high_quality_photos")}
           </p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
@@ -461,8 +491,10 @@ const RentModal = () => {
         {localImages.length > 0 && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <p className="text-green-800 text-xs">
-              <strong>Uploaded:</strong> {localImages.length} photo
-              {localImages.length !== 1 ? "s" : ""}
+              <strong>{t("rent_modal.uploaded")}</strong> {localImages.length}{" "}
+              {localImages.length !== 1
+                ? t("rent_modal.photos")
+                : t("rent_modal.photo")}
             </p>
           </div>
         )}
@@ -483,34 +515,34 @@ const RentModal = () => {
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Input
               id="title"
-              label="Title"
+              label={t("rent_modal.title_label")}
               disabled={isLoading}
               register={register}
               errors={errors}
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Keep it short and catchy (e.g., "Cozy Beachfront Villa")
+              {t("rent_modal.title_placeholder")}
             </p>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Input
               id="description"
-              label="Description"
+              label={t("rent_modal.description_label")}
               disabled={isLoading}
               register={register}
               errors={errors}
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Describe what makes your place unique and special
+              {t("rent_modal.description_placeholder")}
             </p>
           </div>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-blue-800 text-xs">
-            💡 <strong>Tip:</strong> Be specific about amenities, location
-            highlights, and what guests can expect
+            <strong>{t("rent_modal.tip")}</strong>{" "}
+            {t("rent_modal.tip_description")}
           </p>
         </div>
       </div>
@@ -529,7 +561,7 @@ const RentModal = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <Input
             id="price"
-            label="Price"
+            label={t("rent_modal.price_label")}
             formatPrice
             type="number"
             disabled={isLoading}
@@ -539,16 +571,13 @@ const RentModal = () => {
             validation={{
               min: {
                 value: 1,
-                message: "Price must be at least 1",
+                message: t("price_min_error"),
               },
             }}
           />
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p className="text-blue-800 text-xs">
-            💡 <strong>Tip:</strong> Research similar properties in your area to
-            set a competitive price
-          </p>
+          <p className="text-blue-800 text-xs">{t("rent_modal.tip_pricing")}</p>
         </div>
       </div>
     );
@@ -569,12 +598,12 @@ const RentModal = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mb-3">
               <FaHome className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">
-              Create Your Listing
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Let's get your property ready for guests
-            </p>
+                          <h2 className="text-xl font-bold text-gray-900 mb-1">
+                {t("rent_modal.create_listing_header")}
+              </h2>
+              <p className="text-gray-600 text-sm">
+                {t("rent_modal.create_listing_subheader")}
+              </p>
           </div>
           <StepIndicator />
           {bodyContent}

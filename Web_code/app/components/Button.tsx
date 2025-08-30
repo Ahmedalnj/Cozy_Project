@@ -52,10 +52,10 @@ const Button: React.FC<ButtonProps> = ({
         }
         ${
           small
-            ? "py-2 px-4 text-sm sm:py-2.5 sm:px-5 sm:text-sm"
+            ? "py-1.5 px-3 text-sm sm:py-2 sm:px-4 sm:text-sm"
             : large
-            ? "py-3 px-5 text-base sm:py-4 sm:px-6 sm:text-lg lg:py-5 lg:px-8 lg:text-xl"
-            : "py-2.5 px-5 text-sm sm:py-3 sm:px-6 sm:text-base md:py-4 md:px-7 md:text-lg"
+            ? "py-2.5 px-4 text-base sm:py-3 sm:px-5 sm:text-lg lg:py-4 lg:px-7 lg:text-xl"
+            : "py-2 px-4 text-sm sm:py-2.5 sm:px-5 sm:text-base md:py-3 md:px-6 md:text-lg"
         }
         ${className}
       `}

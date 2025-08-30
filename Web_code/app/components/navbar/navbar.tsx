@@ -15,11 +15,13 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
   const { t } = useTranslation("common");
+
   return (
     <div className="fixed w-full bg-white z-50 shadow-sm">
-      <div className="py-2 border-b-[1px] relative">
+      <div className="py-2 border-b-[1px] relative border-neutral-200">
         <Container>
-          <div className="grid grid-cols-[1fr_2fr_1fr] items-center w-full gap-2">
+          {/* Desktop Layout */}
+          <div className="hidden md:grid md:grid-cols-[1fr_2fr_1fr] items-center w-full gap-2">
             {/* يسار: الشعار */}
             <div className="flex justify-start">
               <Logo />
@@ -39,6 +41,29 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
               </div>
               <div title="">
                 {" "}
+                <UserMenu currentUser={currentUser ?? null} />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Layout - All in one row */}
+          <div className="md:hidden">
+            <div className="flex items-center justify-between w-full gap-2">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <Logo />
+              </div>
+
+              {/* Search Bar - Takes remaining space */}
+              <div className="flex-1 min-w-0">
+                <Search />
+              </div>
+
+              {/* Language Switcher + UserMenu */}
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                <div title={t("change_language")}>
+                  <LanguageSwitcher />
+                </div>
                 <UserMenu currentUser={currentUser ?? null} />
               </div>
             </div>

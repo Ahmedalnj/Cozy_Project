@@ -30,9 +30,11 @@ import LanguageSwitcher from "@/app/components/LanguageSwitcher";
 interface UserMenuProps {
   currentUser: SafeUser | null;
 }
+
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   // Translation hook
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const isRTL = i18n.language === "ar";
 
   const router = useRouter();
 
@@ -60,6 +62,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     // open rent modal
     rentModal.onOpen();
   }, [currentUser, loginModal, rentModal]);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
@@ -112,7 +115,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       </div>
       {isOpen && (
         <div
-          className="
+          className={`
             absolute
             rounded
             shadow-md
@@ -120,19 +123,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
             md:w-3/4
             bg-white
             overflow-hidden
-            right-0
             top-12
             text-sm
-            z-500
-            "
+            z-50
+            ${isRTL ? 'left-0' : 'right-0'}
+          `}
         >
-          <div className=" flex flex-col cursor-pointer">
+          <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
                 <MenuItem
                   onClick={() => handleMenuItemClick(() => router.push("/"))}
                   label={t("Home")}
                   Icon={TbHome}
+                  isRTL={isRTL}
                 />
                 <MenuItem
                   onClick={() =>
@@ -140,6 +144,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   }
                   label={t("my_trips")}
                   Icon={PiAirplaneTiltFill}
+                  isRTL={isRTL}
                 />
                 <MenuItem
                   onClick={() =>
@@ -147,6 +152,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   }
                   label={t("my_favorites")}
                   Icon={AiOutlineHeart}
+                  isRTL={isRTL}
                 />
                 <MenuItem
                   onClick={() =>
@@ -154,6 +160,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   }
                   label={t("my_reservations")}
                   Icon={AiOutlineCalendar}
+                  isRTL={isRTL}
                 />
                 <MenuItem
                   onClick={() =>
@@ -161,6 +168,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   }
                   label={t("my_properties")}
                   Icon={FiKey}
+                  isRTL={isRTL}
                 />
                 {currentUser.role === "ADMIN" && (
                   <MenuItem
@@ -169,12 +177,14 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                     }
                     label={t("my_dashboard")}
                     Icon={AiOutlineDashboard}
+                    isRTL={isRTL}
                   />
                 )}
                 <MenuItem
                   onClick={() => handleMenuItemClick(rentModal.onOpen)}
                   label={t("cozy_my_home")}
                   Icon={AiOutlineHome}
+                  isRTL={isRTL}
                 />
                 <div className="px-3 py-2">
                   <LanguageSwitcher fullLabel />
@@ -184,6 +194,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   onClick={() => handleMenuItemClick(() => signOut())}
                   label={t("logout")}
                   Icon={AiOutlineLogout}
+                  isRTL={isRTL}
                 />
               </>
             ) : (
@@ -192,11 +203,13 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   onClick={() => handleMenuItemClick(loginModal.onOpen)}
                   label={t("login")}
                   Icon={AiOutlineLogin}
+                  isRTL={isRTL}
                 />
                 <MenuItem
                   onClick={() => handleMenuItemClick(registerModal.onOpen)}
                   label={t("sign_up")}
                   Icon={AiOutlineUserAdd}
+                  isRTL={isRTL}
                 />
               </>
             )}

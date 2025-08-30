@@ -63,7 +63,7 @@ const LoginModal = () => {
   };
 
   const bodyContent = (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <Heading title={t("welcome_back")} subtitle={t("login_to_account")} />
       <Input
         id="email"
@@ -92,9 +92,9 @@ const LoginModal = () => {
   );
 
   const footerContent = (
-    <div className="flex flex-col gap-4 mt-3">
+    <div className="flex flex-col gap-3 mt-2">
       <hr />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <Button
           outline
           label={t("continue_with_google")}
@@ -108,9 +108,9 @@ const LoginModal = () => {
           onClick={() => signIn("facebook")}
         />
 
-        <div className="text-neutral-500 text-center mt-4 font-light">
+        <div className="text-neutral-500 text-center mt-3 font-light">
           {showResetPassword && (
-            <div className="text-black pb-3">
+            <div className="text-black pb-2">
               {t("forgot_password")}{" "}
               <span
                 onClick={() => {

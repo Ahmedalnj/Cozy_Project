@@ -10,45 +10,43 @@ export const useOffers = () => {
   
   const offers = [
     {
-      label: t("offers.wifi"),
+      label: "wifi",
       englishLabel: "Wi-Fi", // Keep English label for database matching
       icon: FaWifi,
       description: t("offers.wifi_description"),
     },
     {
-      label: t("offers.parking"),
+      label: "parking",
       englishLabel: "Parking",
       icon: FaCar,
       description: t("offers.parking_description"),
     },
     {
-      label: t("offers.tv"),
+      label: "tv",
       englishLabel: "TV",
       icon: FaTv,
       description: t("offers.tv_description"),
     },
     {
-      label: t("offers.air_conditioning"),
+      label: "air_conditioning",
       englishLabel: "Air conditioning",
       icon: FaSnowflake,
       description: t("offers.air_conditioning_description"),
     },
     {
-      label: t("offers.kitchen"),
+      label: "kitchen",
       englishLabel: "Kitchen",
       icon: MdKitchen,
       description: t("offers.kitchen_description"),
     },
     {
-      label: t("offers.swimming_pool"),
+      label: "swimming_pool",
       englishLabel: "Swimming Pool",
       icon: MdPool,
       description: t("offers.swimming_pool_description"),
     },
   ];
 
-
-  
   return offers;
 };
 

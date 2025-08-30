@@ -15,12 +15,16 @@ import Avatar from "@/app/components/Avatar";
 import useRentModal from "@/app/hooks/useRentModal";
 import { SafeUser } from "@/app/types";
 import { signOut } from "next-auth/react";
+import { useTranslation } from "react-i18next";
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
+  const { t, i18n } = useTranslation("common");
+  const isRTL = i18n.language === "ar";
+  
   const router = useRouter();
   const rentModal = useRentModal();
   const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +38,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
           onClick={() => router.push("/")}
           className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
         >
-          Back To Cozy
+          {t("back_to_cozy")}
         </div>
 
         <div
@@ -51,10 +55,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
       {isOpen &&
         createPortal(
           <div
-            className="
+            className={`
               fixed
               top-[80px] sm:top-12
-              right-0 sm:right-0
               w-[250px] sm:w-[200px]
               bg-white
               rounded
@@ -62,33 +65,37 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
               overflow-hidden
               text-sm
               z-[9999]
-              
-            "
+              ${isRTL ? 'left-0 sm:left-0' : 'right-0 sm:right-0'}
+            `}
           >
             <div className="flex flex-col cursor-pointer">
               {currentUser && (
                 <>
                   <MenuItem
                     onClick={() => router.push("/properties")}
-                    label="My Properties"
+                    label={t("my_properties")}
                     Icon={FiKey}
+                    isRTL={isRTL}
                   />
                   <MenuItem
                     onClick={() => router.push("/admin/dashboard")}
-                    label="My Dashboard"
+                    label={t("my_dashboard")}
                     Icon={AiOutlineDashboard}
+                    isRTL={isRTL}
                   />
                   <MenuItem
                     onClick={rentModal.onOpen}
-                    label="Cozy my home"
+                    label={t("cozy_my_home")}
                     Icon={AiOutlineHome}
+                    isRTL={isRTL}
                   />
                   <hr />
                   <MenuItem
                     onClick={() => signOut()}
-                    label="Logout"
+                    label={t("logout")}
                     variant="logout"
                     Icon={AiOutlineLogout}
+                    isRTL={isRTL}
                   />
                 </>
               )}

@@ -1,10 +1,12 @@
 "use client";
 import { IconType } from "react-icons";
+
 interface MenuItemProps {
   onClick: () => void;
   label: string;
   Icon: IconType;
   variant?: "default" | "logout";
+  isRTL?: boolean;
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
@@ -12,6 +14,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   label,
   Icon,
   variant = "default",
+  isRTL = false,
 }) => {
   const baseClasses = `
     px-4
@@ -21,7 +24,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
     cursor-pointer
     rounded-md
     flex
-    justify-between
+    items-center
+    gap-2
   `;
 
   // تحديد الستايل حسب النوع
@@ -31,8 +35,15 @@ const MenuItem: React.FC<MenuItemProps> = ({
       : "hover:bg-neutral-100 text-white-800";
 
   return (
-    <div onClick={onClick} className={`${baseClasses} ${variantClasses}`}>
-      {label}
+    <div 
+      onClick={onClick} 
+      className={`
+        ${baseClasses} 
+        ${variantClasses}
+        ${isRTL ? 'flex-row-reverse' : 'justify-between'}
+      `}
+    >
+      <span className={isRTL ? 'text-right' : 'text-left'}>{label}</span>
       <Icon size={15} />
     </div>
   );

@@ -23,35 +23,41 @@ const HeroSection = () => {
       {/* Background Image with Parallax Effect */}
       <div
         className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out ${
-          isLoaded ? 'scale-110' : 'scale-100'
+          isLoaded ? "scale-110" : "scale-100"
         }`}
         style={{
           backgroundImage: "url('/images/TRIPLI.jpg')",
         }}
-      >
-
-      </div>
+      ></div>
 
       {/* Content with Staggered Animations */}
       <div className="relative z-10 flex items-center justify-center h-full">
         <div className="text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className={`hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight font-dubai transition-all duration-1000 ease-out transform drop-shadow-lg ${
-            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+          <h1
+            className={`hero-title text-6xl md:text-5xl font-bold mb-6 leading-tight font-dubai transition-all duration-1000 ease-out transform drop-shadow-lg ${
+              isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            }`}
+          >
             {t("hero.title")}
             <br />
-            <span className="text-white drop-shadow-lg">{t("hero.subtitle")}</span>
+            <span className="text-white drop-shadow-lg">
+              {t("hero.subtitle")}
+            </span>
           </h1>
 
-          <p className={`hero-description text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto font-dubai transition-all duration-1000 ease-out delay-300 transform drop-shadow-lg ${
-            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+          <p
+            className={`hero-description text-1xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto font-dubai transition-all duration-1000 ease-out delay-300 transform drop-shadow-lg ${
+              isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            }`}
+          >
             {t("hero.description")}
           </p>
 
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center font-dubai transition-all duration-1000 ease-out delay-500 transform ${
-            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+          <div
+            className={`flex flex-col sm:flex-row gap-4 justify-center items-center font-dubai transition-all duration-1000 ease-out delay-500 transform ${
+              isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            }`}
+          >
             <Button
               label={t("hero.search_button")}
               onClick={searchModal.onOpen}
@@ -69,9 +75,11 @@ const HeroSection = () => {
         </div>
 
         {/* Scroll Indicator with Enhanced Animation */}
-        <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 transition-all duration-1000 ease-out delay-700 ${
-          isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`}>
+        <div
+          className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 transition-all duration-1000 ease-out delay-700 ${
+            isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          }`}
+        >
           <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center animate-bounce">
             <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
           </div>
@@ -80,15 +88,21 @@ const HeroSection = () => {
 
       {/* Floating Elements for Enhanced Visual Appeal */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className={`absolute top-20 left-10 w-4 h-4 bg-white rounded-full opacity-20 transition-all duration-2000 ease-out delay-1000 ${
-          isLoaded ? 'animate-pulse' : ''
-        }`}></div>
-        <div className={`absolute top-40 right-20 w-6 h-6 bg-white rounded-full opacity-30 transition-all duration-2000 ease-out delay-1200 ${
-          isLoaded ? 'animate-pulse' : ''
-        }`}></div>
-        <div className={`absolute bottom-40 left-20 w-3 h-3 bg-white rounded-full opacity-25 transition-all duration-2000 ease-out delay-1400 ${
-          isLoaded ? 'animate-pulse' : ''
-        }`}></div>
+        <div
+          className={`absolute top-20 left-10 w-4 h-4 bg-white rounded-full opacity-20 transition-all duration-2000 ease-out delay-1000 ${
+            isLoaded ? "animate-pulse" : ""
+          }`}
+        ></div>
+        <div
+          className={`absolute top-40 right-20 w-6 h-6 bg-white rounded-full opacity-30 transition-all duration-2000 ease-out delay-1200 ${
+            isLoaded ? "animate-pulse" : ""
+          }`}
+        ></div>
+        <div
+          className={`absolute bottom-40 left-20 w-3 h-3 bg-white rounded-full opacity-25 transition-all duration-2000 ease-out delay-1400 ${
+            isLoaded ? "animate-pulse" : ""
+          }`}
+        ></div>
       </div>
     </div>
   );

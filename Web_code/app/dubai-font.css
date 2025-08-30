@@ -16,6 +16,15 @@
     font-display: swap;
 }
 
+/* Fallback fonts for better performance */
+@font-face {
+    font-family: 'Dubai';
+    src: local('Segoe UI'), local('Tahoma'), local('Arial'), sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* CSS Variables for font usage */
 :root {
     --font-dubai: 'Dubai', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

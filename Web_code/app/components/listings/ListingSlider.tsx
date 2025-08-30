@@ -66,15 +66,15 @@ export default function ListingSlider({
           prevEl: ".swiper-button-prev-custom",
           disabledClass: "swiper-button-disabled", // Optional: for disabled state styling
         }}
-        spaceBetween={16}
-        slidesPerView={1.2}
+        spaceBetween={12}
+        slidesPerView={2}
         breakpoints={{
-          480: { slidesPerView: 1.5, spaceBetween: 20 },
-          640: { slidesPerView: 2.3, spaceBetween: 20 },
-          768: { slidesPerView: 2.5, spaceBetween: 24 },
-          1024: { slidesPerView: 3.3, spaceBetween: 24 },
-          1280: { slidesPerView: 4.3, spaceBetween: 28 },
-          1536: { slidesPerView: 5.3, spaceBetween: 32 },
+          480: { slidesPerView: 2.2, spaceBetween: 16 },
+          640: { slidesPerView: 2.5, spaceBetween: 20 },
+          768: { slidesPerView: 3.2, spaceBetween: 24 },
+          1024: { slidesPerView: 4.2, spaceBetween: 24 },
+          1280: { slidesPerView: 5.2, spaceBetween: 28 },
+          1536: { slidesPerView: 6.2, spaceBetween: 32 },
         }}
       >
         {listings.map((listing, index) => (

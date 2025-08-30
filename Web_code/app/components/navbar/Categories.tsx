@@ -1,7 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Container from "../Container";
-import { TbBuilding, TbBuildingStore, TbHome, TbPool, TbBeach } from "react-icons/tb";
+import {
+  TbBuilding,
+  TbBuildingStore,
+  TbHome,
+  TbPool,
+  TbBeach,
+} from "react-icons/tb";
 import {
   GiFamilyHouse,
   GiFarmTractor,
@@ -100,25 +106,25 @@ const Categories = () => {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  
+
   const isMainPage = pathname == "/";
-  
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // إخفاء عند التمرير للأسفل بعد 150px، إظهار عند التمرير للأعلى
       if (currentScrollY > lastScrollY && currentScrollY > 150) {
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
         setIsVisible(true);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
   if (!isMainPage) {
@@ -126,20 +132,61 @@ const Categories = () => {
   }
 
   return (
-    <div className={`transition-all duration-500 ease-in-out transform ${
-      isVisible ? 'translate-y-0 opacity-100 max-h-32' : '-translate-y-full opacity-0 max-h-0'
-    } overflow-hidden`}>
+    <div
+      className={`transition-all duration-500 ease-in-out transform ${
+        isVisible
+          ? "translate-y-0 opacity-100 max-h-40 md:max-h-32"
+          : "-translate-y-full opacity-0 max-h-0"
+      } overflow-hidden`}
+    >
       <Container>
-        <div className="pt-4 flex flex-row items-center justify-between">
-          {categories.map((item) => (
-            <CategoryBox
-              key={item.label}
-              label={t(`categories.${item.label}.label`)}
-              selected={category === item.label}
-              icon={item.icon}
-              value={item.label}
-            />
-          ))}
+        <div className="pt-4 pb-2 md:pb-0">
+          {/* Desktop Layout - Grid for larger screens */}
+          <div className="hidden lg:flex lg:flex-wrap lg:gap-2 lg:items-center lg:justify-between">
+            {categories.map((item) => (
+              <CategoryBox
+                key={item.label}
+                label={t(`categories.${item.label}.label`)}
+                selected={category === item.label}
+                icon={item.icon}
+                value={item.label}
+              />
+            ))}
+          </div>
+
+          {/* Tablet Layout - Grid for medium screens */}
+          <div className="hidden md:grid md:grid-cols-10 lg:hidden md:gap-2 md:items-center md:justify-between">
+            {categories.slice(0, 10).map((item) => (
+              <CategoryBox
+                key={item.label}
+                label={t(`categories.${item.label}.label`)}
+                selected={category === item.label}
+                icon={item.icon}
+                value={item.label}
+              />
+            ))}
+          </div>
+
+          {/* Mobile Layout - Horizontal scroll */}
+          <div className="md:hidden">
+            <div className="relative">
+              <div className="flex flex-row items-center gap-4 overflow-x-auto scrollbar-hide pb-2 scroll-smooth">
+                {categories.map((item) => (
+                  <div key={item.label} className="flex-shrink-0">
+                    <CategoryBox
+                      label={t(`categories.${item.label}.label`)}
+                      selected={category === item.label}
+                      icon={item.icon}
+                      value={item.label}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Gradient fade indicators for scroll */}
+              <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+            </div>
+          </div>
         </div>
       </Container>
     </div>
