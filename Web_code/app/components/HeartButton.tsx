@@ -1,0 +1,78 @@
+"use client";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { SafeUser } from "../types";
+import useFavorite from "../hooks/useFavorite";
+import { useState, MouseEvent } from "react";
+
+interface HeartButtonProps {
+  listingId: string;
+  currentUser?: SafeUser | null;
+  label?: string;
+  showLabel?: boolean; // أضفنا خاصية جديدة للتحكم في عرض النص
+}
+
+const HeartButton: React.FC<HeartButtonProps> = ({
+  listingId,
+  currentUser,
+  label, // قيمة افتراضية
+  showLabel = true, // افتراضيًا يعرض النص
+}) => {
+  const { hasFavorited, toggleFavorite } = useFavorite({
+    listingId,
+    currentUser,
+  });
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleClick = async (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsAnimating(true);
+    await toggleFavorite(e);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className={`flex items-center gap-2 group cursor-pointer ${
+        !showLabel ? "justify-center" : ""
+      }`}
+    >
+      <div className="relative">
+        {/* Heart icons */}
+        <AiOutlineHeart
+          size={28}
+          className="
+            fill-white
+            absolute
+            -top-[2px]
+            -right-[2px]
+            transition-all
+            duration-80
+          "
+        />
+        <AiFillHeart
+          size={24}
+          className={`
+            relative z-auto
+            ${hasFavorited ? "fill-rose-500" : "fill-neutral-500/70"}
+            transition-all duration-70 ease-out
+            ${isAnimating ? "scale-110 -translate-y-1" : ""}
+          `}
+        />
+      </div>
+
+      {showLabel && (
+        <span
+          className={`
+          text-sm transition-all duration-50
+          group-hover:text-rose-500
+          ${hasFavorited ? "text-rose-500 font-medium" : "text-gray-600"}`}
+        >
+          {hasFavorited ? "Added to Favorites" : label}
+        </span>
+      )}
+    </div>
+  );
+};
+
+export default HeartButton;
