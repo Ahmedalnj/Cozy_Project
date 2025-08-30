@@ -1,8 +1,15 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
+import '../core/supabase_config.dart';
 
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
+
+  // Supabase Client مع Service Role Key للعمليات الإدارية
+  static final SupabaseClient _adminSupabase = SupabaseClient(
+    SupabaseConfig.url,
+    SupabaseConfig.serviceRoleKey,
+  );
 
   // تسجيل الدخول بالبريد الإلكتروني وكلمة المرور
   static Future<AuthResponse> signInWithEmail({
@@ -27,19 +34,29 @@ class AuthService {
     Map<String, dynamic>? userData,
   }) async {
     try {
+      print('🚀 بدء عملية إنشاء حساب جديد...');
+      print('📧 البريد الإلكتروني: $email');
+      print('👤 البيانات: $userData');
+
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: userData,
       );
 
-      // إنشاء سجل في جدول User
+      print('✅ تم إنشاء الحساب في Supabase Auth');
+      print('🆔 User ID: ${response.user?.id}');
+
+      // إنشاء سجل في جدول User باستخدام Service Role
       if (response.user != null) {
-        await _createUserRecord(response.user!, userData);
+        print('📝 محاولة إنشاء سجل في جدول User...');
+        await _createUserRecordWithAdmin(response.user!, userData);
       }
 
+      print('🎉 تم إنشاء الحساب بنجاح!');
       return response;
     } catch (error) {
+      print('❌ خطأ في إنشاء الحساب: $error');
       throw _handleAuthError(error);
     }
   }
@@ -95,6 +112,31 @@ class AuthService {
       });
     } catch (error) {
       print('Error creating user record: $error');
+    }
+  }
+
+  // إنشاء سجل في جدول User باستخدام Service Role
+  static Future<void> _createUserRecordWithAdmin(
+      User user, Map<String, dynamic>? userData) async {
+    try {
+      print('🔧 إنشاء سجل في جدول User باستخدام Service Role...');
+      print('🆔 User ID: ${user.id}');
+      print('📧 Email: ${user.email}');
+
+      final result = await _adminSupabase.from('User').insert({
+        '_id': user.id,
+        'email': user.email,
+        'name': userData?['name'] ?? user.userMetadata?['name'],
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+        'role': 'USER',
+      }).select();
+
+      print('✅ تم إنشاء سجل في جدول User بنجاح!');
+      print('📊 النتيجة: $result');
+    } catch (error) {
+      print('❌ خطأ في إنشاء سجل User: $error');
+      print('⚠️ سيتم إنشاء السجل تلقائياً بواسطة Trigger');
     }
   }
 
