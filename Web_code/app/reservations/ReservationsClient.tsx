@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Container from "../components/Container";
-import Heading from "../components/Heading";
+import Container from "../components/ui/Container";
+import Heading from "../components/ui/Heading";
 import { SafeUser, SaveReservation } from "../types";
 import { useState, useCallback } from "react";
 import axios from "axios";
@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
 import { useTranslation } from "react-i18next";
 import RejectionModal from "../components/modals/RejectionModal";
-import ConfirmAcceptModal from "../components/ConfirmAcceptModal";
+import ConfirmAcceptModal from "../components/modals/confirmations/ConfirmAcceptModal";
 
 interface ReservationsClientProps {
   reservations: SaveReservation[];

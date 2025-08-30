@@ -3,7 +3,7 @@
 import { SafeUser } from "@/app/types";
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
-import Container from "@/app/components/Container";
+import Container from "@/app/components/ui/Container";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;

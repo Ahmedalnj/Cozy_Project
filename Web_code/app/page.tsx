@@ -1,13 +1,13 @@
 import getCurrentUser from "./actions/getCurrentUser";
 import getListings, { IListingsParams } from "./actions/getListings";
-import Container from "./components/Container";
-import EmptyState from "./components/EmptyState";
-import ListingSlider from "./components/listings/ListingSlider";
-import HeroSection from "./components/HeroSection";
-import FeaturedListings from "./components/FeaturedListings";
-import FilterResults from "./components/FilterResults";
-import FilteredListings from "./components/FilteredListings";
-import Footer from "./components/Footer";
+import Container from "./components/ui/Container";
+import EmptyState from "./components/ui/EmptyState";
+import ListingSlider from "./components/listings/cards/ListingSlider";
+import HeroSection from "./components/layout/HeroSection";
+import FeaturedListings from "./components/features/FeaturedListings";
+import FilterResults from "./components/features/FilterResults";
+import FilteredListings from "./components/features/FilteredListings";
+import Footer from "./components/layout/Footer";
 
 interface HomeProps {
   searchParams: Promise<IListingsParams>;
@@ -48,10 +48,7 @@ const Home = async (props: HomeProps) => {
         {showDefaultContent && (
           <Container>
             <div className="pt-8 pb-12">
-              <FeaturedListings
-                listings={listings}
-                currentUser={currentUser}
-              />
+              <FeaturedListings listings={listings} currentUser={currentUser} />
             </div>
           </Container>
         )}
@@ -69,10 +66,7 @@ const Home = async (props: HomeProps) => {
         {showDefaultContent && listings.length > 0 && (
           <Container>
             <div className="pt-8 pb-16">
-              <ListingSlider
-                listings={listings}
-                currentUser={currentUser}
-              />
+              <ListingSlider listings={listings} currentUser={currentUser} />
             </div>
           </Container>
         )}

@@ -6,8 +6,8 @@ import { updateUserRole, deleteUser } from "@/app/actions/users.actions";
 import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
-import Avatar from "@/app/components/Avatar";
-import ConfirmationModal from "@/app/components/ConfirmationModal";
+import Avatar from "@/app/components/ui/Avatar";
+import ConfirmationModal from "@/app/components/modals/confirmations/ConfirmationModal";
 
 interface UsersTableProps {
   users: PublicUser[];

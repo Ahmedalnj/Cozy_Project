@@ -8,7 +8,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Container from "@/app/components/Container";
+import Container from "@/app/components/ui/Container";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -276,7 +276,9 @@ const ReservationPage = () => {
           toast.success(t("cash_reservation_created"));
           // تأخير قصير لإظهار رسالة النجاح
           setTimeout(() => {
-            router.push(`/payment/success?reservation_id=${cashResponse.data.reservationId}&payment_type=cash`);
+            router.push(
+              `/payment/success?reservation_id=${cashResponse.data.reservationId}&payment_type=cash`
+            );
           }, 1000);
         } else {
           toast.error(t("cash_reservation_failed"));

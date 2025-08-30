@@ -5,8 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import Container from "@/app/components/Container";
-import Loader from "@/app/components/Loader";
+import Container from "@/app/components/ui/Container";
+import Loader from "@/app/components/ui/Loader";
 import {
   FaCheckCircle,
   FaReceipt,
@@ -173,7 +173,9 @@ const ReservationSuccess = () => {
       pdf.setFontSize(20);
       pdf.setTextColor(220, 38, 127); // rose-500
       const isCashPayment = searchParams?.get("payment_type") === "cash";
-      const headerText = isCashPayment ? "Cozy - Cash Reservation Invoice" : "Cozy - Reservation Invoice";
+      const headerText = isCashPayment
+        ? "Cozy - Cash Reservation Invoice"
+        : "Cozy - Reservation Invoice";
       pdf.text(headerText, 105, 20, { align: "center" });
 
       // Add reservation details
@@ -221,36 +223,40 @@ const ReservationSuccess = () => {
       yPosition += 8;
       pdf.text(`Total Price: $${reservationData.totalPrice}`, 20, yPosition);
       yPosition += 8;
-              pdf.text(`Status: Confirmed`, 20, yPosition);
-        yPosition += 8;
-        pdf.text(`Payment Method: ${isCashPayment ? "Cash on Arrival" : "Credit Card"}`, 20, yPosition);
-        yPosition += 15;
+      pdf.text(`Status: Confirmed`, 20, yPosition);
+      yPosition += 8;
+      pdf.text(
+        `Payment Method: ${isCashPayment ? "Cash on Arrival" : "Credit Card"}`,
+        20,
+        yPosition
+      );
+      yPosition += 15;
 
-              // Payment details
-        if (reservationData.payments.length > 0) {
-          const payment = reservationData.payments[0];
-          pdf.setFontSize(14);
-          pdf.text("Payment Information:", 20, yPosition);
-          yPosition += 10;
-          pdf.setFontSize(12);
-          if (isCashPayment) {
-            pdf.text(`Payment Method: Cash on Arrival`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Amount: $${payment.amount}`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Status: ${payment.status}`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Note: Please pay in cash when you arrive`, 20, yPosition);
-          } else {
-            pdf.text(`Transaction ID: ${payment.transactionId}`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Payment Method: ${payment.paymentMethod}`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Amount: $${payment.amount}`, 20, yPosition);
-            yPosition += 8;
-            pdf.text(`Status: ${payment.status}`, 20, yPosition);
-          }
+      // Payment details
+      if (reservationData.payments.length > 0) {
+        const payment = reservationData.payments[0];
+        pdf.setFontSize(14);
+        pdf.text("Payment Information:", 20, yPosition);
+        yPosition += 10;
+        pdf.setFontSize(12);
+        if (isCashPayment) {
+          pdf.text(`Payment Method: Cash on Arrival`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Amount: $${payment.amount}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Status: ${payment.status}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Note: Please pay in cash when you arrive`, 20, yPosition);
+        } else {
+          pdf.text(`Transaction ID: ${payment.transactionId}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Payment Method: ${payment.paymentMethod}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Amount: $${payment.amount}`, 20, yPosition);
+          yPosition += 8;
+          pdf.text(`Status: ${payment.status}`, 20, yPosition);
         }
+      }
 
       // Add footer
       pdf.setFontSize(10);
@@ -294,7 +300,11 @@ const ReservationSuccess = () => {
               {error ? t("payment_warning") : t("payment_success")}
             </h1>
             <p className="text-sm opacity-90">
-              {error ? t("payment_error_note") : searchParams?.get("payment_type") === "cash" ? t("cash_payment_success_note") : t("payment_success_note")}
+              {error
+                ? t("payment_error_note")
+                : searchParams?.get("payment_type") === "cash"
+                ? t("cash_payment_success_note")
+                : t("payment_success_note")}
             </p>
           </div>
 

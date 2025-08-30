@@ -1,7 +1,7 @@
 "use client";
 
-import Container from "../components/Container";
-import Heading from "../components/Heading";
+import Container from "../components/ui/Container";
+import Heading from "../components/ui/Heading";
 import ListingCard from "../components/listings/ListingCard";
 import { SafeListing, SafeUser } from "../types";
 import { useTranslation } from "react-i18next";

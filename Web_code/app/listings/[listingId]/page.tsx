@@ -1,7 +1,7 @@
 import getListingById from "@/app/actions/getListingById";
-import ClientOnly from "@/app/components/ClientOnly";
+import ClientOnly from "@/app/components/ui/ClientOnly";
 
-import EmptyState from "@/app/components/EmptyState";
+import EmptyState from "@/app/components/ui/EmptyState";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
 import ListingClient from "./ListingClient";

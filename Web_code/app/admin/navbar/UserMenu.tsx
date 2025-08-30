@@ -11,7 +11,7 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import MenuItem from "./MenuItem";
-import Avatar from "@/app/components/Avatar";
+import Avatar from "@/app/components/ui/Avatar";
 import useRentModal from "@/app/hooks/useRentModal";
 import { SafeUser } from "@/app/types";
 import { signOut } from "next-auth/react";
@@ -24,7 +24,7 @@ interface UserMenuProps {
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const { t, i18n } = useTranslation("common");
   const isRTL = i18n.language === "ar";
-  
+
   const router = useRouter();
   const rentModal = useRentModal();
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +65,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
               overflow-hidden
               text-sm
               z-[9999]
-              ${isRTL ? 'left-0 sm:left-0' : 'right-0 sm:right-0'}
+              ${isRTL ? "left-0 sm:left-0" : "right-0 sm:right-0"}
             `}
           >
             <div className="flex flex-col cursor-pointer">

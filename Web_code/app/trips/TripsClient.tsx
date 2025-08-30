@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Container from "../components/Container";
-import Heading from "../components/Heading";
+import Container from "../components/ui/Container";
+import Heading from "../components/ui/Heading";
 import { SafeUser, SaveReservation } from "../types";
 import { useCallback, useState } from "react";
 import axios from "axios";
@@ -65,7 +65,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
           // Determine payment type and status
           const isCashPayment = reservation.payment?.paymentMethod === "cash";
           const isPaid = reservation.payment?.status === "PAID";
-          
+
           // For cash payments, show pending status until host accepts
           if (isCashPayment && !isPaid) {
             return (
@@ -82,7 +82,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
               />
             );
           }
-          
+
           // For paid reservations (any payment method), show paid status
           if (isPaid) {
             return (
@@ -99,7 +99,7 @@ const TripsClient: React.FC<TripsClientProps> = ({
               />
             );
           }
-          
+
           // Default case
           return (
             <ListingCard

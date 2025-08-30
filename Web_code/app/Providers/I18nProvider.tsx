@@ -5,7 +5,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "@/locales/locales/en/common.json";
 import ar from "@/locales/locales/ar/common.json";
-import Loader from "@/app/components/Loader";
+import Loader from "@/app/components/ui/Loader";
 
 interface I18nProviderProps {
   children: React.ReactNode;
@@ -20,11 +20,17 @@ export default function I18nProvider({ children }: I18nProviderProps) {
     console.log("I18nProvider: Arabic translations:", ar);
 
     // Get saved language from localStorage or default to 'en'
-    const savedLanguage = typeof window !== 'undefined' 
-      ? localStorage.getItem('language') || localStorage.getItem('i18nextLng') || 'en'
-      : 'en';
+    const savedLanguage =
+      typeof window !== "undefined"
+        ? localStorage.getItem("language") ||
+          localStorage.getItem("i18nextLng") ||
+          "en"
+        : "en";
 
-    console.log("I18nProvider: Saved language from localStorage:", savedLanguage);
+    console.log(
+      "I18nProvider: Saved language from localStorage:",
+      savedLanguage
+    );
 
     // Simple initialization
     i18n
@@ -44,8 +50,8 @@ export default function I18nProvider({ children }: I18nProviderProps) {
         },
         // Add persistence settings
         detection: {
-          order: ['localStorage', 'navigator'],
-          caches: ['localStorage'],
+          order: ["localStorage", "navigator"],
+          caches: ["localStorage"],
         },
       })
       .then(() => {
@@ -63,49 +69,49 @@ export default function I18nProvider({ children }: I18nProviderProps) {
           "Arabic welcome:",
           i18n.t("welcome", { ns: "common", lng: "ar" })
         );
-        
+
         // Set the language direction based on the current language
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           const htmlElement = document.documentElement;
           const bodyElement = document.body;
-          
-          if (i18n.language === 'ar') {
-            htmlElement.setAttribute('dir', 'rtl');
-            htmlElement.setAttribute('lang', 'ar');
-            bodyElement.setAttribute('dir', 'rtl');
-            bodyElement.setAttribute('lang', 'ar');
+
+          if (i18n.language === "ar") {
+            htmlElement.setAttribute("dir", "rtl");
+            htmlElement.setAttribute("lang", "ar");
+            bodyElement.setAttribute("dir", "rtl");
+            bodyElement.setAttribute("lang", "ar");
           } else {
-            htmlElement.setAttribute('dir', 'ltr');
-            htmlElement.setAttribute('lang', 'en');
-            bodyElement.setAttribute('dir', 'ltr');
-            bodyElement.setAttribute('lang', 'en');
+            htmlElement.setAttribute("dir", "ltr");
+            htmlElement.setAttribute("lang", "en");
+            bodyElement.setAttribute("dir", "ltr");
+            bodyElement.setAttribute("lang", "en");
           }
         }
 
         // Listen for language changes and save to localStorage
-        i18n.on('languageChanged', (lng) => {
-          localStorage.setItem('language', lng);
-          localStorage.setItem('i18nextLng', lng);
-          
+        i18n.on("languageChanged", (lng) => {
+          localStorage.setItem("language", lng);
+          localStorage.setItem("i18nextLng", lng);
+
           // Update document attributes
-          if (typeof window !== 'undefined') {
+          if (typeof window !== "undefined") {
             const htmlElement = document.documentElement;
             const bodyElement = document.body;
-            
-            if (lng === 'ar') {
-              htmlElement.setAttribute('dir', 'rtl');
-              htmlElement.setAttribute('lang', 'ar');
-              bodyElement.setAttribute('dir', 'rtl');
-              bodyElement.setAttribute('lang', 'ar');
+
+            if (lng === "ar") {
+              htmlElement.setAttribute("dir", "rtl");
+              htmlElement.setAttribute("lang", "ar");
+              bodyElement.setAttribute("dir", "rtl");
+              bodyElement.setAttribute("lang", "ar");
             } else {
-              htmlElement.setAttribute('dir', 'ltr');
-              htmlElement.setAttribute('lang', 'en');
-              bodyElement.setAttribute('dir', 'ltr');
-              bodyElement.setAttribute('lang', 'en');
+              htmlElement.setAttribute("dir", "ltr");
+              htmlElement.setAttribute("lang", "en");
+              bodyElement.setAttribute("dir", "ltr");
+              bodyElement.setAttribute("lang", "en");
             }
           }
         });
-        
+
         setIsInitialized(true);
       })
       .catch((error) => {

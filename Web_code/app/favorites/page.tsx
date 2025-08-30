@@ -1,5 +1,5 @@
 import EmptyState from "../components/EmptyState";
-import ClientOnly from "../components/ClientOnly";
+import ClientOnly from "../components/ui/ClientOnly";
 
 import getCurrentUser from "../actions/getCurrentUser";
 import getFavoriteListings from "../actions/getFavoriteListings";

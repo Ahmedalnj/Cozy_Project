@@ -1,23 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { categories } from "@/app/components/navbar/Categories";
+import { categories } from "@/app/components/navigation/navbar/Categories";
 import { SafeListing, SafeUser, SaveReservation } from "@/app/types";
-import Container from "@/app/components/Container";
-import ListingHead from "@/app/components/listings/ListingHead";
-import ListingInfo from "@/app/components/listings/ListingInfo";
+import Container from "@/app/components/ui/Container";
+import ListingHead from "@/app/components/listings/details/ListingHead";
+import ListingInfo from "@/app/components/listings/details/ListingInfo";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
 import { differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import toast from "react-hot-toast";
-import ListingReservation from "@/app/components/listings/ListingReservation";
+import ListingReservation from "@/app/components/listings/details/ListingReservation";
 import { Range } from "react-date-range";
-import useCountries from "@/app/hooks/useCountry";
-import { useOffers } from "@/app/components/offers";
+import useCities from "@/app/hooks/useCities";
+import { useOffers } from "@/app/components/features/offers";
 import { IconType } from "react-icons";
-import ListingMap from "@/app/components/listings/ListingMap";
+import ListingMap from "@/app/components/listings/details/ListingMap";
 import { useTranslation } from "react-i18next";
-import ReviewsSection from "@/app/components/ReviewsSection";
+import ReviewsSection from "@/app/components/reviews/ReviewsSection";
 
 const initialDateRange: Range = {
   startDate: new Date(),
@@ -40,8 +40,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
 }) => {
   const LoginModal = useLoginModal();
   const router = useRouter();
-  const { getByValue } = useCountries();
-  const { t } = useTranslation("common");
+  const { getByValue } = useCities();
+  const { t, i18n } = useTranslation("common");
   const allOffers = useOffers();
   const location = getByValue(listing.locationValue);
 
@@ -106,7 +106,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
       listingId: listing.id,
       listingTitle: listing.title,
       pricePerNight: listing.price,
-      location: location?.label || listing.locationValue,
+      location: location
+        ? i18n.language === "ar"
+          ? location.label
+          : location.labelEn
+        : listing.locationValue,
       imageSrc: listing.imageSrc,
       // إضافة بيانات المستخدم الحالي
       currentUser: {
@@ -135,6 +139,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
     LoginModal,
     isOwner,
     t,
+    i18n.language,
   ]);
 
   useEffect(() => {
@@ -160,22 +165,23 @@ const ListingClient: React.FC<ListingClientProps> = ({
       .map((label) => {
         // Try exact match first
         let found = allOffers.find((o) => o.englishLabel === label);
-        
+
         // If not found, try case-insensitive match
         if (!found) {
-          found = allOffers.find((o) => 
-            o.englishLabel.toLowerCase() === label.toLowerCase()
+          found = allOffers.find(
+            (o) => o.englishLabel.toLowerCase() === label.toLowerCase()
           );
         }
-        
+
         // If still not found, try partial match
         if (!found) {
-          found = allOffers.find((o) => 
-            o.englishLabel.toLowerCase().includes(label.toLowerCase()) ||
-            label.toLowerCase().includes(o.englishLabel.toLowerCase())
+          found = allOffers.find(
+            (o) =>
+              o.englishLabel.toLowerCase().includes(label.toLowerCase()) ||
+              label.toLowerCase().includes(o.englishLabel.toLowerCase())
           );
         }
-        
+
         return found;
       })
       .filter(Boolean) as {
@@ -216,7 +222,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 disabled={isLoading || isOwner}
                 disabledDates={disabledDate}
                 days={dayCount}
-                locationLabel={location?.label || ""}
+                locationValue={listing.locationValue}
               />
               {isOwner && (
                 <div className="mt-4 rounded-xl border-l-4 border-rose-700 bg-rose-100 p-4 shadow-sm">
@@ -236,12 +242,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
               isOwner={isOwner}
             />
           </div>
-          
+
           <div>
-            <ListingMap
-              locationValue={listing.locationValue}
-              locationLabel={location?.label || ""}
-            />
+            <ListingMap locationValue={listing.locationValue} />
           </div>
         </div>
       </div>

@@ -1,15 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Container from "../components/Container";
-import Heading from "../components/Heading";
+import Container from "../components/ui/Container";
+import Heading from "../components/ui/Heading";
 import { SafeListing, SafeUser } from "../types";
 import { useCallback, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ListingCard from "../components/listings/ListingCard";
 import useEditModal from "../hooks/useEditModal";
-import EditModal from "../components/modals/EditModal";
+import EditModal from "../components/listings/modals/EditModal";
 
 interface PropertiesClientProps {
   listings: SafeListing[];

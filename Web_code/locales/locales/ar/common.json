@@ -731,5 +731,10 @@
   "change_language": "تغيير اللغة",
   "Added_to_Favorites": "تمت الإضافة إلى المفضلة",
   "Add_to_Favorites": "أضف إلى المفضلة",
-  "Removed_from_favorites": "تمت الإزالة من المفضلة"
+  "Removed_from_favorites": "تمت الإزالة من المفضلة",
+  "select_city": "اختر المدينة",
+  "choose_city": "اختر مدينة...",
+  "city": "المدينة",
+  "cities": "المدن",
+  "libyan_cities": "مدن ليبيا"
 }

@@ -708,5 +708,10 @@
   "change_language": "Change Language",
   "Added_to_Favorites": "Added to Favorites",
   "Add_to_Favorites": "Add to Favorites",
-  "Removed_from_favorites": "Removed from favorites"
+  "Removed_from_favorites": "Removed from favorites",
+  "select_city": "Select City",
+  "choose_city": "Choose a city...",
+  "city": "City",
+  "cities": "Cities",
+  "libyan_cities": "Libyan Cities"
 }

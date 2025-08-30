@@ -1,6 +1,6 @@
 "use client";
 
-import Container from "@/app/components/Container";
+import Container from "@/app/components/ui/Container";
 import { FaTimesCircle, FaHome, FaCreditCard } from "react-icons/fa";
 import Link from "next/link";
 
@@ -26,8 +26,8 @@ const PaymentCancelPage = () => {
                 What Happened?
               </h3>
               <p className="text-yellow-700 text-sm">
-                The payment process was interrupted or cancelled. Your reservation
-                is still pending and can be completed at any time.
+                The payment process was interrupted or cancelled. Your
+                reservation is still pending and can be completed at any time.
               </p>
             </div>
 
@@ -53,7 +53,7 @@ const PaymentCancelPage = () => {
               <FaHome className="mr-2" />
               Back to Home
             </Link>
-            
+
             <p className="text-gray-500 text-sm">
               You can try the payment again from your reservation page.
             </p>
@@ -65,5 +65,3 @@ const PaymentCancelPage = () => {
 };
 
 export default PaymentCancelPage;
-
-

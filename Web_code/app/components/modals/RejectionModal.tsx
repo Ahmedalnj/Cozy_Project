@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "./modal";
+import Modal from "./base/modal";
 import { useTranslation } from "react-i18next";
 
 interface RejectionModalProps {
@@ -73,7 +73,3 @@ const RejectionModal: React.FC<RejectionModalProps> = ({
 };
 
 export default RejectionModal;
-
-
-
-
