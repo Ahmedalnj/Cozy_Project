@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../shared/widgets/listing_card.dart';
 import '../../core/api_service.dart';
-import '../../core/token_manager.dart';
 
 class DetailScreen extends StatefulWidget {
   final PropertyListing property;
@@ -39,14 +38,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Future<void> _toggleFavorite() async {
     try {
-      final user = await TokenManager.getUser();
-      if (user != null) {
-        final success = await ApiService.toggleFavorite(widget.property.id);
-        if (success) {
-          setState(() {
-            _isFavorite = !_isFavorite;
-          });
-        }
+      final success = await ApiService.toggleFavorite(widget.property.id);
+      if (success) {
+        setState(() {
+          _isFavorite = !_isFavorite;
+        });
       }
     } catch (e) {
       debugPrint('Error toggling favorite: $e');

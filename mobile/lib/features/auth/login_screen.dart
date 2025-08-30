@@ -25,63 +25,77 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
     try {
-      print('Attempting login with email: ${_email.text}');
+      debugPrint('Attempting login with email: ${_email.text}');
       final AuthResponse res = await Supabase.instance.client.auth
           .signInWithPassword(email: _email.text, password: _password.text);
       setState(() => _loading = false);
       if (res.user != null) {
-        print('Login successful! User ID: ${res.user!.id}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful')),
-        );
-        // Navigate to home screen after successful login
-        Navigator.pushReplacementNamed(context, '/');
+        debugPrint('Login successful! User ID: ${res.user!.id}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful')),
+          );
+          // Navigate to home screen after successful login
+          Navigator.pushReplacementNamed(context, '/');
+        }
       } else {
-        print('Login failed: No user returned');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid credentials')),
-        );
+        debugPrint('Login failed: No user returned');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid credentials')),
+          );
+        }
       }
     } on AuthException catch (e) {
       setState(() => _loading = false);
-      print('AuthException: ${e.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      debugPrint('AuthException: ${e.message}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
     } catch (e) {
       setState(() => _loading = false);
-      print('Unexpected error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unexpected error: $e')),
-      );
+      debugPrint('Unexpected error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unexpected error: $e')),
+        );
+      }
     }
   }
 
   Future<void> _signInWithGoogle() async {
     setState(() => _loading = true);
     try {
-      print('Attempting Google sign in...');
+      debugPrint('Attempting Google sign in...');
       await Supabase.instance.client.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'io.supabase.flutter://login-callback/',
       );
       setState(() => _loading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Redirecting to Google...')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Redirecting to Google...')),
+        );
+      }
     } on AuthException catch (e) {
       setState(() => _loading = false);
-      print('Google AuthException: ${e.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      debugPrint('Google AuthException: ${e.message}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
     } catch (e) {
       setState(() => _loading = false);
-      print('Google sign in unexpected error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign in error: $e')),
-      );
+      debugPrint('Google sign in unexpected error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google sign in error: $e')),
+        );
+      }
     }
   }
 

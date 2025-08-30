@@ -9,6 +9,7 @@ class PropertyListing {
   final String dates;
   final int price;
   final String imageUrl;
+  final String? createdBy;
   bool isFavorite;
 
   PropertyListing({
@@ -20,6 +21,7 @@ class PropertyListing {
     required this.dates,
     required this.price,
     required this.imageUrl,
+    this.createdBy,
     this.isFavorite = false,
   });
 
@@ -37,6 +39,7 @@ class PropertyListing {
           ? json['imageSrc'][0]
           : json['imageUrl'] ??
               'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
+      createdBy: json['user_id']?.toString() ?? json['createdBy']?.toString(),
       isFavorite: json['isFavorite'] ?? false,
     );
   }
@@ -52,6 +55,7 @@ class PropertyListing {
       'dates': dates,
       'price': price,
       'imageUrl': imageUrl,
+      'createdBy': createdBy,
       'isFavorite': isFavorite,
     };
   }

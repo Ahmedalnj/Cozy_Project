@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/supabase_client.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -40,7 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
         debugPrint('Signup successful! User ID: ${res.user!.id}');
         // Create user profile in User table
         try {
-          await SupabaseService.createUserProfile({
+          await Supabase.instance.client.from('User').insert({
             '_id': res.user!.id,
             'email': _email.text,
             'name': _name.text,

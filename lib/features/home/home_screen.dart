@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api_service.dart';
 import '../../core/token_manager.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
+import '../../shared/widgets/listing_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,20 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final listingsData = await ApiService.getListings();
-
-      final properties = listingsData.cast<PropertyListing>();
-
-      // Check favorite status for each property
-      if (_currentUserId != null) {
-        for (var property in properties) {
-          final isFavorited = await ApiService.isFavorite(property.id);
-          property.isFavorite = isFavorited;
-        }
-      }
+      final listingsData = await ApiService.getAllListings();
 
       setState(() {
-        _recommendedPlaces = properties;
+        _recommendedPlaces = listingsData;
         _isLoading = false;
       });
     } catch (e) {
@@ -427,28 +418,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-class PropertyListing {
-  final String id;
-  final String title;
-  final String location;
-  final double rating;
-  final String distance;
-  final String dates;
-  final int price;
-  final String imageUrl;
-  bool isFavorite;
-
-  PropertyListing({
-    required this.id,
-    required this.title,
-    required this.location,
-    required this.rating,
-    required this.distance,
-    required this.dates,
-    required this.price,
-    required this.imageUrl,
-    this.isFavorite = false,
-  });
 }

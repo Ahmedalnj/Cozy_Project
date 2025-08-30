@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/api_service.dart';
 import '../../core/token_manager.dart';
 
@@ -38,6 +37,10 @@ class _SignupScreenState extends State<SignupScreen> {
         _password.text,
       );
 
+      // Save token and user data
+      await TokenManager.saveToken(response['token']);
+      await TokenManager.saveUser(response['user']);
+
       setState(() => _loading = false);
       debugPrint('Signup successful! User ID: ${response['user']['id']}');
 
@@ -45,7 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created successfully!')),
         );
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/');
       }
     } catch (e) {
       setState(() => _loading = false);
@@ -64,12 +67,16 @@ class _SignupScreenState extends State<SignupScreen> {
       debugPrint('Attempting Google sign up...');
       final response = await ApiService.googleSignIn();
 
+      // Save token and user data
+      await TokenManager.saveToken(response['token']);
+      await TokenManager.saveUser(response['user']);
+
       setState(() => _loading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Google sign up successful')),
         );
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/');
       }
     } catch (e) {
       setState(() => _loading = false);
