@@ -263,8 +263,8 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-              {/* الشريط العلوي */}
+    <div className="min-h-screen">
+      {/* الشريط العلوي */}
       <div className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
