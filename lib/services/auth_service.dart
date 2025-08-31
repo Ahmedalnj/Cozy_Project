@@ -208,21 +208,34 @@ class AuthService {
   // إضافة/إزالة من المفضلة
   static Future<void> toggleFavorite(String userId, String propertyId) async {
     try {
+      print('🔄 تبديل المفضلة للمستخدم: $userId والعقار: $propertyId');
+
       final user = await getUserProfile(userId);
-      if (user == null) return;
+      if (user == null) {
+        print('❌ لم يتم العثور على المستخدم');
+        return;
+      }
 
       List<String> favorites = List<String>.from(user.favoriteIds ?? []);
+      print('📋 المفضلة الحالية: $favorites');
 
       if (favorites.contains(propertyId)) {
         favorites.remove(propertyId);
+        print('❌ تم إزالة العقار من المفضلة');
       } else {
         favorites.add(propertyId);
+        print('✅ تم إضافة العقار إلى المفضلة');
       }
 
-      await updateUserProfile(userId, {
+      // تحديث قاعدة البيانات
+      await _supabase.from('User').update({
         'favoriteIds': favorites,
-      });
+        'updatedAt': DateTime.now().toIso8601String(),
+      }).eq('_id', userId);
+
+      print('✅ تم تحديث المفضلة بنجاح');
     } catch (error) {
+      print('❌ خطأ في تبديل المفضلة: $error');
       throw _handleAuthError(error);
     }
   }

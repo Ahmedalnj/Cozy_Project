@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/favorites_service.dart';
+import '../../services/auth_service.dart';
 
 class PropertyListing {
   final String id;
@@ -61,7 +63,7 @@ class PropertyListing {
   }
 }
 
-class ListingCard extends StatelessWidget {
+class ListingCard extends StatefulWidget {
   final PropertyListing property;
   final VoidCallback? onFavoriteToggle;
   final VoidCallback? onTap;
@@ -74,9 +76,80 @@ class ListingCard extends StatelessWidget {
   });
 
   @override
+  State<ListingCard> createState() => _ListingCardState();
+}
+
+class _ListingCardState extends State<ListingCard> {
+  final FavoritesService _favoritesService = FavoritesService();
+  bool _isFavorite = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteStatus();
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    try {
+      final isFav = await _favoritesService.isFavorite(widget.property.id);
+      setState(() {
+        _isFavorite = isFav;
+      });
+    } catch (error) {
+      print('❌ خطأ في تحميل حالة المفضلة: $error');
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final currentUser = AuthService.getCurrentUser();
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى تسجيل الدخول لحفظ المفضلة')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final isFav = await _favoritesService.toggle(widget.property.id);
+      setState(() {
+        _isFavorite = isFav;
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_isFavorite
+              ? 'تم إضافة العقار إلى المفضلة'
+              : 'تم إزالة العقار من المفضلة'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // استدعاء callback إذا كان موجوداً
+      widget.onFavoriteToggle?.call();
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('حدث خطأ في تحديث المفضلة'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -99,7 +172,7 @@ class ListingCard extends StatelessWidget {
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(16)),
                   child: Image.network(
-                    property.imageUrl,
+                    widget.property.imageUrl,
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
@@ -122,20 +195,26 @@ class ListingCard extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: GestureDetector(
-                    onTap: onFavoriteToggle,
+                    onTap: _toggleFavorite,
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Icon(
-                        property.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: property.isFavorite ? Colors.red : Colors.grey,
-                        size: 20,
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              _isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: _isFavorite ? Colors.red : Colors.grey,
+                              size: 20,
+                            ),
                     ),
                   ),
                 ),
@@ -151,7 +230,7 @@ class ListingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '\$${property.price}/night',
+                      '\$${widget.property.price}/night',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -170,7 +249,7 @@ class ListingCard extends StatelessWidget {
                 children: [
                   // Title
                   Text(
-                    property.title,
+                    widget.property.title,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -191,7 +270,7 @@ class ListingCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          property.location,
+                          widget.property.location,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -213,7 +292,7 @@ class ListingCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${property.rating}',
+                        '${widget.property.rating}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -227,7 +306,7 @@ class ListingCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        property.distance,
+                        widget.property.distance,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
 import '../../shared/widgets/listing_card.dart';
+import '../../services/auth_service.dart';
+import '../../services/listing_service.dart';
+import '../../services/favorites_service.dart';
+import '../../models/listing_model.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -13,7 +17,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   int _selectedIndex = 1;
   List<PropertyListing> _favorites = [];
   bool _isLoading = true;
-  String? _currentUserId = "user123"; // Mock user ID
 
   @override
   void initState() {
@@ -26,69 +29,103 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       _isLoading = true;
     });
 
-    // Simulate loading data
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // جلب المستخدم الحالي
+      final currentUser = AuthService.getCurrentUser();
+      if (currentUser == null) {
+        setState(() {
+          _favorites = [];
+          _isLoading = false;
+        });
+        return;
+      }
 
-    // Mock data
-    final mockFavorites = [
-      PropertyListing(
-        id: "2",
-        title: "شقة عصرية في أبو ظبي",
-        location: "كورنيش أبو ظبي",
-        price: 300,
-        rating: 4.6,
-        distance: "1 كم من المركز",
-        dates: "متاح",
-        imageUrl:
-            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
-        isFavorite: true,
-      ),
-      PropertyListing(
-        id: "4",
-        title: "فيلا خاصة في العين",
-        location: "جبل حفيت",
-        price: 800,
-        rating: 4.9,
-        distance: "5 كم من المركز",
-        dates: "متاح",
-        imageUrl:
-            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400",
-        isFavorite: true,
-      ),
-    ];
+      // جلب IDs العقارات المفضلة
+      final favoriteIds = await FavoritesService().getFavoriteListingIds();
 
-    setState(() {
-      _favorites = mockFavorites;
-      _isLoading = false;
-    });
+      if (favoriteIds.isEmpty) {
+        setState(() {
+          _favorites = [];
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // جلب تفاصيل العقارات المفضلة
+      final favoriteListings =
+          await ListingService.getListingsByIds(favoriteIds);
+
+      // تحويل إلى PropertyListing للتوافق مع UI
+      final propertyListings = favoriteListings
+          .map((listing) => PropertyListing(
+                id: listing.id,
+                title: listing.title,
+                location: listing.locationValue,
+                price: listing.price,
+                rating: 4.5, // افتراضي
+                distance: "متاح",
+                dates: "متاح",
+                imageUrl: listing.imageSrc?.isNotEmpty == true
+                    ? listing.imageSrc!.first
+                    : "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400",
+                isFavorite: true,
+              ))
+          .toList();
+
+      setState(() {
+        _favorites = propertyListings;
+        _isLoading = false;
+      });
+
+      print('✅ تم تحميل ${propertyListings.length} عقار مفضل من Supabase');
+    } catch (error) {
+      print('❌ خطأ في تحميل المفضلة: $error');
+
+      setState(() {
+        _favorites = [];
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _toggleFavorite(PropertyListing property) async {
-    if (_currentUserId == null) {
+    final currentUser = AuthService.getCurrentUser();
+    if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى تسجيل الدخول لحفظ المفضلة')),
       );
       return;
     }
 
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // استخدام FavoritesService للتبديل
+      final favoritesService = FavoritesService();
+      final isFav = await favoritesService.toggle(property.id);
 
-    setState(() {
-      property.isFavorite = !property.isFavorite;
-      if (!property.isFavorite) {
-        _favorites.remove(property);
-      }
-    });
+      setState(() {
+        property.isFavorite = isFav;
+        if (!isFav) {
+          _favorites.remove(property);
+        }
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(property.isFavorite
-            ? 'تم إضافة العقار إلى المفضلة'
-            : 'تم إزالة العقار من المفضلة'),
-        backgroundColor: Colors.green,
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isFav
+              ? 'تم إضافة العقار إلى المفضلة'
+              : 'تم إزالة العقار من المفضلة'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (error) {
+      print('❌ خطأ في تبديل المفضلة: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('حدث خطأ في تحديث المفضلة'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _onNavBarTap(int index) {
@@ -132,18 +169,44 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(
-                color: Colors.pink,
-              ),
+              child: CircularProgressIndicator(),
             )
           : _favorites.isEmpty
-              ? _buildEmptyState()
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.favorite_border,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'لا توجد عقارات في المفضلة',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'اضغط على القلب لإضافة عقارات للمفضلة',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _favorites.length,
@@ -154,13 +217,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       child: ListingCard(
                         property: property,
                         onFavoriteToggle: () => _toggleFavorite(property),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/detail',
-                            arguments: property,
-                          );
-                        },
                       ),
                     );
                   },
@@ -168,49 +224,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.favorite_border,
-            size: 80,
-            color: Colors.grey.shade400,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'لا توجد مفضلات',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'أضف عقارات إلى مفضلتك لتظهر هنا',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink.shade400,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('تصفح العقارات'),
-          ),
-        ],
       ),
     );
   }

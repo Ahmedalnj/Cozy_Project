@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../shared/widgets/bottom_nav_bar.dart';
 import '../../shared/widgets/listing_card.dart';
+import '../../models/listing_model.dart';
+import '../../services/listing_service.dart';
+import '../../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +22,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadProperties();
+    _getCurrentUser();
+  }
+
+  void _getCurrentUser() {
+    final currentUser = AuthService.getCurrentUser();
+    if (currentUser != null) {
+      setState(() {
+        _currentUserId = currentUser.id;
+      });
+    }
   }
 
   Future<void> _loadProperties() async {
@@ -26,78 +39,108 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
 
-    // Simulate loading data
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // جلب المستخدم الحالي
+      final currentUser = AuthService.getCurrentUser();
+      
+      // جلب العقارات من Supabase
+      final listings = await ListingService.getAllListings();
 
-    // Mock data
-    final mockListings = [
-      PropertyListing(
-        id: "1",
-        title: "فيلا فاخرة في دبي",
-        location: "دبي مارينا",
-        price: 500,
-        rating: 4.8,
-        distance: "2 كم من المركز",
-        dates: "متاح",
-        imageUrl:
-            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400",
-        isFavorite: false,
-      ),
-      PropertyListing(
-        id: "2",
-        title: "شقة عصرية في أبو ظبي",
-        location: "كورنيش أبو ظبي",
-        price: 300,
-        rating: 4.6,
-        distance: "1 كم من المركز",
-        dates: "متاح",
-        imageUrl:
-            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
-        isFavorite: true,
-      ),
-      PropertyListing(
-        id: "3",
-        title: "بيت تقليدي في الشارقة",
-        location: "قلب الشارقة",
-        price: 200,
-        rating: 4.9,
-        distance: "3 كم من المركز",
-        dates: "متاح",
-        imageUrl:
-            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400",
-        isFavorite: false,
-      ),
-    ];
+      // تحويل إلى PropertyListing للتوافق مع UI
+      final propertyListings = listings
+          .map((listing) => PropertyListing(
+                id: listing.id,
+                title: listing.title,
+                location: listing.locationValue,
+                price: listing.price,
+                rating: 4.5, // افتراضي
+                distance: "متاح",
+                dates: "متاح",
+                imageUrl: listing.imageSrc?.isNotEmpty == true
+                    ? listing.imageSrc!.first
+                    : "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400",
+                isFavorite: false, // سيتم تحديثه لاحقاً
+              ))
+          .toList();
 
-    setState(() {
-      _recommendedPlaces = mockListings;
-      _isLoading = false;
-    });
+      // تحديث حالة المفضلة لكل عقار
+      if (currentUser != null) {
+        for (var property in propertyListings) {
+          try {
+            final isFavorite = await AuthService.isFavorite(currentUser.id, property.id);
+            property.isFavorite = isFavorite;
+          } catch (error) {
+            print('❌ خطأ في التحقق من المفضلة: $error');
+          }
+        }
+      }
+
+      setState(() {
+        _recommendedPlaces = propertyListings;
+        _isLoading = false;
+      });
+
+      print('✅ تم تحميل ${propertyListings.length} عقار من Supabase');
+    } catch (error) {
+      print('❌ خطأ في تحميل العقارات: $error');
+
+      // في حالة الخطأ، نستخدم بيانات وهمية
+      final mockListings = [
+        PropertyListing(
+          id: "1",
+          title: "فيلا فاخرة في دبي",
+          location: "دبي مارينا",
+          price: 500,
+          rating: 4.8,
+          distance: "2 كم من المركز",
+          dates: "متاح",
+          imageUrl:
+              "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400",
+          isFavorite: false,
+        ),
+      ];
+
+      setState(() {
+        _recommendedPlaces = mockListings;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _toggleFavorite(PropertyListing property) async {
-    if (_currentUserId == null) {
+    final currentUser = AuthService.getCurrentUser();
+    if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى تسجيل الدخول لحفظ المفضلة')),
       );
       return;
     }
 
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // تحديث المفضلة في Supabase
+      await AuthService.toggleFavorite(currentUser.id, property.id);
 
-    setState(() {
-      property.isFavorite = !property.isFavorite;
-    });
+      setState(() {
+        property.isFavorite = !property.isFavorite;
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(property.isFavorite
-            ? 'تم إضافة العقار إلى المفضلة'
-            : 'تم إزالة العقار من المفضلة'),
-        backgroundColor: Colors.green,
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(property.isFavorite
+              ? 'تم إضافة العقار إلى المفضلة'
+              : 'تم إزالة العقار من المفضلة'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (error) {
+      print('❌ خطأ في تحديث المفضلة: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('حدث خطأ في تحديث المفضلة'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _onNavBarTap(int index) {
