@@ -84,7 +84,14 @@ export async function getUsersForAdmin() {
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: users };
+    // تحويل التواريخ إلى strings لتجنب مشاكل JSON serialization
+    const formattedUsers = users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    }));
+
+    return { success: true, data: formattedUsers };
   } catch (error) {
     console.error("فشل في جلب المستخدمين:", error);
     return { success: false, message: "فشل في جلب بيانات المستخدمين" };

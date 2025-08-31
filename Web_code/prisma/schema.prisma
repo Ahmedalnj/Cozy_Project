@@ -103,24 +103,21 @@ model Payment {
 }
 
 model Review {
-  id        String  @id @default(uuid()) @map("_id") @db.Uuid
-  listingId String  @map("listing_id") @db.Uuid
-  userId    String  @map("user_id") @db.Uuid
-  rating    Int
-  comment   String?
-
-  // Detailed ratings by category
-  cleanliness   Int? // النظافة
-  accuracy      Int? // الدقة
-  checkIn       Int? // تسجيل الدخول
-  communication Int? // التواصل
-  location      Int? // الموقع
-  value         Int? // القيمة
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String   @id @default(uuid()) @map("_id") @db.Uuid
+  listingId     String   @map("listing_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  rating        Int
+  comment       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  accuracy      Int?
+  checkIn       Int?
+  cleanliness   Int?
+  communication Int?
+  location      Int?
+  value         Int?
+  listing       Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([listingId, userId])
   @@map("reviews")

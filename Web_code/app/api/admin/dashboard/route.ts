@@ -16,6 +16,7 @@ export async function GET() {
     const users = await prisma.user.count();
     const listings = await prisma.listing.count();
     const reservations = await prisma.reservation.count();
+    const payments = await prisma.payment.count();
 
     const revenueData = await prisma.reservation.findMany({
       select: { totalPrice: true },
@@ -27,8 +28,18 @@ export async function GET() {
     );
 
     const allUsersRaw = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+      },
       orderBy: { createdAt: "desc" },
-      take: 10,
+      take: 50, // زيادة العدد ليشمل جميع المستخدمين
     });
 
     const allUsers = allUsersRaw.map((user) => ({
@@ -74,17 +85,54 @@ export async function GET() {
       },
     }));
 
-    return NextResponse.json({
+    // جلب آخر 10 مدفوعات
+    const allPaymentsRaw = await prisma.payment.findMany({
+      include: {
+        user: true,
+        listing: true,
+        reservation: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+
+    const allPayments = allPaymentsRaw.map((payment) => ({
+      ...payment,
+      createdAt: payment.createdAt.toISOString(),
+      user: {
+        id: payment.user?.id ?? "",
+        name: payment.user?.name ?? "",
+        email: payment.user?.email ?? "",
+        image: payment.user?.image ?? null,
+      },
+      listing: {
+        title: payment.listing?.title ?? "",
+        id: payment.listing?.id ?? "",
+        locationValue: payment.listing?.locationValue ?? "",
+      },
+      reservation: {
+        id: payment.reservation?.id ?? "",
+        startDate: payment.reservation?.startDate?.toISOString() ?? "",
+        endDate: payment.reservation?.endDate?.toISOString() ?? "",
+        totalPrice: payment.reservation?.totalPrice ?? 0,
+      },
+    }));
+
+    const response = {
       stats: {
         totalUsers: users,
         totalListings: listings,
         totalReservations: reservations,
+        totalPayments: payments,
         totalRevenue: totalRevenue,
       },
       users: allUsers,
       listings: allListings,
       reservations: allReservations,
-    });
+      payments: allPayments,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Error in admin dashboard API:", error);
     return NextResponse.json(

@@ -11,9 +11,9 @@ const Logo = () => {
       className="cursor-pointer transition-all duration-300"
       height={100}
       width={100}
-      src="/images/Cozy_logo.png"
+      src="/images/new_logo.png"
       style={{
-        width: "clamp(40px, 10vw, 100px)",
+        width: "clamp(25px, 5vw, 120px)",
         height: "auto",
       }}
     />

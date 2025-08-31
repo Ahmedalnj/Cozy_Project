@@ -2,7 +2,7 @@
 
 import useEditModal from "@/app/hooks/useEditModal";
 import Modal from "../../modals/base/modal";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import Heading from "../../ui/Heading";
 import { categories } from "@/app/components/navigation/navbar/Categories";
 import CategoryInput from "../../forms/inputs/CategoryInput";
@@ -40,9 +40,9 @@ const EditModal = () => {
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
   const { getByValue } = useCities();
-  const getCityByValue = (value: string) => {
+  const getCityByValue = useCallback((value: string) => {
     return getByValue(value);
-  };
+  }, [getByValue]);
 
   const {
     register,

@@ -23,9 +23,9 @@ export const routes = [
     href: "/admin/dashboard/reservations",
   },
   {
-    label: "Transactions",
+    label: "Payments",
     icon: Banknote,
-    href: "/admin/dashboard/transactions",
+    href: "/admin/dashboard/Payments",
   },
   { label: "Revenue", icon: BarChart, href: "/admin/analysis/revenue" },
   { label: "Reports", icon: FileText, href: "/admin/analysis/reports" },
@@ -37,23 +37,8 @@ export default function Sidebar() {
   if (!isAdminPage) return null;
 
   return (
-    <div
-      className="max-w-screen-2xl  // Similar to Airbnb's very wide container
-      mx-auto
-      xl:px-20         // Larger padding on extra large screens
-      lg:px-10         // Standard padding on large screens
-      md:px-8          // Medium padding on tablets
-      sm:px-6          // Small padding on small tablets
-      px-4 "
-    >
-      <nav
-        className="pt-4
-      flex 
-      flex-row
-      items-center
-      justify-between
-      overflow-x-auto"
-      >
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10 xl:px-20">
+      <nav className="pt-4 flex flex-row items-center justify-between overflow-x-auto">
         {routes.map((route) => {
           const isActive = pathname === route.href;
           return (
@@ -61,12 +46,13 @@ export default function Sidebar() {
               key={route.href}
               href={route.href}
               className={clsx(
-                "flex items-center gap-2 whitespace-nowrap px-3 py-2 rounded-md hover:bg-gray-100 transition",
+                "flex items-center gap-1 sm:gap-2 whitespace-nowrap px-2 sm:px-3 py-2 rounded-md hover:bg-gray-100 transition text-sm sm:text-base",
                 isActive && "bg-gray-200 font-semibold"
               )}
             >
-              <route.icon className="h-5 w-5" />
-              {route.label}
+              <route.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">{route.label}</span>
+              <span className="sm:hidden">{route.label.split(' ')[0]}</span>
             </Link>
           );
         })}

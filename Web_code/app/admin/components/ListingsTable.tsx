@@ -5,13 +5,13 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-// import { useRouter } from "next/navigation";
-import { FiChevronDown, FiChevronUp, FiRefreshCw } from "react-icons/fi";
-import { useTranslation } from "react-i18next";
+import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch, FiTrash2, FiHome, FiMapPin, FiDollarSign } from "react-icons/fi";
+
 
 interface ListingsTableProps {
   listings: SafeListing[];
   onRefresh?: () => Promise<void>;
+  limit?: number;
 }
 
 type SortColumn =
@@ -26,8 +26,9 @@ const LISTINGS_PER_PAGE = 10;
 const ListingsTable: React.FC<ListingsTableProps> = ({
   listings,
   onRefresh,
+  limit,
 }) => {
-  const { t } = useTranslation("common");
+
   const [localListings, setLocalListings] = useState(listings);
 
   // Update local state when props change (dashboard refresh)
@@ -90,6 +91,48 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
     [onRefresh]
   );
 
+  const getCategoryIcon = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "apartment":
+        return "🏢";
+      case "house":
+        return "🏠";
+      case "villa":
+        return "🏰";
+      case "cabin":
+        return "🏡";
+      case "beach":
+        return "🏖️";
+      case "mountain":
+        return "⛰️";
+      case "city":
+        return "🌆";
+      default:
+        return "🏠";
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "apartment":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "house":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "villa":
+        return "bg-purple-50 text-purple-700 border-purple-200";
+      case "cabin":
+        return "bg-amber-50 text-amber-700 border-amber-200";
+      case "beach":
+        return "bg-cyan-50 text-cyan-700 border-cyan-200";
+      case "mountain":
+        return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      case "city":
+        return "bg-gray-50 text-gray-700 border-gray-200";
+      default:
+        return "bg-gray-50 text-gray-700 border-gray-200";
+    }
+  };
+
   const filteredListings = useMemo(() => {
     return localListings
       .filter(
@@ -99,165 +142,247 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
           listing.locationValue.toLowerCase().includes(search.toLowerCase())
       )
       .sort((a, b) => {
-        const valA = a[sortBy];
-        const valB = b[sortBy];
+        let valA = "";
+        let valB = "";
 
-        if (sortBy === "price") {
-          return sortAsc
-            ? (valA as number) - (valB as number)
-            : (valB as number) - (valA as number);
+        switch (sortBy) {
+          case "title":
+            valA = a.title.toLowerCase();
+            valB = b.title.toLowerCase();
+            break;
+          case "category":
+            valA = a.category.toLowerCase();
+            valB = b.category.toLowerCase();
+            break;
+          case "locationValue":
+            valA = a.locationValue.toLowerCase();
+            valB = b.locationValue.toLowerCase();
+            break;
+          case "price":
+            return sortAsc ? a.price - b.price : b.price - a.price;
+          case "createdAt":
+            return sortAsc
+              ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+              : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         }
 
-        if (sortBy === "createdAt") {
-          return sortAsc
-            ? new Date(valA as string).getTime() -
-                new Date(valB as string).getTime()
-            : new Date(valB as string).getTime() -
-                new Date(valA as string).getTime();
-        }
-
-        // لباقي الأعمدة نصية: title, category, locationValue
-        if (typeof valA === "string" && typeof valB === "string") {
-          return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        }
-
-        return 0;
+        return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
   }, [search, sortAsc, sortBy, localListings]);
 
-  const totalPages = Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
+  const totalPages = limit ? Math.ceil(Math.min(filteredListings.length, limit) / LISTINGS_PER_PAGE) : Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
 
   const paginatedListings = useMemo(() => {
     const start = (currentPage - 1) * LISTINGS_PER_PAGE;
-    return filteredListings.slice(start, start + LISTINGS_PER_PAGE);
-  }, [filteredListings, currentPage]);
+    const end = limit ? Math.min(start + LISTINGS_PER_PAGE, limit) : start + LISTINGS_PER_PAGE;
+    return filteredListings.slice(start, end);
+  }, [filteredListings, currentPage, limit]);
 
   const handleSort = (column: SortColumn) => {
     if (sortBy === column) {
-      setSortAsc(!sortAsc); // إذا ضغط على نفس العمود غير اتجاه الترتيب
+      setSortAsc(!sortAsc);
     } else {
-      setSortBy(column); // غير العمود المرتب عليه
-      setSortAsc(true); // بدء بترتيب تصاعدي
+      setSortBy(column);
+      setSortAsc(true);
     }
   };
 
   const renderSortIcon = (column: SortColumn) => {
     if (sortBy !== column) return null;
     return sortAsc ? (
-      <FiChevronUp className="inline" />
+      <FiChevronUp className="inline ml-1 h-4 w-4" />
     ) : (
-      <FiChevronDown className="inline" />
+      <FiChevronDown className="inline ml-1 h-4 w-4" />
     );
   };
 
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages || 1);
-    }
-  }, [filteredListings, totalPages, currentPage]);
-
   return (
-    <div className="mt-5">
-      <h2 className="text-5xl font-semibold mb-4 text-center p-4">
-        Listing Table
-      </h2>
-
-      {/* Search Bar */}
-      <div className="flex items-center gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="🔍 Search by Title or Category"
-          className="border px-3 py-2 rounded-md w-full max-w-xs text-sm focus:outline-none"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
-        <button
-          onClick={fetchListings}
-          disabled={loading}
-          className={`p-2 rounded text-white ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600"
-          } transition`}
-          title="تحديث"
-          aria-label="تحديث"
-        >
-          <FiRefreshCw size={20} />
-        </button>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">جدول العقارات</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              عرض وإدارة جميع العقارات في النظام
+            </p>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="relative flex-1 sm:flex-none">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="البحث في العنوان، الفئة، أو الموقع..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-80"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+            <button
+              onClick={fetchListings}
+              disabled={loading}
+              className={`p-2 rounded-lg text-white transition-all duration-200 flex-shrink-0 ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
+              }`}
+              title="تحديث البيانات"
+              aria-label="تحديث البيانات"
+            >
+              <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border shadow-sm">
-        <table className="min-w-full bg-white text-sm text-gray-700">
-          <thead>
-            <tr className="bg-gray-100 text-left text-gray-600 uppercase text-xs tracking-wider">
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
               <th
-                className="py-2 px-4 cursor-pointer select-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("title")}
               >
-                Title {renderSortIcon("title")}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <FiHome className="h-4 w-4" />
+                  <span className="hidden sm:inline">العنوان</span>
+                  <span className="sm:hidden">🏠</span>
+                  {renderSortIcon("title")}
+                </div>
               </th>
               <th
-                className="py-2 px-4 cursor-pointer select-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("category")}
               >
-                Category {renderSortIcon("category")}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="hidden sm:inline">الفئة</span>
+                  <span className="sm:hidden">📂</span>
+                  {renderSortIcon("category")}
+                </div>
               </th>
               <th
-                className="py-2 px-4 cursor-pointer select-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("locationValue")}
               >
-                Location {renderSortIcon("locationValue")}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <FiMapPin className="h-4 w-4" />
+                  <span className="hidden sm:inline">الموقع</span>
+                  <span className="sm:hidden">📍</span>
+                  {renderSortIcon("locationValue")}
+                </div>
               </th>
               <th
-                className="py-2 px-4 cursor-pointer select-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("price")}
               >
-                Price {renderSortIcon("price")}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <FiDollarSign className="h-4 w-4" />
+                  <span className="hidden sm:inline">السعر</span>
+                  <span className="sm:hidden">💰</span>
+                  {renderSortIcon("price")}
+                </div>
               </th>
               <th
-                className="py-2 px-4 cursor-pointer select-none"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("createdAt")}
               >
-                Created At {renderSortIcon("createdAt")}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="hidden sm:inline">تاريخ الإنشاء</span>
+                  <span className="sm:hidden">📅</span>
+                  {renderSortIcon("createdAt")}
+                </div>
               </th>
-              <th className="py-2 px-4 text-center">Actions</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <span className="hidden sm:inline">الإجراءات</span>
+                <span className="sm:hidden">⚙️</span>
+              </th>
             </tr>
           </thead>
-          <tbody>
-            {paginatedListings.map((listing) => (
-              <tr key={listing.id} className="border-t hover:bg-gray-50">
-                <td className="py-2 px-4">{listing.title}</td>
-                <td className="py-2 px-4">{t(`categories.${listing.category}.label`)}</td>
-                <td className="py-2 px-4">{listing.locationValue}</td>
-                <td className="py-2 px-4">${listing.price}</td>
-                <td className="py-2 px-4">
-                  {format(new Date(listing.createdAt), "yyyy-MM-dd")}
-                </td>
-                <td className="py-2 px-4 flex justify-center gap-2">
-                  <button
-                    onClick={() => handleDelete(listing.id)}
-                    disabled={deletingId === listing.id}
-                    className={`px-3 py-1 text-sm rounded text-white ${
-                      deletingId === listing.id
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-red-500 hover:bg-red-600"
-                    }`}
-                  >
-                    {deletingId === listing.id ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {paginatedListings.length === 0 && (
+          <tbody className="bg-white divide-y divide-gray-200">
+            {paginatedListings.length > 0 ? (
+              paginatedListings.map((listing, index) => (
+                <tr
+                  key={listing.id}
+                  className={`hover:bg-gray-50 transition-colors duration-150 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                  }`}
+                >
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="min-w-0">
+                      <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-xs">
+                        {listing.title}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500 truncate">
+                        ID: {listing.id.slice(-8)}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <span className="text-base sm:text-lg">{getCategoryIcon(listing.category)}</span>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-full text-xs font-medium border ${getCategoryColor(
+                          listing.category
+                        )}`}
+                      >
+                        {listing.category}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="text-xs sm:text-sm text-gray-900 truncate max-w-xs">
+                      📍 {listing.locationValue}
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="text-xs sm:text-sm font-semibold text-gray-900">
+                      ${listing.price.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      لليلة الواحدة
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {format(new Date(listing.createdAt), "dd/MM/yyyy")}
+                      </span>
+                      <span className="text-gray-500">
+                        {format(new Date(listing.createdAt), "HH:mm")}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={() => handleDelete(listing.id)}
+                      disabled={deletingId === listing.id}
+                      className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                      title="حذف العقار"
+                    >
+                      <FiTrash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
                 <td
                   colSpan={6}
-                  className="text-center text-gray-400 py-6 font-semibold"
+                  className="px-4 sm:px-6 py-8 sm:py-12 text-center"
                 >
-                  No Listings found
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🔍</div>
+                    <div className="text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      لا توجد عقارات مطابقة
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-500">
+                      جرب تغيير معايير البحث
+                    </div>
+                  </div>
                 </td>
               </tr>
             )}
@@ -267,20 +392,56 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-4 gap-2 flex-wrap">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded border text-sm ${
-                currentPage === i + 1
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500 hover:bg-blue-100"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
+              عرض <span className="font-medium">{(currentPage - 1) * LISTINGS_PER_PAGE + 1}</span> إلى{" "}
+              <span className="font-medium">
+                {Math.min(currentPage * LISTINGS_PER_PAGE, filteredListings.length)}
+              </span>{" "}
+              من أصل <span className="font-medium">{filteredListings.length}</span> نتيجة
+            </div>
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
+                  currentPage === 1
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                السابق
+              </button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
+                      currentPage === pageNum
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
+                  currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                التالي
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import EmptyState from "../components/EmptyState";
+import EmptyState from "../components/ui/EmptyState";
 import ClientOnly from "../components/ui/ClientOnly";
 import getCurrentUser from "../actions/getCurrentUser";
 import getReservations from "../actions/getReservations";

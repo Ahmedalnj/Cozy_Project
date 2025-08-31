@@ -7,7 +7,7 @@ import { SafeUser, SaveReservation } from "../types";
 import { useState, useCallback } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import ListingCard from "../components/listings/ListingCard";
+import ListingCard from "../components/listings/cards/ListingCard";
 import { useTranslation } from "react-i18next";
 import RejectionModal from "../components/modals/RejectionModal";
 import ConfirmAcceptModal from "../components/modals/confirmations/ConfirmAcceptModal";

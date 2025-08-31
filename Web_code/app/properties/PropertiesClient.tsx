@@ -7,7 +7,7 @@ import { SafeListing, SafeUser } from "../types";
 import { useCallback, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import ListingCard from "../components/listings/ListingCard";
+import ListingCard from "../components/listings/cards/ListingCard";
 import useEditModal from "../hooks/useEditModal";
 import EditModal from "../components/listings/modals/EditModal";
 
