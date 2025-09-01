@@ -38,8 +38,7 @@ const CitySelect: React.FC<CitySelectProps> = ({ value, onChange }) => {
         options={cities}
         value={value}
         onChange={(value) => onChange(value as CitySelectValue)}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        formatOptionLabel={(option: any) => (
+        formatOptionLabel={(option: CitySelectValue) => (
           <div className="flex flex-row items-center gap-3">
             <div className="text-2xl">🏙️</div>
             <div>

@@ -3,7 +3,6 @@
 import { FaStar } from "react-icons/fa";
 
 interface ReviewSummaryProps {
-  listingId: string;
   size?: "sm" | "md";
   reviewStats?: {
     count: number;
@@ -12,7 +11,6 @@ interface ReviewSummaryProps {
 }
 
 const ReviewSummary: React.FC<ReviewSummaryProps> = ({ 
-  listingId, 
   size = "sm",
   reviewStats
 }) => {

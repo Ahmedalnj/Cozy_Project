@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser"; // your server-side auth function
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser(); // fetch user from session or token

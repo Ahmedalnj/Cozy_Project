@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import Stripe from "stripe";
 
+// تعريف واجهات الأخطاء
+interface StripeError {
+  code?: string;
+  message?: string;
+}
+
+interface PrismaError {
+  code?: string;
+  message?: string;
+}
+
 // Initialize Stripe only if the secret key is available
 const getStripe = () => {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -70,15 +81,18 @@ export async function POST(req: Request) {
         payment_status: session.payment_status,
         metadata: session.metadata,
       });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (stripeError: any) {
+    } catch (stripeError: unknown) {
       console.error("Stripe session retrieval error:", stripeError);
 
-      if (stripeError.code === "resource_missing") {
-        return NextResponse.json(
-          { success: false, error: "جلسة الدفع غير موجودة أو منتهية الصلاحية" },
-          { status: 404 }
-        );
+      // التحقق من نوع الخطأ
+      if (stripeError && typeof stripeError === "object" && "code" in stripeError) {
+        const error = stripeError as StripeError;
+        if (error.code === "resource_missing") {
+          return NextResponse.json(
+            { success: false, error: "جلسة الدفع غير موجودة أو منتهية الصلاحية" },
+            { status: 404 }
+          );
+        }
       }
 
       return NextResponse.json(
@@ -288,25 +302,28 @@ export async function POST(req: Request) {
       alreadyConfirmed: false,
       payment: result.payment,
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Confirm Reservation Error:", error);
 
-    if (error.code === "P2002") {
-      console.log("Duplicate session detected");
-      return NextResponse.json(
-        { success: false, error: "تم تأكيد هذا الحجز مسبقاً" },
-        { status: 409 }
-      );
-    }
+    // التحقق من نوع الخطأ
+    if (error && typeof error === "object" && "code" in error) {
+      const prismaError = error as PrismaError;
+      if (prismaError.code === "P2002") {
+        console.log("Duplicate session detected");
+        return NextResponse.json(
+          { success: false, error: "تم تأكيد هذا الحجز مسبقاً" },
+          { status: 409 }
+        );
+      }
 
-    // ✅ تحسين رسائل الخطأ
-    if (error.code === "P2003") {
-      console.log("Foreign key constraint violation");
-      return NextResponse.json(
-        { success: false, error: "بيانات الحجز غير صحيحة" },
-        { status: 400 }
-      );
+      // ✅ تحسين رسائل الخطأ
+      if (prismaError.code === "P2003") {
+        console.log("Foreign key constraint violation");
+        return NextResponse.json(
+          { success: false, error: "بيانات الحجز غير صحيحة" },
+          { status: 400 }
+        );
+      }
     }
 
     return NextResponse.json(

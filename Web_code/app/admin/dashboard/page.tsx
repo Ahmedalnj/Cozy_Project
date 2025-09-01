@@ -1,10 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SafeUser, SafeListing, SaveReservation } from "@/app/types";
 import { formatCurrency } from "@/app/types";
+
+// تعريف واجهة الدفع
+interface Payment {
+  id: string;
+  reservationId: string | null;
+  userId: string;
+  listingId: string;
+  stripeSession: string;
+  transactionId: string | null;
+  paymentMethod: string | null;
+  status: "PENDING" | "SUCCESS" | "FAILED" | "PAID";
+  amount: number;
+  currency: string;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    image: string | null;
+  };
+  listing: {
+    id: string;
+    title: string;
+    locationValue: string;
+  };
+  reservation: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    totalPrice: number;
+  } | null;
+}
 import {
   ResponsiveContainer,
   LineChart,
@@ -26,7 +59,7 @@ interface DashboardData {
   users: SafeUser[];
   listings: SafeListing[];
   reservations: SaveReservation[];
-  payments: any[];
+  payments: Payment[];
   stats: {
     totalUsers: number;
     totalListings: number;

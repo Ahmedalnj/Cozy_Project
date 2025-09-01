@@ -6,12 +6,21 @@ interface IParams {
   authorId?: string;
 }
 
+interface WhereClause {
+  listingId?: string;
+  userId?: string;
+  listing?: {
+    is: {
+      userId: string;
+    };
+  };
+}
+
 export default async function getReservations(params: IParams) {
   try {
     const { listingId, userId, authorId } = params;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const whereClause: any = {};
+    const whereClause: WhereClause = {};
 
     if (listingId) {
       whereClause.listingId = listingId;

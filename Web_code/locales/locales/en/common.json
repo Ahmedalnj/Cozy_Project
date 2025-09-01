@@ -743,5 +743,6 @@
     "sending": "Sending...",
     "success_message": "Message sent successfully! We'll get back to you soon.",
     "error_message": "Failed to send message. Please try again."
-  }
+  },
+  "invoice_details": " Invoice Details"
 }

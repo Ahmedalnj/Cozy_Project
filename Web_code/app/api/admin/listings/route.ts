@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/admin/listings/route.ts
 import { NextResponse } from "next/server";
 import getListings from "@/app/actions/getListings";
@@ -26,9 +25,10 @@ export async function GET(req: Request) {
   try {
     const listings = await getListings(params);
     return NextResponse.json(listings);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "فشل في جلب العقارات";
     return NextResponse.json(
-      { error: error.message || "فشل في جلب العقارات" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

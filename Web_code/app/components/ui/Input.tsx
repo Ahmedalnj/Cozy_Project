@@ -22,6 +22,7 @@ interface InputProps<T extends FieldValues> {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
   defaultValue?: string | null;
+  placeholder?: string;
 }
 import { useTranslation } from "react-i18next";
 
@@ -38,6 +39,7 @@ const Input = <T extends FieldValues>({
   value,
   defaultValue,
   readOnly,
+  placeholder,
 }: InputProps<T>) => {
   const { t } = useTranslation("common");
   return (
@@ -64,7 +66,7 @@ const Input = <T extends FieldValues>({
         defaultValue={defaultValue ?? undefined}
         readOnly={readOnly}
         {...(register ? register(id, { required, ...validation }) : {})}
-        placeholder=" "
+        placeholder={placeholder || " "}
         type={type}
         className={`
           peer

@@ -62,8 +62,21 @@ const SearchModal = () => {
     if (params) {
       currentQuery = qs.parse(params.toString());
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateQuery: any = {
+    
+    // تعريف واجهة للاستعلام
+    interface SearchQuery {
+      locationValue?: string;
+      guestCount?: number;
+      roomCount?: number;
+      bathroomCount?: number;
+      minPrice?: number;
+      maxPrice?: number;
+      startDate?: string;
+      endDate?: string;
+      [key: string]: any; // للخصائص الأخرى من currentQuery
+    }
+    
+    const updateQuery: SearchQuery = {
       ...currentQuery,
       locationValue: location?.value,
       guestCount,

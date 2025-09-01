@@ -169,7 +169,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
         </div>
 
         {/* Reviews Summary */}
-        <ReviewSummary listingId={data.id} size="sm" reviewStats={data.reviewStats} />
+        <ReviewSummary size="sm" reviewStats={data.reviewStats} />
 
         <div className="flex flex-row items-center gap-1 text-xs sm:text-sm md:text-base">
           <div className="font-semibold group-hover:text-green-600 transition-colors duration-200">

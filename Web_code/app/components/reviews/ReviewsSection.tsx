@@ -92,9 +92,19 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
       setEditingReview(null);
     } catch (error: unknown) {
       console.error("Error submitting review:", error);
+      
+      // تعريف واجهة للخطأ
+      interface ApiError {
+        response?: {
+          data?: {
+            error?: string;
+          };
+        };
+      }
+      
       if (typeof error === "object" && error !== null && "response" in error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        console.error("Error details:", (error as any).response?.data);
+        const apiError = error as ApiError;
+        console.error("Error details:", apiError.response?.data);
       }
 
       if (
