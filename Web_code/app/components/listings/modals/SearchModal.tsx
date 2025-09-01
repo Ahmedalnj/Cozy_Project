@@ -73,7 +73,7 @@ const SearchModal = () => {
       maxPrice?: number;
       startDate?: string;
       endDate?: string;
-      [key: string]: any; // للخصائص الأخرى من currentQuery
+      [key: string]: string | number | undefined; // للخصائص الأخرى من currentQuery
     }
     
     const updateQuery: SearchQuery = {

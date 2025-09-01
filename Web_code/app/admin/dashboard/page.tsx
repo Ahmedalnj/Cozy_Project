@@ -176,50 +176,52 @@ const AdminPage = () => {
     const users = data.users.filter(
       (u) =>
         isWithinRange(
-          (u as any).createdAt ?? new Date(),
+          (u as SafeUser & { createdAt?: string }).createdAt ?? new Date(),
           range
         ) &&
-        (query ? match(u.name) || match(u.email) || match((u as any).id) : true)
+        (query ? match(u.name) || match(u.email) || match(u.id) : true)
     );
 
     const listings = data.listings.filter(
       (l) =>
-        isWithinRange((l as any).createdAt ?? new Date(), range) &&
+        isWithinRange((l as SafeListing & { createdAt?: string }).createdAt ?? new Date(), range) &&
         (query
-          ? match(l.title) || match(l.description) || match((l as any).id)
+          ? match(l.title) || match(l.description) || match(l.id)
           : true)
     );
 
     const reservations = data.reservations.filter(
       (r) =>
         isWithinRange(
-          (r as any).createdAt ?? (r as any).startDate ?? new Date(),
+          (r as SaveReservation & { createdAt?: string; startDate?: string }).createdAt ?? 
+          (r as SaveReservation & { createdAt?: string; startDate?: string }).startDate ?? new Date(),
           range
         ) &&
         (query
-          ? match((r as any).id) ||
-            match((r as any).guestName) ||
-            match((r as any).listingTitle)
+          ? match(r.id) ||
+            match((r as SaveReservation & { guestName?: string; listingTitle?: string }).guestName ?? '') ||
+            match((r as SaveReservation & { guestName?: string; listingTitle?: string }).listingTitle ?? '')
           : true)
     );
 
     const payments = (data.payments || []).filter(
       (p) =>
         isWithinRange(
-          (p as any).createdAt ?? new Date(),
+          (p as Payment & { createdAt?: string }).createdAt ?? new Date(),
           range
         ) &&
         (query
-          ? match((p as any).id) ||
-            match((p as any).transactionId) ||
-            match((p as any).user?.name) ||
-            match((p as any).listing?.title)
+          ? match(p.id) ||
+            match(p.transactionId ?? '') ||
+            match(p.user?.name ?? '') ||
+            match(p.listing?.title ?? '')
           : true)
     );
 
-    // استخراج الإحصائيات للنطاق المحدد من الحجوزات (الرجوع لإحصائيات API عند فقدان الحقول)
+    // استخراج الإحصائيات للنطاق المحدد من الحجوزات
     const computedRevenue = reservations.reduce((sum, r) => {
-      const val = Number((r as any).totalPrice ?? (r as any).price ?? 0);
+      const val = Number((r as SaveReservation & { totalPrice?: number; price?: number }).totalPrice ?? 
+                     (r as SaveReservation & { totalPrice?: number; price?: number }).price ?? 0);
       return sum + (Number.isFinite(val) ? val : 0);
     }, 0);
 
@@ -234,10 +236,12 @@ const AdminPage = () => {
     const map = new Map<string, { reservations: number; revenue: number }>();
     for (const r of filtered.reservations) {
       const key = monthKey(
-        (r as any).createdAt ?? (r as any).startDate ?? new Date()
+        (r as SaveReservation & { createdAt?: string; startDate?: string }).createdAt ?? 
+        (r as SaveReservation & { createdAt?: string; startDate?: string }).startDate ?? new Date()
       );
       const prev = map.get(key) ?? { reservations: 0, revenue: 0 };
-      const price = Number((r as any).totalPrice ?? (r as any).price ?? 0);
+      const price = Number((r as SaveReservation & { totalPrice?: number; price?: number }).totalPrice ?? 
+                     (r as SaveReservation & { totalPrice?: number; price?: number }).price ?? 0);
       map.set(key, {
         reservations: prev.reservations + 1,
         revenue: prev.revenue + (Number.isFinite(price) ? price : 0),
@@ -422,7 +426,7 @@ const AdminPage = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis allowDecimals={false} />
-                  <Tooltip formatter={(v: any) => [v, "الحجوزات"]} />
+                  <Tooltip formatter={(v: number) => [v, "الحجوزات"]} />
                   <Line type="monotone" dataKey="reservations" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -444,8 +448,8 @@ const AdminPage = () => {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip
-                    formatter={(v: any) => [
-                      formatCurrency(Number(v) || 0),
+                    formatter={(v: number) => [
+                      formatCurrency(v || 0),
                       "الإيرادات",
                     ]}
                   />

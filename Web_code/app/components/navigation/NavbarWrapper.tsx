@@ -21,9 +21,7 @@ export default function LayoutController({
   return (
     <>
       {!isAdminPage && <Navbar currentUser={currentUser} />}
-      <div className={isAdminPage ? "" : "pt-12"}>
-        {children}
-      </div>
+      <div className={isAdminPage ? "" : "pt-22"}>{children}</div>
     </>
   );
 }

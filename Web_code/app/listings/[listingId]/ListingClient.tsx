@@ -61,7 +61,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
     return dates;
   }, [reservations]);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
@@ -218,7 +217,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onChangeDate={(value) => setDateRange(value)}
                 dateRange={dateRange}
                 onSubmit={handleReservationRedirect}
-                disabled={isLoading || isOwner}
+                disabled={isOwner}
                 disabledDates={disabledDate}
                 days={dayCount}
                 locationValue={listing.locationValue}

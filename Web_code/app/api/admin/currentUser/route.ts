@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser"; // your server-side auth function
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser(); // fetch user from session or token
 
