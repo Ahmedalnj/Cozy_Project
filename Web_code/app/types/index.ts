@@ -6,6 +6,10 @@ export type SafeListing = Omit<Listing, "createdAt"> & {
     name: string | null;
     email: string | null;
   };
+  reviewStats?: {
+    count: number;
+    averageRating: number;
+  };
 };
 
 export type SaveReservation = Omit<

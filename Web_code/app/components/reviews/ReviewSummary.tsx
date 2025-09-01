@@ -1,71 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
-import axios from "axios";
 
 interface ReviewSummaryProps {
   listingId: string;
   size?: "sm" | "md";
+  reviewStats?: {
+    count: number;
+    averageRating: number;
+  };
 }
 
 const ReviewSummary: React.FC<ReviewSummaryProps> = ({ 
   listingId, 
-  size = "sm" 
+  size = "sm",
+  reviewStats
 }) => {
-  const [averageRating, setAverageRating] = useState<number | null>(null);
-  const [reviewCount, setReviewCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  // إذا كانت البيانات متوفرة مسبقاً، استخدمها
+  if (reviewStats) {
+    if (reviewStats.count === 0) {
+      return null; // لا تعرض شيئاً إذا لم تكن هناك مراجعات
+    }
 
-  useEffect(() => {
-    const fetchReviewStats = async () => {
-      try {
-        const response = await axios.get(`/api/listings/${listingId}/reviews`);
-        const reviews = response.data;
-        
-        if (reviews.length > 0) {
-          const avg = reviews.reduce((sum: number, review: { rating: number }) => sum + review.rating, 0) / reviews.length;
-          setAverageRating(avg);
-          setReviewCount(reviews.length);
-        }
-      } catch (error) {
-        console.error("Error fetching review stats:", error);
-      } finally {
-        setLoading(false);
-      }
+    const sizeClasses = {
+      sm: "text-xs",
+      md: "text-sm",
     };
 
-    fetchReviewStats();
-  }, [listingId]);
+    const starSize = {
+      sm: "w-3 h-3",
+      md: "w-4 h-4",
+    };
 
-  if (loading) {
     return (
-      <div className="flex items-center gap-1 text-xs text-gray-400">
-        <FaStar className="w-3 h-3" />
-        <span>--</span>
+      <div className={`flex items-center gap-1 ${sizeClasses[size]} text-gray-600`}>
+        <FaStar className={`${starSize[size]} text-yellow-400`} />
+        <span className="font-medium">{reviewStats.averageRating.toFixed(1)}</span>
+        <span className="text-gray-500">({reviewStats.count})</span>
       </div>
     );
   }
 
-  if (!averageRating) {
-    return null; // Don't show anything if no reviews
-  }
-
-  const sizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-  };
-
-  const starSize = {
-    sm: "w-3 h-3",
-    md: "w-4 h-4",
-  };
-
+  // Fallback للتوافق مع الإصدارات السابقة (إذا لم تكن البيانات متوفرة)
   return (
-    <div className={`flex items-center gap-1 ${sizeClasses[size]} text-gray-600`}>
-      <FaStar className={`${starSize[size]} text-yellow-400`} />
-      <span className="font-medium">{averageRating.toFixed(1)}</span>
-      <span className="text-gray-500">({reviewCount})</span>
+    <div className={`flex items-center gap-1 ${size === "sm" ? "text-xs" : "text-sm"} text-gray-400`}>
+      <FaStar className={`${size === "sm" ? "w-3 h-3" : "w-4 h-4"}`} />
+      <span>--</span>
     </div>
   );
 };

@@ -169,11 +169,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
         </div>
 
         {/* Reviews Summary */}
-        <ReviewSummary listingId={data.id} size="sm" />
+        <ReviewSummary listingId={data.id} size="sm" reviewStats={data.reviewStats} />
 
         <div className="flex flex-row items-center gap-1 text-xs sm:text-sm md:text-base">
           <div className="font-semibold group-hover:text-green-600 transition-colors duration-200">
-            ${price}
+            {t("LYD")} {price}
           </div>
           {!reservation && (
             <div className="font-light text-xs">{t("per_night")}</div>

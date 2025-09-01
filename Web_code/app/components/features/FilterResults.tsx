@@ -43,22 +43,30 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
   }
 
   return (
-    <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 transition-all duration-1000 ease-out transform ${
-      isVisible ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div
+      className={`bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 transition-all duration-1000 ease-out transform ${
+        isVisible ? "translate-y-0 opacity-100" : "-translate-y-8 opacity-0"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Main Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1">
           {/* Results Info */}
           <div className="flex items-center gap-3">
-            <div className={`flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full shadow-lg transition-all duration-500 ease-out transform ${
-              isVisible ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
-            }`}>
+            <div
+              className={`flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full shadow-lg transition-all duration-500 ease-out transform ${
+                isVisible ? "scale-100 rotate-0" : "scale-0 rotate-180"
+              }`}
+            >
               <FaSearch className="w-5 h-5 text-white" />
             </div>
-            <div className={`transition-all duration-700 ease-out transform ${
-              isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-            }`}>
+            <div
+              className={`transition-all duration-700 ease-out transform ${
+                isVisible
+                  ? "translate-x-0 opacity-100"
+                  : "translate-x-4 opacity-0"
+              }`}
+            >
               <h2 className="text-lg font-bold text-gray-900">
                 {t("filter_results.title")}
               </h2>
@@ -72,19 +80,26 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
           <button
             onClick={clearAllFilters}
             className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md transform hover:scale-105 ${
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-4 opacity-0"
             }`}
-            style={{ transitionDelay: '200ms' }}
+            style={{ transitionDelay: "200ms" }}
           >
             <FaTimes className="w-4 h-4" />
-            <span className="font-medium">{t("filter_results.clear_filters")}</span>
+            <span className="font-medium">
+              {t("filter_results.clear_filters")}
+            </span>
           </button>
         </div>
 
         {/* Active Filters */}
-        <div className={`mt-4 transition-all duration-1000 ease-out transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-        }`} style={{ transitionDelay: '400ms' }}>
+        <div
+          className={`mt-4 transition-all duration-1000 ease-out transform ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          }`}
+          style={{ transitionDelay: "400ms" }}
+        >
           <div className="flex flex-wrap gap-2">
             {params.get("locationValue") && (
               <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-blue-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
@@ -122,7 +137,8 @@ const FilterResults = ({ totalResults }: FilterResultsProps) => {
               <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-orange-200 transform hover:scale-105 transition-all duration-200 hover:shadow-md">
                 <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-700">
-                  {params.get("bathroomCount")} {t("filter_results.bathroom_single")}
+                  {params.get("bathroomCount")}{" "}
+                  {t("filter_results.bathroom_single")}
                 </span>
               </div>
             )}

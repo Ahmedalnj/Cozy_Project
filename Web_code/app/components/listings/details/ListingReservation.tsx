@@ -97,10 +97,11 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       <div className="mb-4 p-4 border rounded-lg">
         <div className="flex justify-between font-semibold">
           <span>
-            ${price} {t("listing_reservation.price_per_night")} {days}
+            {t("LYD")}
+            {price} {t("listing_reservation.price_per_night")} {days}
           </span>
           <span>
-            {t("listing_reservation.total")} $ {totalPrice}
+            {t("listing_reservation.total")} {t("LYD")} {totalPrice}
           </span>
         </div>
       </div>

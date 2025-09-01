@@ -128,6 +128,14 @@ const Footer = () => {
                   {t("footer.reportIssue")}
                 </a>
               </li>
+              <li>
+                <a
+                  href="/contact"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {t("contact.title")}
+                </a>
+              </li>
             </ul>
           </div>
 

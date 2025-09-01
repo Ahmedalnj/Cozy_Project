@@ -15,7 +15,12 @@ export default async function getListingById(
                 id: listingId
              },
              include: {
-                user: true
+                user: true,
+                reviews: {
+                    select: {
+                        rating: true,
+                    },
+                },
              }
         });
 
@@ -23,9 +28,20 @@ export default async function getListingById(
             return null;
         }
 
+        // حساب إحصائيات المراجعات
+        const reviewCount = listing.reviews.length;
+        const averageRating = reviewCount > 0 
+            ? listing.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+            : 0;
+
         return {
             ...listing,
             createdAt: listing.createdAt.toISOString(), // تحويل تاريخ الإنشاء إلى string
+            reviewStats: {
+                count: reviewCount,
+                averageRating: Math.round(averageRating * 10) / 10, // تقريب إلى رقم عشري واحد
+            },
+            reviews: undefined, // إزالة بيانات المراجعات الكاملة
             user: {
                 ...listing.user,
                 createdAt: listing.user.createdAt.toISOString(),

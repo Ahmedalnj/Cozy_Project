@@ -1,6 +1,5 @@
 "use client";
 import { signIn } from "next-auth/react";
-import { AiFillFacebook } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -100,12 +99,6 @@ const LoginModal = () => {
           label={t("continue_with_google")}
           icon={FcGoogle}
           onClick={() => signIn("google")}
-        />
-        <Button
-          outline
-          label={t("continue_with_facebook")}
-          icon={AiFillFacebook}
-          onClick={() => signIn("facebook")}
         />
 
         <div className="text-neutral-500 text-center mt-3 font-light">

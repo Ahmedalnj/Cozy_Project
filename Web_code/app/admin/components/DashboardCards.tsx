@@ -36,7 +36,7 @@ export default async function DashboardCards() {
       },
       {
         title: "الإيرادات",
-        value: `$${totalRevenue}`,
+        value: `د.ل${totalRevenue}`,
         icon: "💰",
       },
     ];

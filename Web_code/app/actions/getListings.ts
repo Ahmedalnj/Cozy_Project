@@ -69,11 +69,31 @@ export default async function getListings(params: IListingsParams) {
 
   const listings = await prisma.listing.findMany({
     where: query,
+    include: {
+      reviews: {
+        select: {
+          rating: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
-  return listings.map((listing) => ({
-    ...listing,
-    createdAt: listing.createdAt.toISOString(),
-  }));
+  return listings.map((listing) => {
+    // حساب إحصائيات المراجعات
+    const reviewCount = listing.reviews.length;
+    const averageRating = reviewCount > 0 
+      ? listing.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+      : 0;
+
+    return {
+      ...listing,
+      createdAt: listing.createdAt.toISOString(),
+      reviewStats: {
+        count: reviewCount,
+        averageRating: Math.round(averageRating * 10) / 10, // تقريب إلى رقم عشري واحد
+      },
+      reviews: undefined, // إزالة بيانات المراجعات الكاملة
+    };
+  });
 }

@@ -40,9 +40,12 @@ const EditModal = () => {
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
   const { getByValue } = useCities();
-  const getCityByValue = useCallback((value: string) => {
-    return getByValue(value);
-  }, [getByValue]);
+  const getCityByValue = useCallback(
+    (value: string) => {
+      return getByValue(value);
+    },
+    [getByValue]
+  );
 
   const {
     register,
@@ -301,7 +304,7 @@ const EditModal = () => {
       <div className="flex flex-col gap-8">
         <Heading
           title={t("now_set_price")}
-          subtitle={`How much do you charge ${t("per_night")}?`}
+          subtitle={`How much do you charge ${t("LYD")} ${t("per_night")}?`}
         />
         <Input
           id="price"

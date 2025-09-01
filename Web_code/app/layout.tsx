@@ -42,10 +42,10 @@ export default async function RootLayout({
             <ToasterProvider />
             <SearchModal />
             <LoginModal />
+            <RegisterModal />
             <TermsModal />
             <PolicyModal />
             <RentModal />
-            <RegisterModal />
             <ForgotPasswordModal />
             <ResetPasswordModal />
             <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>

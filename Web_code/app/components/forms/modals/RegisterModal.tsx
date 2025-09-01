@@ -1,6 +1,5 @@
 "use client";
 import axios from "axios";
-import { AiFillFacebook } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -15,6 +14,8 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import { useRouter } from "next/navigation";
 import zxcvbn from "zxcvbn";
 import { useTranslation } from "react-i18next";
+import usePolicy from "@/app/hooks/usePolicy";
+import useTermsModal from "@/app/hooks/useTerms";
 
 const RegisterModal = () => {
   const { t } = useTranslation("common");
@@ -23,6 +24,8 @@ const RegisterModal = () => {
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<number | null>(null);
+  const PolicyModal = usePolicy();
+  const TermsModal = useTermsModal();
 
   const {
     register,
@@ -155,12 +158,6 @@ const RegisterModal = () => {
           icon={FcGoogle}
           onClick={() => signIn("google")}
         />
-        <Button
-          outline
-          label={t("registers.continue_facebook")}
-          icon={AiFillFacebook}
-          onClick={() => signIn("facebook")}
-        />
         <div className="text-neutral-500 text-center mt-4 font-light">
           <div>
             {t("registers.already_have_account")}
@@ -176,11 +173,17 @@ const RegisterModal = () => {
           </div>
           <div>
             {t("registers.agree_text")}
-            <span className="text-neutral-800 cursor-pointer hover:underline">
+            <span
+              onClick={TermsModal.onOpen}
+              className="text-neutral-800 cursor-pointer hover:underline"
+            >
               {t("registers.terms")}
             </span>
             {t("registers.and")}
-            <span className="text-neutral-800 cursor-pointer hover:underline">
+            <span
+              onClick={PolicyModal.onOpen}
+              className="text-neutral-800 cursor-pointer hover:underline"
+            >
               {t("registers.privacy")}
             </span>
           </div>

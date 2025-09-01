@@ -1,7 +1,7 @@
 "use client";
 
 import { SafeListing, SafeUser } from "@/app/types";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import ListingCard from "../listings/cards/ListingCard";
 import { FaStar } from "react-icons/fa";
@@ -13,7 +13,7 @@ interface FeaturedListingsProps {
 }
 
 const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
-  const router = useRouter();
+  // const router = useRouter();
   const { t } = useTranslation("common");
   const { elementRef: sectionRef, isVisible: isSectionVisible } =
     useScrollAnimation({
@@ -83,7 +83,7 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
         </div>
 
         {/* زر عرض المزيد مع Animation */}
-        {listings.length > 6 && (
+        {/* {listings.length > 6 && (
           <div
             className={`text-center mt-12 transition-all duration-1000 ease-out delay-500 transform ${
               isSectionVisible
@@ -98,7 +98,7 @@ const FeaturedListings = ({ listings, currentUser }: FeaturedListingsProps) => {
               {t("featured_listings.view_all_properties")}
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </section>
   );

@@ -619,11 +619,13 @@ const ReservationPage = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <span className="text-gray-600">
-                    ${reservationData.pricePerNight} × {reservationData.days}{" "}
+                    {t("LYD")}
+                    {reservationData.pricePerNight} × {reservationData.days}{" "}
                     {t("per_night")}
                   </span>
                   <span className="font-semibold text-gray-800">
-                    ${reservationData.pricePerNight * reservationData.days}
+                    {t("LYD")}
+                    {reservationData.pricePerNight * reservationData.days}
                   </span>
                 </div>
 
@@ -636,7 +638,8 @@ const ReservationPage = () => {
                   <div className="flex justify-between items-center text-xl font-bold">
                     <span className="text-gray-800">{t("total_amount")}</span>
                     <span className="text-rose-600">
-                      ${reservationData.totalPrice}
+                      {t("LYD")}
+                      {reservationData.totalPrice}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">

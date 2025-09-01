@@ -7,7 +7,6 @@ import {
   RegisterOptions,
   Path,
 } from "react-hook-form";
-import { BiDollar } from "react-icons/bi";
 
 interface InputProps<T extends FieldValues> {
   id: Path<T>;
@@ -24,6 +23,7 @@ interface InputProps<T extends FieldValues> {
   value?: string;
   defaultValue?: string | null;
 }
+import { useTranslation } from "react-i18next";
 
 const Input = <T extends FieldValues>({
   id,
@@ -39,19 +39,23 @@ const Input = <T extends FieldValues>({
   defaultValue,
   readOnly,
 }: InputProps<T>) => {
+  const { t } = useTranslation("common");
   return (
     <div className="w-full relative">
       {formatPrice && (
-        <BiDollar
-          size={24}
+        <span
           className="
-            text-neutral-700
-            absolute
-            top-5
-            left-3
-            z-10
-          "
-        />
+      text-neutral-700
+      absolute
+      top-5
+      left-3
+      z-10
+      text-sm
+      font-semibold
+    "
+        >
+          {t("LYD")}
+        </span>
       )}
       <input
         id={id}
@@ -78,9 +82,10 @@ const Input = <T extends FieldValues>({
           disabled:cursor-not-allowed
           shadow-sm
           ${formatPrice ? "pl-10" : "pl-4"}
-          ${errors[id] 
-            ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200" 
-            : "border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+          ${
+            errors[id]
+              ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+              : "border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
           }
           hover:border-gray-400
         `}
@@ -88,7 +93,11 @@ const Input = <T extends FieldValues>({
       {errors[id] && (
         <p className="text-rose-500 text-sm mt-1 flex items-center">
           <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
           </svg>
           {errors[id]?.message as string}
         </p>
@@ -109,9 +118,10 @@ const Input = <T extends FieldValues>({
           peer-placeholder-shown:translate-y-0
           peer-focus:scale-75
           peer-focus:-translate-y-4
-          ${errors[id] 
-            ? "text-rose-500 peer-focus:text-rose-500" 
-            : "text-gray-500 peer-focus:text-rose-500"
+          ${
+            errors[id]
+              ? "text-rose-500 peer-focus:text-rose-500"
+              : "text-gray-500 peer-focus:text-rose-500"
           }
           ${disabled ? "text-gray-400 peer-focus:text-gray-400" : ""}
         `}

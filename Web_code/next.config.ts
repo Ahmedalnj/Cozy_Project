@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
         pathname: "/**", // يمكن استخدام * للحصول على جميع المسارات
       },
     ],
+    domains: ["images.unsplash.com"],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
