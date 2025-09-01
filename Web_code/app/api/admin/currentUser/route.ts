@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser"; // your server-side auth function
 
 export async function GET() {
