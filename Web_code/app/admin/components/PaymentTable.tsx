@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch } from "react-icons/fi";
 import Avatar from "@/app/components/ui/Avatar";
+import { useTranslation } from "react-i18next";
 
 
 interface Payment {
@@ -51,6 +52,7 @@ type SortColumn = "user" | "listing" | "amount" | "status" | "paymentMethod" | "
 const PAYMENTS_PER_PAGE = 10;
 
 const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit }) => {
+  const { t } = useTranslation("common");
   const [localPayments, setLocalPayments] = useState(payments);
 
   // Update local state when props change (dashboard refresh)
@@ -246,7 +248,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                   : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
               }`}
               title="تحديث البيانات"
-              aria-label="تحديث البيانات"
+              aria-label={t("refresh_data")}
             >
               <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
             </button>

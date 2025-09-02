@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch, FiTrash2, FiHome, FiMapPin, FiDollarSign } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 
 interface ListingsTableProps {
@@ -28,6 +29,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
   onRefresh,
   limit,
 }) => {
+  const { t } = useTranslation("common");
 
   const [localListings, setLocalListings] = useState(listings);
 
@@ -229,8 +231,8 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
               }`}
-              title="تحديث البيانات"
-              aria-label="تحديث البيانات"
+              title={t("refresh_data")}
+              aria-label={t("refresh_data")}
             >
               <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
             </button>

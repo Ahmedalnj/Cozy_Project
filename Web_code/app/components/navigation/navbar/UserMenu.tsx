@@ -10,6 +10,7 @@ import { signOut } from "next-auth/react";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 //icons imports
 import {
@@ -27,6 +28,9 @@ import { PiAirplaneTiltFill } from "react-icons/pi";
 import { TbHome } from "react-icons/tb";
 import LanguageSwitcher from "@/app/components/navigation/LanguageSwitcher";
 
+import { SwitchToHostingButton } from "@/app/components/ui";
+
+
 interface UserMenuProps {
   currentUser: SafeUser | null;
 }
@@ -34,7 +38,12 @@ interface UserMenuProps {
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   // Translation hook
   const { t, i18n } = useTranslation("common");
-  const isRTL = i18n.language === "ar";
+  const isRTL = i18n.language === "ar" || i18n.language === "ar-EG";
+  
+  // للتأكد من أن RTL يعمل
+  console.log("UserMenu - Current language:", i18n.language, "isRTL:", isRTL);
+  
+
 
   const router = useRouter();
 
@@ -43,6 +52,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const loginModal = useLoginModal();
 
   const rentModal = useRentModal();
+
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -66,25 +76,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
-        <div
-          onClick={onRent}
-          className="
-      hidden
-      md:block
-      text-sm
-      font-semibold
-      py-3
-      px-4
-      rounded-full
-      
-      transition
-      cursor-pointer
-      border-[1px]
-      border-neutral-200
-      hover:shadow-md
-    "
-        >
-          {t("cozy_my_home")}
+        <div className="hidden md:block">
+          <SwitchToHostingButton
+            hostStatus={currentUser?.hostStatus || "NOT_REQUESTED"}
+            className="text-sm font-semibold py-3 px-4 rounded-full transition cursor-pointer border-[1px] border-neutral-200 hover:shadow-md"
+          />
         </div>
         <div
           onClick={toggleOpen}
@@ -140,8 +136,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                 />
                 <MenuItem
                   onClick={() =>
-                    handleMenuItemClick(() => router.push("/trips"))
-                  }
+                    handleMenuItemClick(() => router.push("/trips"))}
                   label={t("my_trips")}
                   Icon={PiAirplaneTiltFill}
                   isRTL={isRTL}
@@ -154,22 +149,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   Icon={AiOutlineHeart}
                   isRTL={isRTL}
                 />
-                <MenuItem
-                  onClick={() =>
-                    handleMenuItemClick(() => router.push("/reservations"))
-                  }
-                  label={t("my_reservations")}
-                  Icon={AiOutlineCalendar}
-                  isRTL={isRTL}
-                />
-                <MenuItem
-                  onClick={() =>
-                    handleMenuItemClick(() => router.push("/properties"))
-                  }
-                  label={t("my_properties")}
-                  Icon={FiKey}
-                  isRTL={isRTL}
-                />
+
                 {currentUser.role === "ADMIN" && (
                   <MenuItem
                     onClick={() =>
@@ -180,12 +160,18 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                     isRTL={isRTL}
                   />
                 )}
-                <MenuItem
-                  onClick={() => handleMenuItemClick(rentModal.onOpen)}
-                  label={t("cozy_my_home")}
-                  Icon={AiOutlineHome}
-                  isRTL={isRTL}
-                />
+
+                {currentUser?.hostStatus === "APPROVED" && (
+                  <MenuItem
+                    onClick={() =>
+                      handleMenuItemClick(() => router.push("/host-dashboard"))
+                    }
+                    label={t("host_dashboard")}
+                    Icon={AiOutlineHome}
+                    isRTL={isRTL}
+                  />
+                )}
+
                 <div className="px-3 py-2">
                   <LanguageSwitcher fullLabel />
                 </div>
@@ -211,6 +197,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   Icon={AiOutlineUserAdd}
                   isRTL={isRTL}
                 />
+
               </>
             )}
           </div>

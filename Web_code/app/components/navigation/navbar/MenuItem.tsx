@@ -19,12 +19,14 @@ const MenuItem: React.FC<MenuItemProps> = ({ onClick, label, Icon, isRTL = false
         transition
         font-semibold
         flex
-        ${isRTL ? 'flex-row-reverse' : 'justify-between'}
+        justify-between
         items-center
         gap-2
+        cursor-pointer
+        ${isRTL ? 'rtl' : 'ltr'}
       `}
     >
-      <span className={isRTL ? 'text-right' : 'text-left'}>{label}</span>
+      <span>{label}</span>
       <Icon size={15} />
     </div>
   );

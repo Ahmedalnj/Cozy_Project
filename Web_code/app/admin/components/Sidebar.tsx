@@ -56,6 +56,12 @@ export const routes = [
     description: "إدارة المدفوعات",
   },
   {
+    label: "طلبات المضيف",
+    icon: User,
+    href: "/admin/host-requests",
+    description: "إدارة طلبات الانضمام كمضيف",
+  },
+  {
     label: "الإيرادات",
     icon: BarChart,
     href: "/admin/analysis/revenue",

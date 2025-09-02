@@ -3,18 +3,19 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const userRole = req.nextauth.token?.role;
+    const userEmail = req.nextauth.token?.email;
 
+    // السماح فقط لهذا الإيميل بالدخول على صفحات /admin
     if (
       req.nextUrl.pathname.startsWith("/admin") &&
-      userRole !== "ADMIN" // بدون تعديل الحالة
+      userEmail !== "ahmed.alnjjar40@gmail.com"
     ) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => !!token, // لازم يكون مسجل دخول
     },
   }
 );

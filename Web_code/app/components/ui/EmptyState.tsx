@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Heading from "./Heading";
 import Button from "./Button";
+import { useTranslation } from "react-i18next";
 
 interface EmptyState {
   title?: string;
@@ -15,6 +16,7 @@ const EmptyState: React.FC<EmptyState> = ({
   subtitle = "Try changing or removing some of your filters",
   showReset,
 }) => {
+  const { t } = useTranslation("common");
   const router = useRouter();
 
   return (
@@ -34,7 +36,7 @@ const EmptyState: React.FC<EmptyState> = ({
         {showReset && (
           <Button
             outline
-            label="Remove all filters"
+            label={t("remove_all_filters")}
             onClick={() => router.push("/")}
           />
         )}

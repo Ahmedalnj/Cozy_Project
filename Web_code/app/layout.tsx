@@ -16,6 +16,9 @@ import PolicyModal from "./components/forms/modals/PolicyModal";
 import NavbarWrapper from "./components/navigation/NavbarWrapper";
 import ForgotPasswordModal from "./components/forms/modals/ForgotPasswordModal";
 import ResetPasswordModal from "./components/forms/modals/ResetPasswordModal";
+import HostRequestModalProvider from "./components/modals/HostRequestModalProvider";
+import { HostModeProvider } from "./contexts/HostModeContext";
+import SessionProvider from "./Providers/SessionProvider";
 import I18NProvider from "./Providers/I18nProvider";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
@@ -37,19 +40,24 @@ export default async function RootLayout({
     <html>
       <body className={font.className}>
         <I18NProvider>
-          <ClientOnly>
-            <LanguageInitializer />
-            <ToasterProvider />
-            <SearchModal />
-            <LoginModal />
-            <RegisterModal />
-            <TermsModal />
-            <PolicyModal />
-            <RentModal />
-            <ForgotPasswordModal />
-            <ResetPasswordModal />
-            <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
-          </ClientOnly>
+          <SessionProvider>
+            <HostModeProvider>
+              <ClientOnly>
+                <LanguageInitializer />
+                <ToasterProvider />
+                <SearchModal />
+                <LoginModal />
+                <RegisterModal />
+                <TermsModal />
+                <PolicyModal />
+                <RentModal />
+                <ForgotPasswordModal />
+                <ResetPasswordModal />
+                <HostRequestModalProvider />
+                <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
+              </ClientOnly>
+            </HostModeProvider>
+          </SessionProvider>
         </I18NProvider>
       </body>
     </html>

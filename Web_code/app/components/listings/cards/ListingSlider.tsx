@@ -47,13 +47,13 @@ export default function ListingSlider({
         {/* Navigation Buttons (left side) */}
         <div className="flex gap-2">
           <button
-            aria-label="previous"
+            aria-label={t("previous")}
             className="swiper-button-prev-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
             <HiOutlineChevronLeft className="w-4 h-4 text-black" />
           </button>
           <button
-            aria-label="next"
+            aria-label={t("next")}
             className="swiper-button-next-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
             <HiOutlineChevronRight className="w-4 h-4 text-black" />

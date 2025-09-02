@@ -12,6 +12,7 @@ import useResetPasswordModal from "@/app/hooks/useResetPasswordModal";
 import { useRouter } from "next/navigation";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 // Improved password validation schema
 const passwordSchema = z
@@ -35,6 +36,7 @@ const schema = z
 type FormData = z.infer<typeof schema>;
 
 const ResetPasswordModal = () => {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const resetPasswordModal = useResetPasswordModal();
   const loginModal = useLoginModal();
@@ -115,7 +117,7 @@ const ResetPasswordModal = () => {
       <div className="relative">
         <Input
           id="password"
-          label="New Password"
+          label={t("new_password")}
           type={showPassword ? "text" : "password"}
           disabled={isLoading}
           register={register}
@@ -135,7 +137,7 @@ const ResetPasswordModal = () => {
       <div className="relative">
         <Input
           id="confirmPassword"
-          label="Confirm Password"
+          label={t("confirm_password")}
           type={showConfirmPassword ? "text" : "password"}
           disabled={isLoading}
           register={register}
@@ -159,7 +161,7 @@ const ResetPasswordModal = () => {
       disabled={isLoading}
       isOpen={resetPasswordModal.isOpen}
       title="Reset Password"
-      actionLabel="Update Password" // نص عادي فقط
+      actionLabel={t("update_password")}
       isLoading={isLoading} // تمرير حالة التحميل
       onClose={resetPasswordModal.onClose}
       onSubmit={handleSubmit(onSubmit)}

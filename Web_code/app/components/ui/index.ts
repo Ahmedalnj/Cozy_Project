@@ -9,3 +9,6 @@ export { default as Skeleton } from './Skeleton';
 export { default as EmptyState } from './EmptyState';
 export { default as ClientOnly } from './ClientOnly';
 
+// Host Management Components - مكونات إدارة المضيف
+export { default as SwitchToHostingButton } from './SwitchToHostingButton';
+

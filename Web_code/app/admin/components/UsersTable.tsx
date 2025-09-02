@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 import Avatar from "@/app/components/ui/Avatar";
 import ConfirmationModal from "@/app/components/modals/confirmations/ConfirmationModal";
+import { useTranslation } from "react-i18next";
 
 interface UsersTableProps {
   users: PublicUser[];
@@ -26,6 +27,7 @@ type SortColumn = "name" | "email" | "role" | "createdAt";
 const USERS_PER_PAGE = 10;
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
+  const { t } = useTranslation("common");
   const [localUsers, setLocalUsers] = useState(users);
 
   // Update local state when props change (dashboard refresh)
@@ -242,8 +244,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
               }`}
-              title="تحديث البيانات"
-              aria-label="تحديث البيانات"
+              title={t("refresh_data")}
+              aria-label={t("refresh_data")}
             >
               <FiRefreshCw
                 size={18}

@@ -36,6 +36,7 @@ const Input = <T extends FieldValues>({
   register,
   errors,
   validation,
+  onChange,
   value,
   defaultValue,
   readOnly,
@@ -62,10 +63,15 @@ const Input = <T extends FieldValues>({
       <input
         id={id}
         disabled={disabled}
-        value={value}
+        {...(register 
+          ? register(id, { required, ...validation })
+          : {
+              value: value || "",
+              onChange: onChange,
+              readOnly: readOnly || !onChange
+            }
+        )}
         defaultValue={defaultValue ?? undefined}
-        readOnly={readOnly}
-        {...(register ? register(id, { required, ...validation }) : {})}
         placeholder={placeholder || " "}
         type={type}
         className={`
@@ -86,8 +92,8 @@ const Input = <T extends FieldValues>({
           ${formatPrice ? "pl-10" : "pl-4"}
           ${
             errors[id]
-              ? "border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
-              : "border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+              ? "border-gray-500 focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+              : "border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
           }
           hover:border-gray-400
         `}
@@ -122,7 +128,7 @@ const Input = <T extends FieldValues>({
           peer-focus:-translate-y-4
           ${
             errors[id]
-              ? "text-rose-500 peer-focus:text-rose-500"
+              ? "text-gray-200 peer-focus:text-rose-500"
               : "text-gray-500 peer-focus:text-rose-500"
           }
           ${disabled ? "text-gray-400 peer-focus:text-gray-400" : ""}

@@ -52,11 +52,11 @@ export default function LanguageSwitcher({
       <span className="text-sm font-semibold text-gray-800">
         {fullLabel
           ? currentLang === "en"
-            ? "English"
-            : "عربي"
+            ? "عربي"
+            : "English"
           : currentLang === "en"
-          ? "EN"
-          : "AR"}
+          ? "AR"
+          : "EN"}
       </span>
     </div>
   );

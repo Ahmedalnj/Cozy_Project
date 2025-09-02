@@ -6,6 +6,7 @@ import { SafeReview, SafeUser } from "@/app/types";
 import { format } from "date-fns";
 import { FaTrash, FaEdit, FaCalendarAlt, FaUser } from "react-icons/fa";
 import Button from "../ui/Button";
+import { useTranslation } from "react-i18next";
 
 interface ReviewCardProps {
   review: SafeReview;
@@ -22,6 +23,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   onDelete,
   isDeleting = false,
 }) => {
+  const { t } = useTranslation("common");
   const isOwner = currentUser?.id === review.userId;
 
   // Check if review has detailed ratings
@@ -53,7 +55,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
               </h4>
               {isOwner && (
                 <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                  أنت
+                  {t("you")}
                 </span>
               )}
             </div>
@@ -102,24 +104,24 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       {hasDetailedRatings && (
         <div className="mb-3 p-3 bg-gray-50 rounded-lg">
           <h5 className="text-xs font-semibold text-gray-700 mb-2">
-            التقييمات المفصلة:
+            {t("detailed_ratings")}:
           </h5>
           <div className="grid grid-cols-2 gap-2">
             {[
               {
                 key: "cleanliness",
-                label: "النظافة",
+                label: t("cleanliness"),
                 value: review.cleanliness,
               },
-              { key: "accuracy", label: "الدقة", value: review.accuracy },
-              { key: "checkIn", label: "تسجيل الدخول", value: review.checkIn },
+              { key: "accuracy", label: t("accuracy"), value: review.accuracy },
+              { key: "checkIn", label: t("check_in"), value: review.checkIn },
               {
                 key: "communication",
-                label: "التواصل",
+                label: t("communication"),
                 value: review.communication,
               },
-              { key: "location", label: "الموقع", value: review.location },
-              { key: "value", label: "القيمة", value: review.value },
+              { key: "location", label: t("location"), value: review.location },
+              { key: "value", label: t("value"), value: review.value },
             ].map(
               ({ key, label, value }) =>
                 value && (

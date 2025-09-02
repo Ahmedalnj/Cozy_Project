@@ -5,18 +5,50 @@ import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import useSearchModal from "../../hooks/useSearchModal";
 import useRentModal from "../../hooks/useRentModal";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import useHostRequestModal from "../../hooks/useHostRequestModal";
+import useLoginModal from "../../hooks/useLoginModal";
 
 const HeroSection = () => {
   const { t } = useTranslation("common");
+  const { data: session } = useSession();
+  const router = useRouter();
   const searchModal = useSearchModal();
-  const rentmodal = useRentModal();
+  const hostRequestModal = useHostRequestModal();
+  const loginModal = useLoginModal();
+
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     // Trigger animations after component mounts
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (session?.user) {
+      // Fetch user data to check hostStatus
+      fetch("/api/user/current")
+        .then((res) => res.json())
+        .then((data) => setCurrentUser(data))
+        .catch((error) => console.error("Error fetching user:", error));
+    }
+  }, [session]);
+
+  // Show "Become a Host" button only for non-hosts and non-pending users
+  const shouldShowBecomeHostButton = !currentUser?.hostStatus || 
+    (currentUser?.hostStatus !== "PENDING" && currentUser?.hostStatus !== "APPROVED");
+
+  const handleBecomeHostClick = async () => {
+    if (!session?.user) {
+      // إذا لم يكن المستخدم مسجل، نفتح loginModal
+      loginModal.onOpen();
+      return;
+    }
+    hostRequestModal.onOpen();
+  };
 
   return (
     <div className="relative h-[90vh] min-h-[600px] bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
@@ -64,13 +96,15 @@ const HeroSection = () => {
               large
               className="bg-white text-gray-900 hover:bg-gray-100 transform hover:scale-105 transition-transform duration-200"
             />
-            <Button
-              label={t("hero.rent_button")}
-              onClick={rentmodal.onOpen}
-              outline
-              large
-              className="border-white text-rose-500 hover:bg-white hover:text-gray-900 transform hover:scale-105 transition-transform duration-200"
-            />
+            {shouldShowBecomeHostButton && (
+              <Button
+                label={t("hero.rent_button")}
+                onClick={handleBecomeHostClick}
+                outline
+                large
+                className="border-white text-rose-500 hover:bg-white hover:text-gray-900 transform hover:scale-105 transition-transform duration-200"
+              />
+            )}
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 // في ملف src/app/components/Skeleton.tsx
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface SkeletonProps {
   loading?: boolean;
@@ -14,6 +15,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
   children,
   className = "",
 }) => {
+  const { t } = useTranslation("common");
   if (!loading) return <>{children}</>;
 
   return (
@@ -21,7 +23,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
       className={`animate-pulse rounded-md ${
         active ? "bg-gray-200" : "bg-gray-100"
       } ${className}`}
-      aria-label="Loading..."
+              aria-label={t("loading")}
     >
       {children &&
         React.Children.map(children, (child) => {

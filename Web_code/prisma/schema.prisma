@@ -21,11 +21,13 @@ model User {
   role           String?       @default("USER")
   codeExpiresAt  DateTime?
   resetCode      String?
+  hostStatus     HostStatus    @default(NOT_REQUESTED)
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
   payments       Payment[]     @relation("UserPayments")
   reviews        Review[]
+  hostRequests   HostRequest[]
 }
 
 model Account {
@@ -123,9 +125,29 @@ model Review {
   @@map("reviews")
 }
 
+model HostRequest {
+  id        String     @id @default(uuid()) @map("_id") @db.Uuid
+  userId    String     @db.Uuid
+  status    HostStatus @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  fullName  String?
+  phone     String?
+  idCardUrl String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum PaymentStatus {
   PENDING
   SUCCESS
   FAILED
   PAID
+}
+
+enum HostStatus {
+  NOT_REQUESTED
+  PENDING
+  APPROVED
+  REJECTED
 }

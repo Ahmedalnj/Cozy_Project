@@ -71,8 +71,8 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
               actionId={listing.id}
               onAction={onCancel}
               disabled={deletingId === listing.id}
-              actionLabel="Delete"
-              secondaryActionLabel="Update"
+                      actionLabel={t("delete")}
+        secondaryActionLabel={t("edit")}
               currentUser={currentUser}
               secondaryAction={() => editModal.onOpen(listing)}
             />

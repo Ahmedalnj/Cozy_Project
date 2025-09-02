@@ -7,6 +7,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch, FiTrash2, FiCalendar, FiUser, FiHome, FiDollarSign } from "react-icons/fi";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface ReservationsTableProps {
   reservations: SaveReservation[];
@@ -23,6 +24,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   onRefresh,
   limit,
 }) => {
+  const { t } = useTranslation("common");
   const [localReservations, setLocalReservations] = useState(reservations);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
@@ -237,7 +239,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                   : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
               }`}
               title="تحديث البيانات"
-              aria-label="تحديث البيانات"
+              aria-label={t("refresh_data")}
             >
               <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
             </button>
