@@ -61,18 +61,6 @@ export const routes = [
     href: "/admin/host-requests",
     description: "إدارة طلبات الانضمام كمضيف",
   },
-  {
-    label: "الإيرادات",
-    icon: BarChart,
-    href: "/admin/analysis/revenue",
-    description: "تحليل الإيرادات",
-  },
-  {
-    label: "التقارير",
-    icon: FileText,
-    href: "/admin/analysis/reports",
-    description: "التقارير التفصيلية",
-  },
 ];
 
 interface SidebarProps {
@@ -175,30 +163,14 @@ export default function Sidebar({ currentUser }: SidebarProps) {
 
           {/* Right: Search, Language, User Menu */}
           <div className="flex items-center space-x-3">
-            {/* Search Button */}
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#00B4D8] hover:shadow-sm transition-all duration-200 hover:scale-105"
-              title="البحث في العقارات"
-            >
-              <Search className="h-4 w-4" />
-              <span className="hidden lg:inline">البحث</span>
-            </button>
+            
 
             {/* Language Switcher */}
             <div className="flex items-center">
               <LanguageSwitcher />
             </div>
 
-            {/* Settings */}
-            <Link
-              href="/admin/settings"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#00B4D8] hover:shadow-sm transition-all duration-200 hover:scale-105"
-              title="الإعدادات"
-            >
-              <Settings className="h-4 w-4" />
-              <span className="hidden lg:inline">الإعدادات</span>
-            </Link>
+            
 
             {/* User Menu */}
             <div className="relative" ref={userMenuRef}>
@@ -305,28 +277,14 @@ export default function Sidebar({ currentUser }: SidebarProps) {
 
             {/* Mobile Actions */}
             <div className="flex items-center space-x-1 flex-shrink-0">
-              {/* Search */}
-              <button
-                onClick={() => router.push("/")}
-                className="flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-[#00B4D8] hover:shadow-sm transition-all duration-200 hover:scale-105"
-                title="البحث"
-              >
-                <Search className="h-3.5 w-3.5" />
-              </button>
+              
 
               {/* Language */}
               <div className="flex items-center">
                 <LanguageSwitcher />
               </div>
 
-              {/* Settings */}
-              <Link
-                href="/admin/settings"
-                className="flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-[#00B4D8] hover:shadow-sm transition-all duration-200 hover:scale-105"
-                title="الإعدادات"
-              >
-                <Settings className="h-3.5 w-3.5" />
-              </Link>
+             
 
               {/* User Menu */}
               <div className="relative" ref={userMenuRef}>

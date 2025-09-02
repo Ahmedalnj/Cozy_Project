@@ -821,5 +821,13 @@
   "fill_company_fields": "يرجى ملء جميع حقول الشركة",
   "fill_identity_fields": "يرجى ملء جميع حقول الهوية",
   "request_sent_successfully": "تم إرسال طلبك بنجاح! سنراجع طلبك قريباً",
-  "error_sending_request": "حدث خطأ أثناء إرسال الطلب"
+  "error_sending_request": "حدث خطأ أثناء إرسال الطلب",
+  "company_website_placeholder": "https://example.com",
+  "become_host": "أصبح مضيفاً",
+  "request_pending": "طلب قيد المراجعة",
+  "switch_to_guest": "التبديل إلى الضيف",
+  "switch_to_host": "التبديل إلى المضيف",
+  "request_rejected": "تم رفض الطلب",
+  "request_pending_message": "طلبك قيد المراجعة. سنتواصل معك قريباً!",
+  "request_rejected_message": "تم رفض طلبك. يرجى التواصل مع الإدارة."
 }

@@ -44,7 +44,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
     idCardType: "",
   });
 
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({
@@ -200,7 +200,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
             disabled={isLoading}
             required
             errors={{}}
-            placeholder="https://example.com"
+           
           />
         </div>
       )}
@@ -248,7 +248,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
             disabled={isLoading}
             required
             errors={{}}
-            placeholder={formData.idCardType === "national" ? t("enter_national_id") : t("enter_personal_id")}
+           
           />
         </div>
       )}

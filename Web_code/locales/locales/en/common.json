@@ -798,5 +798,13 @@
   "fill_company_fields": "Please fill in all company fields",
   "fill_identity_fields": "Please fill in all identity fields",
   "request_sent_successfully": "Your request has been sent successfully! We'll review your request soon",
-  "error_sending_request": "An error occurred while sending the request"
+  "error_sending_request": "An error occurred while sending the request",
+  "company_website_placeholder": "https://example.com",
+  "become_host": "Become a Host",
+  "request_pending": "Request Pending",
+  "switch_to_guest": "Switch to Guest",
+  "switch_to_host": "Switch to Host",
+  "request_rejected": "Request Rejected",
+  "request_pending_message": "Your request is under review. We'll contact you soon!",
+  "request_rejected_message": "Your request was rejected. Please contact the administration."
 }

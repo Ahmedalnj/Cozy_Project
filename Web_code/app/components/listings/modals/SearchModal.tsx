@@ -12,13 +12,17 @@ import Heading from "../../ui/Heading";
 import Calendar from "../../forms/inputs/Calender";
 import Counter from "../../forms/inputs/Counter";
 import PriceRange from "../../forms/inputs/PriceRange";
+import { useTranslation } from "react-i18next";
+
 enum STEPS {
   LOCATION = 0,
   DATE = 1,
   INFO = 2,
   PRICE = 3,
 }
+
 const SearchModal = () => {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const params = useSearchParams();
   const searchModal = useSearchModal();
@@ -122,23 +126,23 @@ const SearchModal = () => {
 
   const actionLabel = useMemo(() => {
     if (step == STEPS.PRICE) {
-      return "Search";
+      return t("search");
     }
-    return "Next";
-  }, [step]);
+    return t("next");
+  }, [step, t]);
 
   const secondaryActionLabel = useMemo(() => {
     if (step == STEPS.LOCATION) {
       return undefined;
     }
-    return "Back";
-  }, [step]);
+    return t("back");
+  }, [step, t]);
 
   let bodyContent = (
     <div className="flex flex-col gap-8">
       <Heading
-        title="Where Do You Wanna Go ?"
-        subtitle="Find The Perfect Location!"
+        title={t("search_modal.location_step.title")}
+        subtitle={t("search_modal.location_step.subtitle")}
       />
       <CitySelect
         value={location}
@@ -159,8 +163,8 @@ const SearchModal = () => {
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
-          title="When Do You Plan To Go?"
-          subtitle="Make Sure Everyone Is Free!"
+          title={t("search_modal.date_step.title")}
+          subtitle={t("search_modal.date_step.subtitle")}
         />
         <Calendar
           value={dateRange}
@@ -173,22 +177,25 @@ const SearchModal = () => {
   if (step == STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading title="More Information" subtitle="Find Your Perfect Places" />
+        <Heading 
+          title={t("search_modal.info_step.title")} 
+          subtitle={t("search_modal.info_step.subtitle")} 
+        />
         <Counter
-          title="Guests"
-          subtitle="How Many Guests Are Coming?"
+          title={t("search_modal.info_step.guests")}
+          subtitle={t("search_modal.info_step.guests_subtitle")}
           value={guestCount}
           onChange={(value) => setGuestCount(value)}
         />
         <Counter
-          title="Rooms"
-          subtitle="How Many Rooms Are You Need?"
+          title={t("search_modal.info_step.rooms")}
+          subtitle={t("search_modal.info_step.rooms_subtitle")}
           value={roomCount}
           onChange={(value) => setRoomCount(value)}
         />
         <Counter
-          title="BathRooms"
-          subtitle="How Many BathRooms Are You Need?"
+          title={t("search_modal.info_step.bathrooms")}
+          subtitle={t("search_modal.info_step.bathrooms_subtitle")}
           value={bathroomCount}
           onChange={(value) => setBathroomCount(value)}
         />
@@ -199,7 +206,10 @@ const SearchModal = () => {
   if (step == STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading title="Price Range" subtitle="Set your budget" />
+        <Heading 
+          title={t("search_modal.price_step.title")} 
+          subtitle={t("search_modal.price_step.subtitle")} 
+        />
         <PriceRange
           minPrice={minPrice}
           maxPrice={maxPrice}
@@ -217,7 +227,7 @@ const SearchModal = () => {
       isOpen={searchModal.isOpen}
       onClose={searchModal.onClose}
       onSubmit={onSubmit}
-      title="Filters"
+      title={t("search_modal.title")}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step == STEPS.LOCATION ? undefined : onBack}

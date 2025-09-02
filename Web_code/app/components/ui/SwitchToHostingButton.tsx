@@ -4,8 +4,11 @@ import React from "react";
 import { useHostMode } from "@/app/contexts/HostModeContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useSession } from "next-auth/react";
 import useHostRequestModal from "@/app/hooks/useHostRequestModal";
+import useLoginModal from "@/app/hooks/useLoginModal";
 import { SafeUser } from "@/app/types";
+import { useTranslation } from "react-i18next";
 
 interface SwitchToHostingButtonProps {
   hostStatus: string;
@@ -16,11 +19,20 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
   hostStatus,
   className = "",
 }) => {
+  const { t } = useTranslation("common");
   const { isHostMode, toggleMode, isLoading } = useHostMode();
+  const { data: session } = useSession();
   const hostRequestModal = useHostRequestModal();
+  const loginModal = useLoginModal();
   const router = useRouter();
 
   const handleClick = async () => {
+    // التحقق من تسجيل الدخول أولاً
+    if (!session?.user) {
+      loginModal.onOpen();
+      return;
+    }
+
     switch (hostStatus) {
       case "NOT_REQUESTED":
         // فتح modal طلب المضيف
@@ -29,7 +41,7 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
       
       case "PENDING":
         // رسالة أن الطلب قيد المراجعة
-        toast("طلبك قيد المراجعة. سنتواصل معك قريباً!");
+        toast(t("request_pending_message"));
         break;
       
       case "APPROVED":
@@ -39,7 +51,7 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
       
       case "REJECTED":
         // رسالة أن الطلب مرفوض
-        toast.error("تم رفض طلبك. يرجى التواصل مع الإدارة.");
+        toast.error(t("request_rejected_message"));
         break;
       
       default:
@@ -50,22 +62,22 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
   const getButtonLabel = () => {
     switch (hostStatus) {
       case "NOT_REQUESTED":
-        return "أصبح مضيفاً";
+        return t("become_host");
       case "PENDING":
-        return "طلب قيد المراجعة";
+        return t("request_pending");
       case "APPROVED":
-        return "لوحة المضيف";
+        return isHostMode ? t("switch_to_guest") : t("switch_to_host");
       case "REJECTED":
-        return "تم رفض الطلب";
+        return t("request_rejected");
       default:
-        return "أصبح مضيفاً";
+        return t("become_host");
     }
   };
 
   const getButtonStyle = () => {
     switch (hostStatus) {
       case "NOT_REQUESTED":
-        return "bg-rose-500 hover:bg-rose-450 text-white";
+        return "bg-rose-500 hover:bg-rose-700 text-white";
       case "PENDING":
         return "bg-yellow-500 hover:bg-yellow-600 text-white";
       case "APPROVED":
@@ -78,8 +90,6 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
   };
 
   const isDisabled = hostStatus === "PENDING" || hostStatus === "REJECTED" || isLoading;
-
-
 
   return (
     <div className="flex items-center space-x-2 space-x-reverse">
