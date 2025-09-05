@@ -13,8 +13,8 @@ const FavoritePage = async () => {
     return (
       <ClientOnly>
         <EmptyState
-          title="No Favorites Found"
-          subtitle="Looks Like You Have No Favorite Listings."
+          title="no_favorites_found"
+          subtitle="no_favorites_subtitle"
         ></EmptyState>
       </ClientOnly>
     );

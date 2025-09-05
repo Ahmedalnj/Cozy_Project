@@ -4,10 +4,9 @@ import React from "react";
 import { useHostMode } from "@/app/contexts/HostModeContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react";
 import useHostRequestModal from "@/app/hooks/useHostRequestModal";
+import { useSession } from "next-auth/react";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import { SafeUser } from "@/app/types";
 import { useTranslation } from "react-i18next";
 
 interface SwitchToHostingButtonProps {
@@ -64,9 +63,9 @@ const SwitchToHostingButton: React.FC<SwitchToHostingButtonProps> = ({
       case "NOT_REQUESTED":
         return t("become_host");
       case "PENDING":
-        return t("request_pending");
+        return t("request_pending_message");
       case "APPROVED":
-        return isHostMode ? t("switch_to_guest") : t("switch_to_host");
+        return t("host_dashboard_button");
       case "REJECTED":
         return t("request_rejected");
       default:

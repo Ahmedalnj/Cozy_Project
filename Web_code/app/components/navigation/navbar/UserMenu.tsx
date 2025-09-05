@@ -7,29 +7,24 @@ import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { SafeUser } from "@/app/types";
 import { signOut } from "next-auth/react";
-import useRentModal from "@/app/hooks/useRentModal";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-hot-toast";
 
 //icons imports
 import {
   AiOutlineHome,
   AiOutlineHeart,
-  AiOutlineCalendar,
   AiOutlineDashboard,
   AiOutlineLogout,
   AiOutlineLogin,
   AiOutlineUserAdd,
 } from "react-icons/ai";
 import { AiOutlineMenu } from "react-icons/ai";
-import { FiKey } from "react-icons/fi";
 import { PiAirplaneTiltFill } from "react-icons/pi";
 import { TbHome } from "react-icons/tb";
 import LanguageSwitcher from "@/app/components/navigation/LanguageSwitcher";
 
 import { SwitchToHostingButton } from "@/app/components/ui";
-
 
 interface UserMenuProps {
   currentUser: SafeUser | null;
@@ -39,20 +34,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   // Translation hook
   const { t, i18n } = useTranslation("common");
   const isRTL = i18n.language === "ar" || i18n.language === "ar-EG";
-  
+
   // للتأكد من أن RTL يعمل
   console.log("UserMenu - Current language:", i18n.language, "isRTL:", isRTL);
-  
-
 
   const router = useRouter();
 
   const registerModal = useRegisterModal();
 
   const loginModal = useLoginModal();
-
-  const rentModal = useRentModal();
-
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -64,14 +54,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     setIsOpen(false);
     callback();
   }, []);
-
-  const onRent = useCallback(() => {
-    if (!currentUser) {
-      return loginModal.onOpen();
-    }
-    // open rent modal
-    rentModal.onOpen();
-  }, [currentUser, loginModal, rentModal]);
 
   return (
     <div className="relative">
@@ -136,7 +118,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                 />
                 <MenuItem
                   onClick={() =>
-                    handleMenuItemClick(() => router.push("/trips"))}
+                    handleMenuItemClick(() => router.push("/trips"))
+                  }
                   label={t("my_trips")}
                   Icon={PiAirplaneTiltFill}
                   isRTL={isRTL}
@@ -166,7 +149,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                     onClick={() =>
                       handleMenuItemClick(() => router.push("/host-dashboard"))
                     }
-                    label={t("host_dashboard")}
+                    label={t("host_dashboard_button")}
                     Icon={AiOutlineHome}
                     isRTL={isRTL}
                   />
@@ -197,7 +180,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   Icon={AiOutlineUserAdd}
                   isRTL={isRTL}
                 />
-
               </>
             )}
           </div>

@@ -62,11 +62,23 @@ const ContactClient = () => {
           console.error('Server returned non-JSON response:', errorText);
           
           if (response.status === 500) {
-            toast.error('إعدادات البريد الإلكتروني غير مكتملة. يرجى التواصل مع الإدارة.');
-          } else if (response.status === 404) {
-            toast.error('صفحة التواصل غير متاحة حالياً. يرجى المحاولة لاحقاً.');
+            // تحقق من نوع المحتوى
+            const contentType = response.headers.get("content-type");
+            
+            if (contentType && contentType.includes("application/json")) {
+              const errorData = await response.json();
+              toast.error(errorData.error || t("contact_errors.generic_error"));
+            } else {
+              // إذا لم يكن JSON، اقرأ النص
+              const errorText = await response.text();
+              if (errorText.includes("SMTP")) {
+                toast.error(t("contact_errors.email_config_incomplete"));
+              } else {
+                toast.error(t("contact_errors.contact_page_unavailable"));
+              }
+            }
           } else {
-            toast.error(t('contact.error_message'));
+            toast.error(t("contact_errors.generic_error"));
           }
         }
       }

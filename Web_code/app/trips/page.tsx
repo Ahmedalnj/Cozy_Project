@@ -11,7 +11,7 @@ const TripsPage = async () => {
   if (!currentUser) {
     return (
       <ClientOnly>
-        <EmptyState title="unauthorized" subtitle="Please Login"></EmptyState>
+        <EmptyState title="unauthorized" subtitle="please_login"></EmptyState>
       </ClientOnly>
     );
   }
@@ -24,8 +24,8 @@ const TripsPage = async () => {
     return (
       <ClientOnly>
         <EmptyState
-          title="no trips found"
-          subtitle="looks like you have not reserved any trips."
+          title="no_trips_found"
+          subtitle="no_trips_subtitle"
         ></EmptyState>
       </ClientOnly>
     );

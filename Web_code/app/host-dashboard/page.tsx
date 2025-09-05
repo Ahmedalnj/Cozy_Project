@@ -1,79 +1,84 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Button from "@/app/components/ui/Button";
-import { SafeUser } from "@/app/types";
 import useRentModal from "@/app/hooks/useRentModal";
 import { useTranslation } from "react-i18next";
 
-const HostDashboard: React.FC = () => {
-  const { t } = useTranslation("common");
+interface Statistics {
+  propertiesCount: number;
+  reservationsCount: number;
+  totalRevenue: number;
+}
+
+const HostDashboard = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const rentModal = useRentModal();
-  const [currentUser, setCurrentUser] = useState<SafeUser | null>(null);
-  const [statistics, setStatistics] = useState({
+  const { t } = useTranslation("common");
+  const [isLoading, setIsLoading] = useState(true);
+  const [statistics, setStatistics] = useState<Statistics>({
     propertiesCount: 0,
     reservationsCount: 0,
-    pendingReservations: 0,
-    completedReservations: 0,
-    averageRating: 0,
-    revenue: 0
+    totalRevenue: 0,
   });
-  const [recentActivities, setRecentActivities] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (session?.user) {
-      getCurrentUserData();
-    } else {
+    if (!session?.user) {
       router.push("/");
+      return;
     }
-  }, [session, router]);
 
-  const getCurrentUserData = async () => {
-    try {
-      const response = await fetch("/api/user/current");
-      if (response.ok) {
-        const userData = await response.json();
-        setCurrentUser(userData);
-        
+    const checkHostStatus = async () => {
+      try {
         // التحقق من أن المستخدم مضيف معتمد
+        const response = await fetch("/api/user/current");
+        if (!response.ok) throw new Error("فشل في جلب بيانات المستخدم");
+        
+        const userData = await response.json();
         if (userData.hostStatus !== "APPROVED") {
           router.push("/");
-        } else {
-          // جلب الإحصائيات
-          await getHostStatistics();
+          return;
         }
-      } else {
+      } catch (error) {
+        console.error("خطأ في التحقق من حالة المضيف:", error);
         router.push("/");
+        return;
       }
-    } catch (error) {
-      console.error("خطأ في التحقق من حالة المضيف:", error);
-      router.push("/");
-    }
-  };
+    };
 
-  const getHostStatistics = async () => {
-    try {
-      const response = await fetch("/api/host/statistics");
-      if (response.ok) {
+    const fetchStatistics = async () => {
+      try {
+        // جلب الإحصائيات
+        const response = await fetch("/api/host/statistics");
+        if (!response.ok) throw new Error("فشل في جلب الإحصائيات");
+        
         const data = await response.json();
-        setStatistics(data.statistics);
-        setRecentActivities(data.recentActivities);
+        setStatistics({
+          propertiesCount: data.statistics.propertiesCount || 0,
+          reservationsCount: data.statistics.reservationsCount || 0,
+          totalRevenue: data.statistics.revenue || 0,
+        });
+      } catch (error) {
+        console.error("خطأ في جلب الإحصائيات:", error);
+        // في حالة الخطأ، استخدم قيم افتراضية
+        setStatistics({
+          propertiesCount: 0,
+          reservationsCount: 0,
+          totalRevenue: 0,
+        });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("خطأ في جلب الإحصائيات:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  if (!currentUser || currentUser.hostStatus !== "APPROVED") {
+    checkHostStatus();
+    fetchStatistics();
+  }, [session, router]);
+
+  if (!session?.user) {
     return null;
   }
 
@@ -83,14 +88,12 @@ const HostDashboard: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            لوحة تحكم المضيف
+            {t("host_dashboard.title")}
           </h1>
           <p className="text-gray-600">
-            مرحباً بك في لوحة تحكم المضيف. يمكنك إدارة عقاراتك وحجوزاتك هنا.
+            {t("host_dashboard.subtitle")}
           </p>
         </div>
-
-
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -100,11 +103,11 @@ const HostDashboard: React.FC = () => {
                 <span className="text-2xl">🏠</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mr-3">
-                إدارة العقارات
+                {t("host_dashboard.manage_properties_title")}
               </h3>
             </div>
             <p className="text-gray-600 mb-4">
-              أضف عقارات جديدة، عدّل العقارات الموجودة، واحذف العقارات.
+              {t("host_dashboard.manage_properties_description")}
             </p>
             <Button
               label={t("manage_properties")}
@@ -119,11 +122,11 @@ const HostDashboard: React.FC = () => {
                 <span className="text-2xl">📅</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mr-3">
-                إدارة الحجوزات
+                {t("host_dashboard.manage_reservations_title")}
               </h3>
             </div>
             <p className="text-gray-600 mb-4">
-              راجع الحجوزات الجديدة، وافق أو ارفض الطلبات، وأدر الحجوزات الحالية.
+              {t("host_dashboard.manage_reservations_description")}
             </p>
             <Button
               label={t("manage_reservations")}
@@ -138,11 +141,11 @@ const HostDashboard: React.FC = () => {
                 <span className="text-2xl">➕</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mr-3">
-                إضافة عقار جديد
+                {t("host_dashboard.add_property_title")}
               </h3>
             </div>
             <p className="text-gray-600 mb-4">
-              أضف عقار جديد إلى منصة Cozy وابدأ في استقبال الحجوزات.
+              {t("host_dashboard.add_property_description")}
             </p>
             <Button
               label={t("add_new_property")}
@@ -154,7 +157,7 @@ const HostDashboard: React.FC = () => {
 
         {/* Statistics */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">إحصائياتي</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("host_dashboard.statistics_title")}</h2>
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -167,89 +170,24 @@ const HostDashboard: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{statistics.propertiesCount}</div>
-                <div className="text-sm text-gray-600">العقارات</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">{statistics.propertiesCount || 0}</div>
+                <div className="text-sm text-gray-600">{t("host_dashboard.properties_count")}</div>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{statistics.reservationsCount}</div>
-                <div className="text-sm text-gray-600">إجمالي الحجوزات</div>
+                <div className="text-3xl font-bold text-green-600 mb-2">{statistics.reservationsCount || 0}</div>
+                <div className="text-sm text-gray-600">{t("host_dashboard.total_reservations")}</div>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-yellow-600 mb-2">{statistics.pendingReservations}</div>
-                <div className="text-sm text-gray-600">الحجوزات المستقبلية</div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{statistics.completedReservations}</div>
-                <div className="text-sm text-gray-600">الحجوزات المنتهية</div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-indigo-600 mb-2">{statistics.averageRating}</div>
-                <div className="text-sm text-gray-600">التقييم</div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-2">${statistics.revenue}</div>
-                <div className="text-sm text-gray-600">الإيرادات</div>
+                <div className="text-3xl font-bold text-purple-600 mb-2">
+                  {(statistics.totalRevenue || 0).toLocaleString()} {t("LYD")}
+                </div>
+                <div className="text-sm text-gray-600">{t("host_dashboard.total_revenue")}</div>
               </div>
             </div>
           )}
         </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              النشاطات الأخيرة
-            </h3>
-          </div>
-          <div className="p-6">
-            {isLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center space-x-4 space-x-reverse animate-pulse">
-                    <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                    <div className="h-4 bg-gray-200 rounded flex-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-20"></div>
-                  </div>
-                ))}
-              </div>
-            ) : recentActivities.length > 0 ? (
-              <div className="space-y-4">
-                {recentActivities.map((activity: any) => (
-                  <div key={activity.id} className="flex items-center space-x-4 space-x-reverse">
-                    <div className={`w-2 h-2 rounded-full ${
-                      activity.status === "CONFIRMED" ? "bg-green-500" :
-                      activity.status === "PENDING" ? "bg-yellow-500" :
-                      "bg-blue-500"
-                    }`}></div>
-                    <span className="text-sm text-gray-600 flex-1">
-                      {activity.message}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(activity.time).toLocaleDateString('ar-EG', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                لا توجد نشاطات حديثة
-              </div>
-            )}
-          </div>
-        </div>
-
-
       </div>
     </div>
   );

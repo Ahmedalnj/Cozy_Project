@@ -18,6 +18,15 @@ import Input from "../../ui/Input";
 import { SafeListing } from "@/app/types";
 import useCities from "../../../hooks/useCities";
 import { useTranslation } from "react-i18next";
+import {
+  FaCheck,
+  FaHome,
+  FaMapMarkerAlt,
+  FaInfoCircle,
+  FaImage,
+  FaEdit,
+  FaDollarSign,
+} from "react-icons/fa";
 
 enum STEPS {
   CATEGORY = 0,
@@ -61,7 +70,7 @@ const EditModal = () => {
       guestCount: 1,
       roomCount: 1,
       bathroomCount: 1,
-      imageSrc: "",
+      imageSrc: [],
       price: 1,
       title: "",
       description: "",
@@ -79,22 +88,26 @@ const EditModal = () => {
         guestCount: listing.guestCount || 1,
         roomCount: listing.roomCount || 1,
         bathroomCount: listing.bathroomCount || 1,
-        imageSrc: listing.imageSrc || "",
+        imageSrc: listing.imageSrc || [],
         price: listing.price || 1,
         title: listing.title || "",
         description: listing.description || "",
       });
+      setLocalImages(listing.imageSrc || []);
       setStep(STEPS.CATEGORY);
     }
   }, [editModal.isOpen, listing, reset, getCityByValue]);
 
+  // مزامنة الصور المحلية مع form state - فقط عند تغيير localImages
   useEffect(() => {
-    setValue("imageSrc", localImages, {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-  }, [localImages, setValue]);
+    if (localImages.length > 0 || editModal.isOpen) {
+      setValue("imageSrc", localImages, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    }
+  }, [localImages, setValue, editModal.isOpen]);
 
   const category = watch("category");
   const location = watch("location");
@@ -174,18 +187,153 @@ const EditModal = () => {
   };
 
   const actionLabel = useMemo(() => {
+    if (isLoading) {
+      return step === STEPS.PRICE
+        ? t("rent_modal.updating_listing")
+        : t("rent_modal.loading");
+    }
     if (step === STEPS.PRICE) {
       return t("update");
     }
-    return "";
-  }, [step, t]);
+    return t("rent_modal.continue");
+  }, [step, isLoading, t]);
 
   const secondaryActionLabel = useMemo(() => {
     if (step === STEPS.CATEGORY) {
       return undefined;
     }
-    return t("next");
+    return t("rent_modal.back");
   }, [step, t]);
+
+  // خطوات التقدم
+  const steps = [
+    {
+      label: t("rent_modal.steps.category"),
+      icon: FaHome,
+      completed: !!category,
+    },
+    {
+      label: t("rent_modal.steps.location"),
+      icon: FaMapMarkerAlt,
+      completed: !!location,
+    },
+    {
+      label: t("rent_modal.steps.info"),
+      icon: FaInfoCircle,
+      completed: guestCount > 0 && roomCount > 0 && bathroomCount > 0,
+    },
+    {
+      label: t("rent_modal.steps.images"),
+      icon: FaImage,
+      completed: localImages.length > 0,
+    },
+    {
+      label: t("rent_modal.steps.description"),
+      icon: FaEdit,
+      completed: false,
+    },
+    {
+      label: t("rent_modal.steps.price"),
+      icon: FaDollarSign,
+      completed: false,
+    },
+  ];
+
+  // حساب النسبة المئوية للتقدم
+  const progressPercentage = Math.round(((step + 1) / steps.length) * 100);
+
+  // الحصول على عنوان الخطوة الحالية
+  const getCurrentStepTitle = () => {
+    const stepTitles = [
+      t("rent_modal.category_title"),
+      t("rent_modal.location_title"),
+      t("rent_modal.info_title"),
+      t("rent_modal.images_title"),
+      t("rent_modal.description_title"),
+      t("rent_modal.price_title"),
+    ];
+    return stepTitles[step];
+  };
+
+  // مكون خطوات التقدم
+  const StepIndicator = () => (
+    <div className="mb-4">
+      {/* شريط التقدم */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-xs font-medium text-gray-700">
+            {t("rent_modal.progress")}
+          </span>
+          <span className="text-xs font-medium text-rose-500">
+            {progressPercentage}%
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div
+            className="bg-gradient-to-r from-rose-500 to-pink-500 h-1.5 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between ">
+        {steps.map((stepItem, index) => {
+          const Icon = stepItem.icon;
+          const isCurrentStep = index === step;
+          const isCompleted = stepItem.completed;
+          const isPast = index < step;
+
+          return (
+            <div key={index} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isCurrentStep
+                      ? "bg-rose-500 text-white shadow-lg scale-110"
+                      : isCompleted || isPast
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <FaCheck className="w-4 h-4" />
+                  ) : (
+                    <Icon className="w-4 h-4" />
+                  )}
+                </div>
+                <span
+                  className={`text-xs mt-1 font-medium transition-colors duration-300 ${
+                    isCurrentStep
+                      ? "text-rose-500"
+                      : isCompleted || isPast
+                      ? "text-green-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {stepItem.label}
+                </span>
+              </div>
+              {index < steps.length - 1 && (
+                <div
+                  className={`w-12 h-0.5 mx-1 transition-colors duration-300 ${
+                    isCompleted || isPast ? "bg-green-500" : "bg-gray-200"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {category && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <p className="text-green-800 text-xs">
+            <strong>{t("rent_modal.selected_category")}</strong>{" "}
+            {t(`categories.${category}.label`)}
+          </p>
+        </div>
+      )}
+    </div>
+  );
 
   let bodyContent = (
     <div className="flex flex-col gap-8">
@@ -219,7 +367,9 @@ const EditModal = () => {
           value={location}
           onChange={(value) => setCustomValue("location", value)}
         />
-        <Map center={location?.latlng || [32.8872, 13.191]} />
+        <div className="w-full h-56 md:h-64">
+          <Map center={location?.latlng || [32.8872, 13.191]} zoom={4} />
+        </div>
       </div>
     );
   }
@@ -331,8 +481,24 @@ const EditModal = () => {
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
-      title={t("edit_your_listing")}
-      body={bodyContent}
+      title={`${getCurrentStepTitle()} - Step ${step + 1} of ${steps.length}`}
+      body={
+        <div className="space-y-4">
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mb-3">
+              <FaEdit className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">
+              {t("rent_modal.edit_listing_header")}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {t("rent_modal.edit_listing_subtitle")}
+            </p>
+          </div>
+          <StepIndicator />
+          {bodyContent}
+        </div>
+      }
     />
   );
 };

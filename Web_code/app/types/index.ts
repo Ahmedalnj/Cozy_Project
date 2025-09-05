@@ -56,7 +56,7 @@ export type SafeUser = Omit<
 
 export type PublicUser = Pick<
   User,
-  "id" | "name" | "email" | "role" | "image"
+  "id" | "name" | "email" | "role" | "image" | "hostStatus"
 > & {
   createdAt: string;
   image?: string | null;

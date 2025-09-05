@@ -66,7 +66,7 @@ const SearchModal = () => {
     if (params) {
       currentQuery = qs.parse(params.toString());
     }
-    
+
     // تعريف واجهة للاستعلام
     interface SearchQuery {
       locationValue?: string;
@@ -79,7 +79,7 @@ const SearchModal = () => {
       endDate?: string;
       [key: string]: string | number | undefined; // للخصائص الأخرى من currentQuery
     }
-    
+
     const updateQuery: SearchQuery = {
       ...currentQuery,
       locationValue: location?.value,
@@ -139,7 +139,7 @@ const SearchModal = () => {
   }, [step, t]);
 
   let bodyContent = (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-3 max-w-full">
       <Heading
         title={t("search_modal.location_step.title")}
         subtitle={t("search_modal.location_step.subtitle")}
@@ -149,37 +149,42 @@ const SearchModal = () => {
         onChange={(value) => setLocation(value as CitySelectValue)}
       />
       <hr />
-      <Map
-        center={
-          (location?.latlng && location.latlng.length === 2
-            ? [location.latlng[0], location.latlng[1]]
-            : [32.8872, 13.191]) as [number, number]
-        }
-      />
+      <div className="w-full max-w-full h-56 md:h-64">
+        <Map
+          center={
+            (location?.latlng && location.latlng.length === 2
+              ? [location.latlng[0], location.latlng[1]]
+              : [32.8872, 13.191]) as [number, number]
+          }
+          zoom={4}
+        />
+      </div>
     </div>
   );
 
   if (step == STEPS.DATE) {
     bodyContent = (
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3 max-w-full">
         <Heading
           title={t("search_modal.date_step.title")}
           subtitle={t("search_modal.date_step.subtitle")}
         />
-        <Calendar
-          value={dateRange}
-          onChange={(value) => setDateRAnge(value.selection)}
-        />
+        <div className="w-full max-w-full">
+          <Calendar
+            value={dateRange}
+            onChange={(value) => setDateRAnge(value.selection)}
+          />
+        </div>
       </div>
     );
   }
 
   if (step == STEPS.INFO) {
     bodyContent = (
-      <div className="flex flex-col gap-8">
-        <Heading 
-          title={t("search_modal.info_step.title")} 
-          subtitle={t("search_modal.info_step.subtitle")} 
+      <div className="flex flex-col gap-3 max-w-full">
+        <Heading
+          title={t("search_modal.info_step.title")}
+          subtitle={t("search_modal.info_step.subtitle")}
         />
         <Counter
           title={t("search_modal.info_step.guests")}
@@ -205,19 +210,21 @@ const SearchModal = () => {
 
   if (step == STEPS.PRICE) {
     bodyContent = (
-      <div className="flex flex-col gap-8">
-        <Heading 
-          title={t("search_modal.price_step.title")} 
-          subtitle={t("search_modal.price_step.subtitle")} 
+      <div className="flex flex-col gap-3 max-w-full">
+        <Heading
+          title={t("search_modal.price_step.title")}
+          subtitle={t("search_modal.price_step.subtitle")}
         />
-        <PriceRange
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          onChange={(min, max) => {
-            setMinPrice(min);
-            setMaxPrice(max);
-          }}
-        />
+        <div className="w-full max-w-full">
+          <PriceRange
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onChange={(min, max) => {
+              setMinPrice(min);
+              setMaxPrice(max);
+            }}
+          />
+        </div>
       </div>
     );
   }

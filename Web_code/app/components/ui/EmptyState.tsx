@@ -19,6 +19,10 @@ const EmptyState: React.FC<EmptyState> = ({
   const { t } = useTranslation("common");
   const router = useRouter();
 
+  // ترجمة العنوان والوصف إذا كانا مفاتيح ترجمة
+  const translatedTitle = title.includes(" ") ? title : t(title);
+  const translatedSubtitle = subtitle.includes(" ") ? subtitle : t(subtitle);
+
   return (
     <div
       className="
@@ -30,7 +34,7 @@ const EmptyState: React.FC<EmptyState> = ({
             items-center
         "
     >
-      <Heading center title={title} subtitle={subtitle} />
+      <Heading center title={translatedTitle} subtitle={translatedSubtitle} />
 
       <div className="w-48 mt-4">
         {showReset && (

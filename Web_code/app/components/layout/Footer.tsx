@@ -11,10 +11,15 @@ import {
 } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import Logo from "../navigation/navbar/Logo";
+import useTermsModal from "@/app/hooks/useTerms";
+import usePolicy from "@/app/hooks/usePolicy";
+
+
 
 const Footer = () => {
   const { t } = useTranslation("common");
-
+  const terms = useTermsModal();
+  const policy = usePolicy();
   return (
     <footer className="bg-gray-900 text-white w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -59,14 +64,6 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="/properties"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  {t("footer.allProperties")}
-                </a>
-              </li>
-              <li>
-                <a
                   href="/favorites"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
@@ -96,37 +93,22 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">{t("footer.support")}</h3>
             <ul className="space-y-2">
+             
               <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  {t("footer.helpCenter")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                <div
+                  onClick={policy.onOpen}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                 >
                   {t("footer.privacyPolicy")}
-                </a>
+                </div>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                <div
+                  onClick={terms.onOpen}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                 >
                   {t("footer.termsOfService")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  {t("footer.reportIssue")}
-                </a>
+                </div>
               </li>
               <li>
                 <a
@@ -145,7 +127,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-400">
                 <FaPhone className="w-4 h-4" />
-                <span className="text-sm">+218 91 234 5678</span>
+                <span className="text-sm" dir="ltr">+218 91 234 5678</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <FaEnvelope className="w-4 h-4" />
@@ -170,3 +152,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

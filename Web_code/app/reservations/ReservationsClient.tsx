@@ -133,7 +133,7 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
 
   return (
     <Container>
-      <Heading title="Reservations" subtitle="Booking on your properties" />
+      <Heading title={t("reservations.title")} subtitle={t("reservations.subtitle")} />
 
       <div
         className="

@@ -72,39 +72,57 @@ const RegisterModal = () => {
   };
 
   const bodyContent = (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <Heading
         title={t("registers.welcome")}
         subtitle={t("registers.subtitle")}
       />
-      <Input
-        id="name"
-        label={t("registers.name")}
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-        validation={{
-          pattern: {
-            value: /^[A-Za-z\s]+$/,
-            message: t("registers.name_invalid"),
-          },
-        }}
-      />
-      <Input
-        id="email"
-        label={t("registers.email")}
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-        validation={{
-          pattern: {
-            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-            message: t("registers.email_invalid"),
-          },
-        }}
-      />
+      <div>
+        <Input
+          id="name"
+          label={t("registers.name")}
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            required: t("validation.name_required"),
+            minLength: {
+              value: 2,
+              message: t("validation.name_min_length"),
+            },
+            maxLength: {
+              value: 50,
+              message: t("validation.name_max_length"),
+            },
+            pattern: {
+              value: /^[A-Za-z\u0600-\u06FF\s]+$/,
+              message: t("validation.name_pattern"),
+            },
+          }}
+        />
+      </div>
+      <div>
+        <Input
+          id="email"
+          label={t("registers.email")}
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            required: t("validation.email_required"),
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: t("validation.email_pattern"),
+            },
+            maxLength: {
+              value: 100,
+              message: t("validation.email_max_length"),
+            },
+          }}
+        />
+      </div>
       <div>
         <Input
           id="password"
@@ -115,50 +133,71 @@ const RegisterModal = () => {
           errors={errors}
           required
           validation={{
-            validate: handlePasswordValidation,
+            required: t("validation.password_required"),
             minLength: {
               value: 8,
-              message: t("registers.password_min"),
+              message: t("validation.password_min_length"),
             },
+            maxLength: {
+              value: 128,
+              message: t("validation.password_max_length"),
+            },
+            validate: handlePasswordValidation,
           }}
         />
         {passwordStrength !== null && (
-          <div>
-            <p>
+          <div className="mt-1 p-1.5 bg-gray-50 rounded-lg">
+            <p className="text-xs text-gray-700 mb-1">
               {t("registers.password_strength")}:{" "}
-              {["Weak", "Fair", "Good", "Strong"][passwordStrength]}
+              <span className="font-medium">
+                {t(`validation.password_strength_${passwordStrength}`)}
+              </span>
             </p>
-            <progress value={passwordStrength} max={4}></progress>
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div 
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  passwordStrength === 0 ? 'bg-red-500' :
+                  passwordStrength === 1 ? 'bg-orange-500' :
+                  passwordStrength === 2 ? 'bg-yellow-500' :
+                  passwordStrength === 3 ? 'bg-blue-500' :
+                  'bg-green-500'
+                }`}
+                style={{ width: `${(passwordStrength + 1) * 20}%` }}
+              ></div>
+            </div>
           </div>
         )}
       </div>
-      <Input
-        id="confirmPassword"
-        label={t("registers.confirm_password")}
-        type="password"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-        validation={{
-          validate: (value) =>
-            value === getValues("password") || t("registers.password_mismatch"),
-        }}
-      />
+      <div>
+        <Input
+          id="confirmPassword"
+          label={t("registers.confirm_password")}
+          type="password"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            required: t("validation.confirm_password_required"),
+            validate: (value) =>
+              value === getValues("password") || t("validation.password_mismatch"),
+          }}
+        />
+      </div>
     </div>
   );
 
   const footerContent = (
-    <div className="flex flex-col gap-4 mt-3">
+    <div className="flex flex-col gap-2 mt-2">
       <hr />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <Button
           outline
           label={t("registers.continue_google")}
           icon={FcGoogle}
           onClick={() => signIn("google")}
         />
-        <div className="text-neutral-500 text-center mt-4 font-light">
+        <div className="text-neutral-500 text-center mt-2 font-light text-xs">
           <div>
             {t("registers.already_have_account")}
             <span
@@ -202,6 +241,7 @@ const RegisterModal = () => {
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
+      noOverflow={true}
     />
   );
 };

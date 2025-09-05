@@ -32,11 +32,11 @@ interface ParsedHostRequestData {
 }
 
 const HostRequestsTable: React.FC = () => {
-  const { t } = useTranslation("common");
   const [hostRequests, setHostRequests] = useState<HostRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<HostRequest | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchHostRequests();
@@ -110,9 +110,9 @@ const HostRequestsTable: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      PENDING: { text: "قيد المراجعة", className: "bg-yellow-100 text-yellow-800" },
-      APPROVED: { text: "تمت الموافقة", className: "bg-green-100 text-green-800" },
-      REJECTED: { text: "تم الرفض", className: "bg-red-100 text-red-800" },
+      PENDING: { text: t("request_pending"), className: "bg-yellow-100 text-yellow-800" },
+      APPROVED: { text: t("request_approved"), className: "bg-green-100 text-green-800" },
+      REJECTED: { text: t("request_rejected"), className: "bg-red-100 text-red-800" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
@@ -139,21 +139,28 @@ const HostRequestsTable: React.FC = () => {
       return JSON.parse(idCardUrl);
     } catch {
       return {
-        requestType: "غير محدد",
+        requestType: t("not_specified"),
         email: "",
       };
     }
   };
 
-  const getRequestTypeLabel = (requestType: string) => {
-    switch (requestType) {
-      case "personal":
-        return "شخصي";
-      case "business":
-        return "شركة";
-      default:
-        return "غير محدد";
+  const getStatusConfig = (status: string) => {
+    const configs = {
+      PENDING: { text: t("request_pending"), className: "bg-yellow-100 text-yellow-800" },
+      APPROVED: { text: t("request_approved"), className: "bg-green-100 text-green-800" },
+      REJECTED: { text: t("request_rejected"), className: "bg-red-100 text-red-800" },
+    };
+    return configs[status as keyof typeof configs] || { text: status, className: "bg-gray-100 text-gray-800" };
+  };
+
+  const getRequestTypeLabel = (type: string) => {
+    if (type === "personal") {
+      return t("personal");
+    } else if (type === "business") {
+      return t("business_or_office");
     }
+    return t("not_specified");
   };
 
   const getRequestTypeBadge = (requestType: string) => {
@@ -279,7 +286,7 @@ const HostRequestsTable: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Button
-                      label={t("view_details")}
+                      label="عرض التفاصيل"
                       onClick={() => setSelectedRequest(request)}
                       small
                       outline
@@ -290,14 +297,14 @@ const HostRequestsTable: React.FC = () => {
                     {request.status === "PENDING" && (
                       <div className="flex space-x-2 space-x-reverse">
                         <Button
-                          label={t("approve")}
+                          label="موافقة"
                           onClick={() => handleApprove(request.id)}
                           disabled={processingId === request.id}
                           small
                           className="bg-green-500 hover:bg-green-600 text-white"
                         />
                         <Button
-                          label={t("reject")}
+                          label="رفض"
                           onClick={() => handleReject(request.id)}
                           disabled={processingId === request.id}
                           small

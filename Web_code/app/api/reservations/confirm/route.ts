@@ -19,7 +19,7 @@ const getStripe = () => {
     throw new Error("STRIPE_SECRET_KEY is not configured");
   }
   return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-07-30.basil",
+    apiVersion: "2024-06-20",
   });
 };
 
@@ -85,11 +85,18 @@ export async function POST(req: Request) {
       console.error("Stripe session retrieval error:", stripeError);
 
       // التحقق من نوع الخطأ
-      if (stripeError && typeof stripeError === "object" && "code" in stripeError) {
+      if (
+        stripeError &&
+        typeof stripeError === "object" &&
+        "code" in stripeError
+      ) {
         const error = stripeError as StripeError;
         if (error.code === "resource_missing") {
           return NextResponse.json(
-            { success: false, error: "جلسة الدفع غير موجودة أو منتهية الصلاحية" },
+            {
+              success: false,
+              error: "جلسة الدفع غير موجودة أو منتهية الصلاحية",
+            },
             { status: 404 }
           );
         }
@@ -258,35 +265,40 @@ export async function POST(req: Request) {
     // ✅ إرسال الفاتورة تلقائياً بعد نجاح الحجز
     try {
       console.log("Sending automatic invoice...");
-      
+
       // التحقق من وجود URL التطبيق
       const appUrl = process.env.NEXT_PUBLIC_APP_URL;
       if (!appUrl) {
         console.log("⚠️ NEXT_PUBLIC_APP_URL not configured, skipping invoice");
         return;
       }
-      
+
       // جلب بيانات المستخدم لإرسال الفاتورة
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { email: true, name: true }
+        select: { email: true, name: true },
       });
 
       if (user?.email) {
         // إرسال الفاتورة
-        const invoiceResponse = await fetch(`${appUrl}/api/payments/send-invoice`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            paymentId: result.payment.id,
-            email: user.email
-          })
-        });
+        const invoiceResponse = await fetch(
+          `${appUrl}/api/payments/send-invoice`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paymentId: result.payment.id,
+              email: user.email,
+            }),
+          }
+        );
 
         if (invoiceResponse.ok) {
           console.log("✅ Invoice sent successfully");
         } else {
-          console.log("⚠️ Failed to send invoice, but reservation was successful");
+          console.log(
+            "⚠️ Failed to send invoice, but reservation was successful"
+          );
         }
       }
     } catch (invoiceError) {

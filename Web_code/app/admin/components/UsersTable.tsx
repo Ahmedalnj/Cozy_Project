@@ -27,7 +27,7 @@ type SortColumn = "name" | "email" | "role" | "createdAt";
 const USERS_PER_PAGE = 10;
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation();
   const [localUsers, setLocalUsers] = useState(users);
 
   // Update local state when props change (dashboard refresh)
@@ -81,8 +81,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
 
   const handleRoleSelect = (userId: string, newRole: string) => {
     confirmModal(
-      "تأكيد تغيير الدور",
-      `هل تريد حقًا تغيير دور المستخدم إلى ${newRole}؟`,
+      t("confirm_role_change_title"),
+      `${t("confirm_role_change_message")} ${newRole === "ADMIN" ? t("admin") : t("user")}؟`,
       () => handleConfirmRoleChange(userId, newRole)
     );
   };
@@ -107,19 +107,19 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
 
   const handleDelete = (userId: string) => {
     confirmModal(
-      "تأكيد الحذف",
-      "هل أنت متأكد أنك تريد حذف هذا المستخدم؟",
+      t("confirm_delete_title"),
+      t("confirm_delete_message"),
       async () => {
         try {
           await deleteUser(userId);
           setLocalUsers((prev) => prev.filter((user) => user.id !== userId));
-          toast.success("تم حذف المستخدم بنجاح");
+          toast.success(t("user_deleted_successfully"));
           // Refresh dashboard data to update stats
           if (onRefresh) {
             await onRefresh();
           }
         } catch {
-          toast.error("حدث خطأ أثناء حذف المستخدم");
+          toast.error(t("error_deleting_user"));
         }
       }
     );
@@ -244,8 +244,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
               }`}
-              title={t("refresh_data")}
-              aria-label={t("refresh_data")}
+              title="تحديث البيانات"
+              aria-label="تحديث البيانات"
             >
               <FiRefreshCw
                 size={18}

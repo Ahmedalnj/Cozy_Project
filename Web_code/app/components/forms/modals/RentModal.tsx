@@ -271,7 +271,7 @@ const RentModal = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-center gap-2 overflow-x-auto">
         {steps.map((stepItem, index) => {
           const Icon = stepItem.icon;
           const isCurrentStep = index === step;
@@ -279,38 +279,37 @@ const RentModal = () => {
           const isPast = index < step;
 
           return (
-            <div key={index} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isCurrentStep
-                      ? "bg-rose-500 text-white shadow-lg scale-110"
-                      : isCompleted || isPast
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {isCompleted ? (
-                    <FaCheck className="w-4 h-4" />
-                  ) : (
-                    <Icon className="w-4 h-4" />
-                  )}
-                </div>
-                <span
-                  className={`text-xs mt-1 font-medium transition-colors duration-300 ${
-                    isCurrentStep
-                      ? "text-rose-500"
-                      : isCompleted || isPast
-                      ? "text-green-500"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {stepItem.label}
-                </span>
+            <div key={index} className="flex flex-col items-center min-w-0">
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isCurrentStep
+                    ? "bg-rose-500 text-white shadow-lg scale-110"
+                    : isCompleted || isPast
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {isCompleted ? (
+                  <FaCheck className="w-3 h-3" />
+                ) : (
+                  <Icon className="w-3 h-3" />
+                )}
               </div>
+              <span
+                className={`text-xs mt-1 font-medium transition-colors duration-300 text-center max-w-16 truncate ${
+                  isCurrentStep
+                    ? "text-rose-500"
+                    : isCompleted || isPast
+                    ? "text-green-500"
+                    : "text-gray-400"
+                }`}
+                title={stepItem.label}
+              >
+                {stepItem.label}
+              </span>
               {index < steps.length - 1 && (
                 <div
-                  className={`w-12 h-0.5 mx-1 transition-colors duration-300 ${
+                  className={`w-8 h-0.5 mx-1 transition-colors duration-300 ${
                     isCompleted || isPast ? "bg-green-500" : "bg-gray-200"
                   }`}
                 />
@@ -530,6 +529,17 @@ const RentModal = () => {
               register={register}
               errors={errors}
               required
+              validation={{
+                required: t("validation.title_required"),
+                minLength: {
+                  value: 10,
+                  message: t("validation.title_min_length"),
+                },
+                maxLength: {
+                  value: 100,
+                  message: t("validation.title_max_length"),
+                },
+              }}
             />
             <p className="text-xs text-gray-500 mt-1">
               {t("rent_modal.title_placeholder")}
@@ -543,6 +553,17 @@ const RentModal = () => {
               register={register}
               errors={errors}
               required
+              validation={{
+                required: t("validation.description_required"),
+                minLength: {
+                  value: 20,
+                  message: t("validation.description_min_length"),
+                },
+                maxLength: {
+                  value: 500,
+                  message: t("validation.description_max_length"),
+                },
+              }}
             />
             <p className="text-xs text-gray-500 mt-1">
               {t("rent_modal.description_placeholder")}
@@ -581,7 +602,11 @@ const RentModal = () => {
             validation={{
               min: {
                 value: 1,
-                message: t("price_min_error"),
+                message: t("validation.price_min"),
+              },
+              max: {
+                value: 10000,
+                message: t("validation.price_max"),
               },
             }}
           />

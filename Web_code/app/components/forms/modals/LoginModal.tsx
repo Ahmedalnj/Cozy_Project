@@ -37,6 +37,7 @@ const LoginModal = () => {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -64,29 +65,45 @@ const LoginModal = () => {
   const bodyContent = (
     <div className="flex flex-col gap-3">
       <Heading title={t("welcome_back")} subtitle={t("login_to_account")} />
-      <Input
-        id="email"
-        label={t("email")}
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-        validation={{
-          pattern: {
-            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
-            message: t("invalid_email"),
-          },
-        }}
-      />
-      <Input
-        id="password"
-        label={t("password")}
-        type="password"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
+      <div>
+        <Input
+          id="email"
+          label={t("email")}
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            required: t("validation.email_required"),
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: t("validation.email_pattern"),
+            },
+            maxLength: {
+              value: 100,
+              message: t("validation.email_max_length"),
+            },
+          }}
+        />
+      </div>
+      <div>
+        <Input
+          id="password"
+          label={t("password")}
+          type="password"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+          validation={{
+            required: t("validation.password_required"),
+            minLength: {
+              value: 1,
+              message: t("validation.password_min_length"),
+            },
+          }}
+        />
+      </div>
     </div>
   );
 

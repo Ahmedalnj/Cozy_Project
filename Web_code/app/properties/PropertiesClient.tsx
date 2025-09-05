@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import ListingCard from "../components/listings/cards/ListingCard";
 import useEditModal from "../hooks/useEditModal";
 import EditModal from "../components/listings/modals/EditModal";
+import { useTranslation } from "react-i18next";
 
 interface PropertiesClientProps {
   listings: SafeListing[];
@@ -23,6 +24,7 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
   const editModal = useEditModal();
+  const { t } = useTranslation("common");
 
   const onCancel = useCallback(
     (id: string) => {
@@ -31,23 +33,23 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
       axios
         .delete(`/api/listings/${id}`)
         .then(() => {
-          toast.success("Listing deleted");
+          toast.success(t("listing_deleted"));
           router.refresh();
         })
         .catch((error) => {
-          toast.error(error?.response?.data?.error || "Error deleting listing");
+          toast.error(error?.response?.data?.error || t("error_deleting_listing"));
         })
         .finally(() => {
           setDeletingId("");
         });
     },
-    [router]
+    [router, t]
   );
 
   return (
     <>
       <Container>
-        <Heading title="Properties" subtitle="List of your Properties" />
+        <Heading title={t("properties.title")} subtitle={t("properties.subtitle")} />
         <div
           className="
             mt-10
@@ -71,8 +73,8 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
               actionId={listing.id}
               onAction={onCancel}
               disabled={deletingId === listing.id}
-                      actionLabel={t("delete")}
-        secondaryActionLabel={t("edit")}
+              actionLabel={t("delete")}
+              secondaryActionLabel={t("edit")}
               currentUser={currentUser}
               secondaryAction={() => editModal.onOpen(listing)}
             />

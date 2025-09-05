@@ -34,7 +34,7 @@ const Recenter: React.FC<{ center: [number, number] }> = ({ center }) => {
 
 const Map: React.FC<MapProps> = ({ center, locationLabel, zoom }) => {
   return (
-    <div className="relative w-full h-[450px] md:h-[600px] rounded-lg overflow-hidden">
+    <div className="relative w-full h-full min-h-[180px] md:min-h-[220px] rounded-lg overflow-hidden">
       <MapContainer
         center={(center as L.LatLngExpression) || [51, -0.09]}
         zoom={zoom ?? (center ? 8 : 2)} // 👈 إذا ما حددت zoom بياخذ القيمة الافتراضية
@@ -58,11 +58,11 @@ const Map: React.FC<MapProps> = ({ center, locationLabel, zoom }) => {
 
       {/* Overlay معلومات الموقع */}
       {locationLabel && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-90 backdrop-blur-md p-4 rounded-lg shadow-lg max-w-md text-center">
-          <h2 className="text-lg font-semibold text-neutral-800">
+        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-90 backdrop-blur-md p-1 rounded-lg shadow-lg max-w-[200px] text-center">
+          <h2 className="text-xs font-semibold text-neutral-800">
             Where you'll be
           </h2>
-          <p className="text-neutral-600 mt-1">{locationLabel}</p>
+          <p className="text-neutral-600 mt-0.5 text-xs">{locationLabel}</p>
         </div>
       )}
     </div>
