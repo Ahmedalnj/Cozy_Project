@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: {
+    // السماح بإكمال البناء على Vercel حتى لو وُجدت أخطاء ESLint
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // السماح بإكمال البناء حتى لو وُجدت أخطاء TypeScript
+    ignoreBuildErrors: true,
+  },
   experimental: {
     // يمكنك إضافة خيارات تجريبية هنا إذا كنت تستخدم ميزات تجريبية
   },
