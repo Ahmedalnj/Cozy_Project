@@ -24,7 +24,8 @@ export default function ListingSlider({
   className = "",
   title,
 }: ListingSliderProps) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const isRTL = i18n.language === "ar";
   const scrollAnimation = useScrollAnimation({
     threshold: 0.2,
     rootMargin: "-50px",
@@ -35,7 +36,11 @@ export default function ListingSlider({
   const defaultTitle = t("listing_slider.discover_new_places");
 
   return (
-    <div ref={sliderRef} className={`relative w-full ${className}`}>
+    <div
+      ref={sliderRef}
+      className={`relative w-full ${className}`}
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       {/* Header with title on right and arrows on left */}
       <div
         className={`flex items-center justify-between mb-4 transition-all duration-1000 ease-out transform ${
@@ -50,13 +55,21 @@ export default function ListingSlider({
             aria-label={t("previous")}
             className="swiper-button-prev-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
-            <HiOutlineChevronLeft className="w-4 h-4 text-black" />
+            {isRTL ? (
+              <HiOutlineChevronRight className="w-4 h-4 text-black" />
+            ) : (
+              <HiOutlineChevronLeft className="w-4 h-4 text-black" />
+            )}
           </button>
           <button
             aria-label={t("next")}
             className="swiper-button-next-custom !static !m-0 !h-8 !w-8 !min-h-8 !min-w-8 !bg-transparent !p-1 !rounded-full !border !border-gray-300 hover:!bg-gray-100 hover:!scale-110 transition-all duration-200 flex items-center justify-center"
           >
-            <HiOutlineChevronRight className="w-4 h-4 text-black" />
+            {isRTL ? (
+              <HiOutlineChevronLeft className="w-4 h-4 text-black" />
+            ) : (
+              <HiOutlineChevronRight className="w-4 h-4 text-black" />
+            )}
           </button>
         </div>
 

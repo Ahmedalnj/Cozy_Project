@@ -13,12 +13,15 @@ import Calendar from "../../forms/inputs/Calender";
 import Counter from "../../forms/inputs/Counter";
 import PriceRange from "../../forms/inputs/PriceRange";
 import { useTranslation } from "react-i18next";
+import { categories } from "@/app/components/navigation/navbar/Categories";
+import CategoryInput from "../../forms/inputs/CategoryInput";
 
 enum STEPS {
-  LOCATION = 0,
-  DATE = 1,
-  INFO = 2,
-  PRICE = 3,
+  CATEGORY = 0,
+  LOCATION = 1,
+  DATE = 2,
+  INFO = 3,
+  PRICE = 4,
 }
 
 const SearchModal = () => {
@@ -28,7 +31,8 @@ const SearchModal = () => {
   const searchModal = useSearchModal();
 
   const [location, setLocation] = useState<CitySelectValue>();
-  const [step, setStep] = useState(STEPS.LOCATION);
+  const [step, setStep] = useState(STEPS.CATEGORY);
+  const [category, setCategory] = useState<string>("");
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
   const [bathroomCount, setBathroomCount] = useState(1);
@@ -70,6 +74,7 @@ const SearchModal = () => {
     // تعريف واجهة للاستعلام
     interface SearchQuery {
       locationValue?: string;
+      category?: string;
       guestCount?: number;
       roomCount?: number;
       bathroomCount?: number;
@@ -83,6 +88,7 @@ const SearchModal = () => {
     const updateQuery: SearchQuery = {
       ...currentQuery,
       locationValue: location?.value,
+      category: category || undefined,
       guestCount,
       roomCount,
       bathroomCount,
@@ -105,7 +111,7 @@ const SearchModal = () => {
       { skipNull: true }
     );
 
-    setStep(STEPS.LOCATION);
+    setStep(STEPS.CATEGORY);
     searchModal.onClose();
 
     router.push(url);
@@ -132,7 +138,7 @@ const SearchModal = () => {
   }, [step, t]);
 
   const secondaryActionLabel = useMemo(() => {
-    if (step == STEPS.LOCATION) {
+    if (step == STEPS.CATEGORY) {
       return undefined;
     }
     return t("back");
@@ -141,26 +147,53 @@ const SearchModal = () => {
   let bodyContent = (
     <div className="flex flex-col gap-3 max-w-full">
       <Heading
-        title={t("search_modal.location_step.title")}
-        subtitle={t("search_modal.location_step.subtitle")}
+        title={t("search_modal.category_step.title", {
+          defaultValue: "اختر الفئة",
+        })}
+        subtitle={t("search_modal.category_step.subtitle", {
+          defaultValue: "حدد الفئة لتضييق نتائج البحث",
+        })}
       />
-      <CitySelect
-        value={location}
-        onChange={(value) => setLocation(value as CitySelectValue)}
-      />
-      <hr />
-      <div className="w-full max-w-full h-56 md:h-64">
-        <Map
-          center={
-            (location?.latlng && location.latlng.length === 2
-              ? [location.latlng[0], location.latlng[1]]
-              : [32.8872, 13.191]) as [number, number]
-          }
-          zoom={4}
-        />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[40vh] p-1">
+        {categories.map((item) => (
+          <div key={item.label} className="col-span-1">
+            <CategoryInput
+              onClick={(val) => setCategory(val)}
+              selected={category === item.label}
+              label={item.label}
+              icon={item.icon}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
+
+  if (step == STEPS.LOCATION) {
+    bodyContent = (
+      <div className="flex flex-col gap-3 max-w-full">
+        <Heading
+          title={t("search_modal.location_step.title")}
+          subtitle={t("search_modal.location_step.subtitle")}
+        />
+        <CitySelect
+          value={location}
+          onChange={(value) => setLocation(value as CitySelectValue)}
+        />
+        <hr />
+        <div className="w-full max-w-full h-56 md:h-64">
+          <Map
+            center={
+              (location?.latlng && location.latlng.length === 2
+                ? [location.latlng[0], location.latlng[1]]
+                : [32.8872, 13.191]) as [number, number]
+            }
+            zoom={4}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (step == STEPS.DATE) {
     bodyContent = (
@@ -237,7 +270,7 @@ const SearchModal = () => {
       title={t("search_modal.title")}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
-      secondaryAction={step == STEPS.LOCATION ? undefined : onBack}
+      secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
       body={bodyContent}
     ></Modal>
   );
