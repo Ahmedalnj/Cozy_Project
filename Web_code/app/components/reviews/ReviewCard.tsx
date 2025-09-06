@@ -66,7 +66,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </div>
         </div>
 
-        {isOwner && (
+        {/* {isOwner && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <Button
               label=""
@@ -87,7 +87,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
               icon={FaTrash}
             />
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Main Rating */}
@@ -110,18 +110,34 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
             {[
               {
                 key: "cleanliness",
-                label: t("cleanliness"),
+                label: t("review_categories.cleanliness"),
                 value: review.cleanliness,
               },
-              { key: "accuracy", label: t("accuracy"), value: review.accuracy },
-              { key: "checkIn", label: t("check_in"), value: review.checkIn },
+              {
+                key: "accuracy",
+                label: t("review_categories.accuracy"),
+                value: review.accuracy,
+              },
+              {
+                key: "checkIn",
+                label: t("review_categories.check_in"),
+                value: review.checkIn,
+              },
               {
                 key: "communication",
-                label: t("communication"),
+                label: t("review_categories.communication"),
                 value: review.communication,
               },
-              { key: "location", label: t("location"), value: review.location },
-              { key: "value", label: t("value"), value: review.value },
+              {
+                key: "location",
+                label: t("review_categories.location"),
+                value: review.location,
+              },
+              {
+                key: "value",
+                label: t("review_categories.value"),
+                value: review.value,
+              },
             ].map(
               ({ key, label, value }) =>
                 value && (

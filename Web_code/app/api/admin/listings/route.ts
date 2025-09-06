@@ -1,35 +1,69 @@
 // app/api/admin/listings/route.ts
 import { NextResponse } from "next/server";
-import getListings from "@/app/actions/getListings";
+import prisma from "@/app/libs/prismadb";
+import getCurrentUser from "@/app/actions/getCurrentUser";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-
-  const params = {
-    userId: searchParams.get("userId") || undefined,
-    guestCount: searchParams.get("guestCount")
-      ? Number(searchParams.get("guestCount"))
-      : undefined,
-    roomCount: searchParams.get("roomCount")
-      ? Number(searchParams.get("roomCount"))
-      : undefined,
-    bathroomCount: searchParams.get("bathroomCount")
-      ? Number(searchParams.get("bathroomCount"))
-      : undefined,
-    startDate: searchParams.get("startDate") || undefined,
-    endDate: searchParams.get("endDate") || undefined,
-    locationValue: searchParams.get("locationValue") || undefined,
-    category: searchParams.get("category") || undefined,
-  };
-
   try {
-    const listings = await getListings(params);
-    return NextResponse.json(listings);
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "فشل في جلب العقارات";
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json(
+        { error: "غير مصرح لك. سجل الدخول أولاً" },
+        { status: 401 }
+      );
+    }
+
+    if (currentUser.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "غير مصرح لك بالوصول لهذه البيانات" },
+        { status: 403 }
+      );
+    }
+
+    const listings = await prisma.listing.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        reviews: {
+          select: {
+            rating: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
     return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
+      listings.map((listing) => {
+        // حساب إحصائيات المراجعات
+        const reviewCount = listing.reviews.length;
+        const averageRating =
+          reviewCount > 0
+            ? listing.reviews.reduce((sum, review) => sum + review.rating, 0) /
+              reviewCount
+            : 0;
+
+        return {
+          ...listing,
+          createdAt: listing.createdAt.toISOString(),
+          reviewStats: {
+            count: reviewCount,
+            averageRating: Math.round(averageRating * 10) / 10,
+          },
+          reviews: undefined, // إزالة بيانات المراجعات الكاملة
+        };
+      })
     );
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "فشل في جلب العقارات";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -12,6 +12,39 @@ const nextConfig: NextConfig = {
   experimental: {
     // يمكنك إضافة خيارات تجريبية هنا إذا كنت تستخدم ميزات تجريبية
   },
+  // إعدادات Content Security Policy
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://maps.googleapis.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: https: blob:",
+              "connect-src 'self' https://api.stripe.com https://maps.googleapis.com wss:",
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
+  },
+  // تحسين تحميل الملفات الثابتة
+  assetPrefix: process.env.NODE_ENV === "production" ? "" : "",
+  // تحسين تحميل CSS
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
   images: {
     remotePatterns: [
       {

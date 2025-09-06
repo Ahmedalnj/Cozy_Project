@@ -2,10 +2,21 @@
 
 import { SaveReservation } from "@/app/types";
 import axios from "axios";
+import Avatar from "@/app/components/ui/Avatar";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch, FiTrash2, FiCalendar, FiUser, FiHome, FiDollarSign } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiRefreshCw,
+  FiSearch,
+  FiTrash2,
+  FiCalendar,
+  FiUser,
+  FiHome,
+  FiDollarSign,
+} from "react-icons/fi";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +26,13 @@ interface ReservationsTableProps {
   limit?: number;
 }
 
-type SortColumn = "listing" | "guest" | "startDate" | "endDate" | "totalPrice" | "createdAt";
+type SortColumn =
+  | "listing"
+  | "guest"
+  | "startDate"
+  | "endDate"
+  | "totalPrice"
+  | "createdAt";
 
 const RESERVATIONS_PER_PAGE = 10;
 
@@ -32,7 +49,6 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState("");
-
 
   // Update local state when props change (dashboard refresh)
   useEffect(() => {
@@ -179,29 +195,43 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
             break;
           case "startDate":
             return sortAsc
-              ? new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-              : new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+              ? new Date(a.startDate).getTime() -
+                  new Date(b.startDate).getTime()
+              : new Date(b.startDate).getTime() -
+                  new Date(a.startDate).getTime();
           case "endDate":
             return sortAsc
               ? new Date(a.endDate).getTime() - new Date(b.endDate).getTime()
               : new Date(b.endDate).getTime() - new Date(a.endDate).getTime();
           case "totalPrice":
-            return sortAsc ? a.totalPrice - b.totalPrice : b.totalPrice - a.totalPrice;
+            return sortAsc
+              ? a.totalPrice - b.totalPrice
+              : b.totalPrice - a.totalPrice;
           case "createdAt":
             return sortAsc
-              ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-              : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+              ? new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              : new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime();
         }
 
-        return sortAsc ? valA.toString().localeCompare(valB.toString()) : valB.toString().localeCompare(valA.toString());
+        return sortAsc
+          ? valA.toString().localeCompare(valB.toString())
+          : valB.toString().localeCompare(valA.toString());
       });
   }, [search, sortAsc, sortBy, localReservations]);
 
-  const totalPages = limit ? Math.ceil(Math.min(filteredReservations.length, limit) / RESERVATIONS_PER_PAGE) : Math.ceil(filteredReservations.length / RESERVATIONS_PER_PAGE);
+  const totalPages = limit
+    ? Math.ceil(
+        Math.min(filteredReservations.length, limit) / RESERVATIONS_PER_PAGE
+      )
+    : Math.ceil(filteredReservations.length / RESERVATIONS_PER_PAGE);
 
   const paginatedReservations = useMemo(() => {
     const start = (currentPage - 1) * RESERVATIONS_PER_PAGE;
-    const end = limit ? Math.min(start + RESERVATIONS_PER_PAGE, limit) : start + RESERVATIONS_PER_PAGE;
+    const end = limit
+      ? Math.min(start + RESERVATIONS_PER_PAGE, limit)
+      : start + RESERVATIONS_PER_PAGE;
     return filteredReservations.slice(start, end);
   }, [filteredReservations, currentPage, limit]);
 
@@ -211,7 +241,9 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900">جدول الحجوزات</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              جدول الحجوزات
+            </h3>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">
               عرض وإدارة جميع الحجوزات في النظام
             </p>
@@ -241,7 +273,10 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
               title="تحديث البيانات"
               aria-label={t("refresh_data")}
             >
-              <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
+              <FiRefreshCw
+                size={18}
+                className={loading ? "animate-spin" : ""}
+              />
             </button>
           </div>
         </div>
@@ -337,12 +372,17 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <div className="min-w-0">
-                      <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                        {reservation.user?.name || "غير محدد"}
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex-shrink-0">
+                        <Avatar src={reservation.user?.image} size="lg" />
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-500 truncate">
-                        {reservation.user?.email}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                          {reservation.user?.name || "غير محدد"}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          {reservation.user?.email}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -368,22 +408,28 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="text-xs sm:text-sm font-semibold text-gray-900">
-                      ${reservation.totalPrice.toLocaleString()}
+                      {reservation.totalPrice.toLocaleString()} د.ل
                     </div>
-                    <div className="text-xs text-gray-500">
-                      إجمالي
-                    </div>
+                    <div className="text-xs text-gray-500">إجمالي</div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
                     <div className="flex items-center justify-center gap-1 sm:gap-2">
-                      <span className="text-base sm:text-lg">{getStatusIcon(reservation.startDate, reservation.endDate)}</span>
+                      <span className="text-base sm:text-lg">
+                        {getStatusIcon(
+                          reservation.startDate,
+                          reservation.endDate
+                        )}
+                      </span>
                       <span
                         className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-full text-xs font-medium border ${getStatusColor(
                           reservation.startDate,
                           reservation.endDate
                         )}`}
                       >
-                        {getStatusText(reservation.startDate, reservation.endDate)}
+                        {getStatusText(
+                          reservation.startDate,
+                          reservation.endDate
+                        )}
                       </span>
                     </div>
                   </td>
@@ -426,11 +472,20 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-              عرض <span className="font-medium">{(currentPage - 1) * RESERVATIONS_PER_PAGE + 1}</span> إلى{" "}
+              عرض{" "}
               <span className="font-medium">
-                {Math.min(currentPage * RESERVATIONS_PER_PAGE, filteredReservations.length)}
+                {(currentPage - 1) * RESERVATIONS_PER_PAGE + 1}
               </span>{" "}
-              من أصل <span className="font-medium">{filteredReservations.length}</span> نتيجة
+              إلى{" "}
+              <span className="font-medium">
+                {Math.min(
+                  currentPage * RESERVATIONS_PER_PAGE,
+                  filteredReservations.length
+                )}
+              </span>{" "}
+              من أصل{" "}
+              <span className="font-medium">{filteredReservations.length}</span>{" "}
+              نتيجة
             </div>
             <div className="flex items-center justify-center gap-1 sm:gap-2">
               <button
@@ -461,7 +516,9 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                 );
               })}
               <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage === totalPages}
                 className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
                   currentPage === totalPages

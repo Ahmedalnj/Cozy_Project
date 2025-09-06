@@ -30,6 +30,13 @@ interface Payment {
     id: string;
     title: string;
     locationValue: string;
+    userId: string;
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    };
   };
   reservation: {
     id: string;
@@ -172,6 +179,12 @@ const AdminPage = () => {
         .toLowerCase()
         .includes(query.trim().toLowerCase());
 
+    // البحث عن ID المستخدم (آخر 8 أرقام)
+    const isUserIdSearch =
+      query.trim().length > 0 &&
+      query.trim().length === 8 &&
+      /^[a-f0-9]+$/i.test(query.trim());
+
     // فلترة المستخدمين حسب النطاق الزمني والبحث
     const users = data.users.filter(
       (u) =>
@@ -179,28 +192,56 @@ const AdminPage = () => {
           (u as SafeUser & { createdAt?: string }).createdAt ?? new Date(),
           range
         ) &&
-        (query ? match(u.name) || match(u.email) || match(u.id) : true)
+        (query
+          ? isUserIdSearch
+            ? u.id.slice(-8) === query.trim()
+            : match(u.name) || match(u.email) || match(u.id)
+          : true)
     );
 
     const listings = data.listings.filter(
       (l) =>
-        isWithinRange((l as SafeListing & { createdAt?: string }).createdAt ?? new Date(), range) &&
+        isWithinRange(
+          (l as SafeListing & { createdAt?: string }).createdAt ?? new Date(),
+          range
+        ) &&
         (query
-          ? match(l.title) || match(l.description) || match(l.id)
+          ? isUserIdSearch
+            ? l.userId.slice(-8) === query.trim()
+            : match(l.title) || match(l.description) || match(l.id)
           : true)
     );
 
     const reservations = data.reservations.filter(
       (r) =>
         isWithinRange(
-          (r as SaveReservation & { createdAt?: string; startDate?: string }).createdAt ?? 
-          (r as SaveReservation & { createdAt?: string; startDate?: string }).startDate ?? new Date(),
+          (r as SaveReservation & { createdAt?: string; startDate?: string })
+            .createdAt ??
+            (r as SaveReservation & { createdAt?: string; startDate?: string })
+              .startDate ??
+            new Date(),
           range
         ) &&
         (query
-          ? match(r.id) ||
-            match((r as SaveReservation & { guestName?: string; listingTitle?: string }).guestName ?? '') ||
-            match((r as SaveReservation & { guestName?: string; listingTitle?: string }).listingTitle ?? '')
+          ? isUserIdSearch
+            ? r.userId.slice(-8) === query.trim()
+            : match(r.id) ||
+              match(
+                (
+                  r as SaveReservation & {
+                    guestName?: string;
+                    listingTitle?: string;
+                  }
+                ).guestName ?? ""
+              ) ||
+              match(
+                (
+                  r as SaveReservation & {
+                    guestName?: string;
+                    listingTitle?: string;
+                  }
+                ).listingTitle ?? ""
+              )
           : true)
     );
 
@@ -211,17 +252,24 @@ const AdminPage = () => {
           range
         ) &&
         (query
-          ? match(p.id) ||
-            match(p.transactionId ?? '') ||
-            match(p.user?.name ?? '') ||
-            match(p.listing?.title ?? '')
+          ? isUserIdSearch
+            ? p.userId.slice(-8) === query.trim()
+            : match(p.id) ||
+              match(p.transactionId ?? "") ||
+              match(p.user?.name ?? "") ||
+              match(p.listing?.title ?? "")
           : true)
     );
 
     // استخراج الإحصائيات للنطاق المحدد من الحجوزات
     const computedRevenue = reservations.reduce((sum, r) => {
-      const val = Number((r as SaveReservation & { totalPrice?: number; price?: number }).totalPrice ?? 
-                     (r as SaveReservation & { totalPrice?: number; price?: number }).price ?? 0);
+      const val = Number(
+        (r as SaveReservation & { totalPrice?: number; price?: number })
+          .totalPrice ??
+          (r as SaveReservation & { totalPrice?: number; price?: number })
+            .price ??
+          0
+      );
       return sum + (Number.isFinite(val) ? val : 0);
     }, 0);
 
@@ -236,12 +284,20 @@ const AdminPage = () => {
     const map = new Map<string, { reservations: number; revenue: number }>();
     for (const r of filtered.reservations) {
       const key = monthKey(
-        (r as SaveReservation & { createdAt?: string; startDate?: string }).createdAt ?? 
-        (r as SaveReservation & { createdAt?: string; startDate?: string }).startDate ?? new Date()
+        (r as SaveReservation & { createdAt?: string; startDate?: string })
+          .createdAt ??
+          (r as SaveReservation & { createdAt?: string; startDate?: string })
+            .startDate ??
+          new Date()
       );
       const prev = map.get(key) ?? { reservations: 0, revenue: 0 };
-      const price = Number((r as SaveReservation & { totalPrice?: number; price?: number }).totalPrice ?? 
-                     (r as SaveReservation & { totalPrice?: number; price?: number }).price ?? 0);
+      const price = Number(
+        (r as SaveReservation & { totalPrice?: number; price?: number })
+          .totalPrice ??
+          (r as SaveReservation & { totalPrice?: number; price?: number })
+            .price ??
+          0
+      );
       map.set(key, {
         reservations: prev.reservations + 1,
         revenue: prev.revenue + (Number.isFinite(price) ? price : 0),
@@ -275,7 +331,9 @@ const AdminPage = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-6 text-center">
-        <h2 className="text-2xl font-semibold text-red-600 mb-3" dir="rtl">{error}</h2>
+        <h2 className="text-2xl font-semibold text-red-600 mb-3" dir="rtl">
+          {error}
+        </h2>
         <button
           onClick={onRefresh}
           className="px-5 py-2 bg-[#00B4D8] text-white rounded-lg shadow hover:bg-[#0099CC] transition"
@@ -293,7 +351,9 @@ const AdminPage = () => {
           <h2 className="text-2xl font-bold text-gray-700 mb-2" dir="rtl">
             لا توجد بيانات متاحة
           </h2>
-          <p className="text-gray-500" dir="rtl">تعذر تحميل بيانات لوحة التحكم.</p>
+          <p className="text-gray-500" dir="rtl">
+            تعذر تحميل بيانات لوحة التحكم.
+          </p>
         </div>
       </div>
     );
@@ -306,7 +366,10 @@ const AdminPage = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-6 h-6 text-[#00B4D8]" />
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight" dir="rtl">
+            <h1
+              className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight"
+              dir="rtl"
+            >
               لوحة تحكم المدير
             </h1>
           </div>
@@ -337,7 +400,7 @@ const AdminPage = () => {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="البحث في المستخدمين، العقارات، الحجوزات..."
+              placeholder="ادخل ID لعرض معلومات المستخدم وعقاراته وحجزاته و مدفوعاته"
               dir="rtl"
               className="w-full py-2 outline-none text-sm"
             />
@@ -356,7 +419,7 @@ const AdminPage = () => {
                 <option value="all">كل الوقت</option>
               </select>
             </div>
-                          <label className="flex items-center gap-2 text-sm" dir="rtl">
+            <label className="flex items-center gap-2 text-sm" dir="rtl">
               <input
                 type="checkbox"
                 checked={autoRefresh}
@@ -435,7 +498,9 @@ const AdminPage = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-800" dir="rtl">الإيرادات حسب الشهر</h3>
+              <h3 className="font-semibold text-gray-800" dir="rtl">
+                الإيرادات حسب الشهر
+              </h3>
               <LegendBadge>أعمدة</LegendBadge>
             </div>
             <div className="h-72">
@@ -467,20 +532,36 @@ const AdminPage = () => {
 
         {/* الجداول */}
         <div className="grid grid-cols-1 gap-6">
-          <Card title={`أحدث المستخدمين (${filtered.users.length} من ${data.stats.totalUsers})`}>
-            <UsersTable users={filtered.users} onRefresh={onRefresh} limit={5} />
+          <Card
+            title={`أحدث المستخدمين (${filtered.users.length} من ${data.stats.totalUsers})`}
+          >
+            <UsersTable
+              users={filtered.users}
+              onRefresh={onRefresh}
+              limit={5}
+            />
           </Card>
-          <Card title={`أحدث العقارات (${filtered.listings.length} من ${data.stats.totalListings})`}>
-            <ListingsTable listings={filtered.listings} onRefresh={onRefresh} limit={5} />
+          <Card
+            title={`أحدث العقارات (${filtered.listings.length} من ${data.stats.totalListings})`}
+          >
+            <ListingsTable
+              listings={filtered.listings}
+              onRefresh={onRefresh}
+              limit={5}
+            />
           </Card>
-          <Card title={`أحدث الحجوزات (${filtered.reservations.length} من ${data.stats.totalReservations})`}>
+          <Card
+            title={`أحدث الحجوزات (${filtered.reservations.length} من ${data.stats.totalReservations})`}
+          >
             <ReservationsTable
               reservations={filtered.reservations}
               onRefresh={onRefresh}
               limit={5}
             />
           </Card>
-          <Card title={`أحدث المدفوعات (${filtered.payments.length} من ${data.stats.totalPayments})`}>
+          <Card
+            title={`أحدث المدفوعات (${filtered.payments.length} من ${data.stats.totalPayments})`}
+          >
             <PaymentTable
               payments={filtered.payments}
               onRefresh={onRefresh}
@@ -530,7 +611,9 @@ const Card = ({
 }) => (
   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
     <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-      <h3 className="font-semibold text-gray-800" dir="rtl">{title}</h3>
+      <h3 className="font-semibold text-gray-800" dir="rtl">
+        {title}
+      </h3>
     </div>
     <div className="p-4">{children}</div>
   </div>
@@ -560,11 +643,21 @@ const StatCard = ({
     <div className="p-5 relative z-10">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500" dir="rtl">{title}</p>
+          <p className="text-sm text-gray-500" dir="rtl">
+            {title}
+          </p>
           <p className="mt-1 text-3xl font-bold text-gray-900">{value}</p>
-          {subtitle && <p className="mt-1 text-xs text-gray-500" dir="rtl">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-xs text-gray-500" dir="rtl">
+              {subtitle}
+            </p>
+          )}
         </div>
-        {emoji && <div className="text-4xl select-none" dir="ltr">{emoji}</div>}
+        {emoji && (
+          <div className="text-4xl select-none" dir="ltr">
+            {emoji}
+          </div>
+        )}
       </div>
     </div>
   </div>

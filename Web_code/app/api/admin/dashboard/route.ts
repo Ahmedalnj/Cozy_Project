@@ -52,6 +52,16 @@ export async function GET() {
     }));
 
     const allListingsRaw = await prisma.listing.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: 10,
     });
@@ -78,6 +88,7 @@ export async function GET() {
       user: {
         name: reservation.user?.name ?? "",
         email: reservation.user?.email ?? "",
+        image: reservation.user?.image ?? "",
       },
       listing: {
         ...reservation.listing,
@@ -89,7 +100,11 @@ export async function GET() {
     const allPaymentsRaw = await prisma.payment.findMany({
       include: {
         user: true,
-        listing: true,
+        listing: {
+          include: {
+            user: true,
+          },
+        },
         reservation: true,
       },
       orderBy: { createdAt: "desc" },
@@ -109,6 +124,12 @@ export async function GET() {
         title: payment.listing?.title ?? "",
         id: payment.listing?.id ?? "",
         locationValue: payment.listing?.locationValue ?? "",
+        user: {
+          id: payment.listing?.user?.id ?? "",
+          name: payment.listing?.user?.name ?? "",
+          email: payment.listing?.user?.email ?? "",
+          image: payment.listing?.user?.image ?? null,
+        },
       },
       reservation: {
         id: payment.reservation?.id ?? "",

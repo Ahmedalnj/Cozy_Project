@@ -93,44 +93,75 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
         />
       </div>
 
-      {/* Price Summary */}
-      <div className="mb-4 p-4 border rounded-lg">
-        <div className="flex justify-between font-semibold">
-          <span>
-            {t("LYD")}
-            {price} {t("listing_reservation.price_per_night")} {days}
-          </span>
-          <span>
-            {t("listing_reservation.total")} {t("LYD")} {totalPrice}
-          </span>
+      {/* Calendar Legend for Owner */}
+      {disabled && (
+        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            {t("listing_reservation.calendar_legend")}
+          </h4>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-white rounded-sm border border-white"></div>
+              <span className="text-sm text-gray-700">
+                {t("listing_reservation.available_days")}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-gray-300 rounded-sm border border-gray-400"></div>
+              <span className="text-sm text-gray-700">
+                {t("listing_reservation.booked_days")}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Day Count Hint */}
-      {showDayCountHint && days === 0 && (
+      {/* Price Summary - Only show for non-owners */}
+      {!disabled && (
+        <div className="mb-4 p-4 border rounded-lg">
+          <div className="flex justify-between font-semibold">
+            <span>
+              {t("LYD")}
+              {price} {t("listing_reservation.price_per_night")} {days}
+            </span>
+            <span>
+              {t("listing_reservation.total")} {t("LYD")} {totalPrice}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Day Count Hint - Only show for non-owners */}
+      {!disabled && showDayCountHint && days === 0 && (
         <div className="mb-2 text-sm text-rose-500 text-center">
           {t("listing_reservation.select_at_least_one_night")}
         </div>
       )}
 
-      {/* Reserve Button */}
-      <div className="mb-2">
-        <Button
-          disabled={disabled}
-          label={t("listing_reservation.reserve")}
-          onClick={onSubmit}
-        />
-      </div>
+      {/* Reserve Button - Only show if not disabled (not owner) */}
+      {!disabled && (
+        <>
+          <div className="mb-2">
+            <Button
+              label={t("listing_reservation.reserve")}
+              onClick={onSubmit}
+            />
+          </div>
 
-      <p className="text-center text-sm text-gray-500 mb-4">
-        {t("listing_reservation.wont_be_charged")}
-      </p>
+          <p className="text-center text-sm text-gray-500 mb-4">
+            {t("listing_reservation.wont_be_charged")}
+          </p>
+        </>
+      )}
 
-      <div className="text-center">
-        <button className="text-sm underline text-gray-500">
-          {t("listing_reservation.report_listing")}
-        </button>
-      </div>
+      {/* Report Button - Only show for non-owners */}
+      {!disabled && (
+        <div className="text-center">
+          <button className="text-sm underline text-gray-500">
+            {t("listing_reservation.report_listing")}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

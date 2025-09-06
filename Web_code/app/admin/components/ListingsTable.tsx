@@ -5,9 +5,18 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch, FiTrash2, FiHome, FiMapPin, FiDollarSign } from "react-icons/fi";
+import Avatar from "@/app/components/ui/Avatar";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiRefreshCw,
+  FiSearch,
+  FiTrash2,
+  FiHome,
+  FiMapPin,
+  FiDollarSign,
+} from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-
 
 interface ListingsTableProps {
   listings: SafeListing[];
@@ -17,6 +26,7 @@ interface ListingsTableProps {
 
 type SortColumn =
   | "title"
+  | "host"
   | "category"
   | "locationValue"
   | "price"
@@ -53,6 +63,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
         const res = await fetch("/api/admin/listings");
         if (!res.ok) throw new Error("فشل في جلب البيانات");
         const data: SafeListing[] = await res.json();
+        console.log("Listings data:", data[0]); // اختبار البيانات
         setLocalListings(data);
         setSearch("");
         setCurrentPage(1);
@@ -141,7 +152,8 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
         (listing) =>
           listing.title.toLowerCase().includes(search.toLowerCase()) ||
           listing.category.toLowerCase().includes(search.toLowerCase()) ||
-          listing.locationValue.toLowerCase().includes(search.toLowerCase())
+          listing.locationValue.toLowerCase().includes(search.toLowerCase()) ||
+          listing.id.toLowerCase().includes(search.toLowerCase())
       )
       .sort((a, b) => {
         let valA = "";
@@ -151,6 +163,10 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
           case "title":
             valA = a.title.toLowerCase();
             valB = b.title.toLowerCase();
+            break;
+          case "host":
+            valA = a.user?.name?.toLowerCase() || "";
+            valB = b.user?.name?.toLowerCase() || "";
             break;
           case "category":
             valA = a.category.toLowerCase();
@@ -164,19 +180,25 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
             return sortAsc ? a.price - b.price : b.price - a.price;
           case "createdAt":
             return sortAsc
-              ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-              : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+              ? new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              : new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime();
         }
 
         return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
   }, [search, sortAsc, sortBy, localListings]);
 
-  const totalPages = limit ? Math.ceil(Math.min(filteredListings.length, limit) / LISTINGS_PER_PAGE) : Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
+  const totalPages = limit
+    ? Math.ceil(Math.min(filteredListings.length, limit) / LISTINGS_PER_PAGE)
+    : Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
 
   const paginatedListings = useMemo(() => {
     const start = (currentPage - 1) * LISTINGS_PER_PAGE;
-    const end = limit ? Math.min(start + LISTINGS_PER_PAGE, limit) : start + LISTINGS_PER_PAGE;
+    const end = limit
+      ? Math.min(start + LISTINGS_PER_PAGE, limit)
+      : start + LISTINGS_PER_PAGE;
     return filteredListings.slice(start, end);
   }, [filteredListings, currentPage, limit]);
 
@@ -204,7 +226,9 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900">جدول العقارات</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              جدول العقارات
+            </h3>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">
               عرض وإدارة جميع العقارات في النظام
             </p>
@@ -214,7 +238,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder="البحث في العنوان، الفئة، أو الموقع..."
+                placeholder="البحث في العنوان، الفئة، الموقع، أو ID العقار..."
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-80"
                 value={search}
                 onChange={(e) => {
@@ -234,7 +258,10 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
               title={t("refresh_data")}
               aria-label={t("refresh_data")}
             >
-              <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
+              <FiRefreshCw
+                size={18}
+                className={loading ? "animate-spin" : ""}
+              />
             </button>
           </div>
         </div>
@@ -254,6 +281,16 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
                   <span className="hidden sm:inline">العنوان</span>
                   <span className="sm:hidden">🏠</span>
                   {renderSortIcon("title")}
+                </div>
+              </th>
+              <th
+                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort("host")}
+              >
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="hidden sm:inline">المضيف</span>
+                  <span className="sm:hidden">👤</span>
+                  {renderSortIcon("host")}
                 </div>
               </th>
               <th
@@ -324,8 +361,25 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex-shrink-0">
+                        <Avatar src={listing.user?.image} size="lg" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                          {listing.user?.name || "بدون اسم"}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          {listing.user?.email || ""}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <span className="text-base sm:text-lg">{getCategoryIcon(listing.category)}</span>
+                      <span className="text-base sm:text-lg">
+                        {getCategoryIcon(listing.category)}
+                      </span>
                       <span
                         className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-full text-xs font-medium border ${getCategoryColor(
                           listing.category
@@ -342,11 +396,9 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="text-xs sm:text-sm font-semibold text-gray-900">
-                      ${listing.price.toLocaleString()}
+                      د.ل {listing.price.toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      لليلة الواحدة
-                    </div>
+                    <div className="text-xs text-gray-500">لليلة الواحدة</div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                     <div className="flex flex-col">
@@ -373,7 +425,7 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
             ) : (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 sm:px-6 py-8 sm:py-12 text-center"
                 >
                   <div className="flex flex-col items-center justify-center">
@@ -397,11 +449,20 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-              عرض <span className="font-medium">{(currentPage - 1) * LISTINGS_PER_PAGE + 1}</span> إلى{" "}
+              عرض{" "}
               <span className="font-medium">
-                {Math.min(currentPage * LISTINGS_PER_PAGE, filteredListings.length)}
+                {(currentPage - 1) * LISTINGS_PER_PAGE + 1}
               </span>{" "}
-              من أصل <span className="font-medium">{filteredListings.length}</span> نتيجة
+              إلى{" "}
+              <span className="font-medium">
+                {Math.min(
+                  currentPage * LISTINGS_PER_PAGE,
+                  filteredListings.length
+                )}
+              </span>{" "}
+              من أصل{" "}
+              <span className="font-medium">{filteredListings.length}</span>{" "}
+              نتيجة
             </div>
             <div className="flex items-center justify-center gap-1 sm:gap-2">
               <button
@@ -432,7 +493,9 @@ const ListingsTable: React.FC<ListingsTableProps> = ({
                 );
               })}
               <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage === totalPages}
                 className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
                   currentPage === totalPages

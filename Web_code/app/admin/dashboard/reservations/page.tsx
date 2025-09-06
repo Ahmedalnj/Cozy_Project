@@ -23,6 +23,7 @@ export default async function AdminReservationsPage() {
       user: {
         name: reservation.user.name,
         email: reservation.user.email,
+        image: reservation.user.image,
       },
       listing: {
         ...reservation.listing,

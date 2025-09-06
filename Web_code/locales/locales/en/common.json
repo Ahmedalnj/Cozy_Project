@@ -590,6 +590,9 @@
     "select_at_least_one_night": "Please select at least 1 night stay",
     "reserve": "Reserve",
     "wont_be_charged": "You won't be charged yet",
+    "available_days": "Available days for booking",
+    "booked_days": "Booked days",
+    "calendar_legend": "Calendar Legend",
     "report_listing": "Report this listing"
   },
   "listing_offer": {
@@ -716,7 +719,8 @@
     "communication": "Communication",
     "location": "Location",
     "value": "Value",
-    "overall": "Overall rating"
+    "overall": "Overall rating",
+    "detailed": "Detailed ratings"
   },
   "guest_favourite": {
     "title": "Guest favourite",
@@ -866,7 +870,8 @@
     "actions": "Actions",
     "no_name": "No Name",
     "user_alt": "User",
-    "failed_to_load": "Failed to load host requests"
+    "failed_to_load": "Failed to load host requests",
+    "note": "You can only approve or reject pending requests"
   },
   "properties": {
     "title": "My Properties",
@@ -876,6 +881,7 @@
   "request_pending": "Pending",
   "request_approved": "Approved",
   "personal": "Personal",
+  "business": "Business or Office",
   "business_or_office": "Business or Office",
   "not_specified": "Not Specified",
   "remove_all_filters": "Remove All Filters",
@@ -897,5 +903,35 @@
     "reservation_data_missing": "Reservation data is missing",
     "user_data_required": "User data is required",
     "invalid_dates": "Invalid dates"
-  }
+  },
+  "host_request_title": "Request to Become a Host",
+  "host_request_subtitle": "Join us and start hosting your property",
+  "host_request_description": "As a host, you can list your property, manage reservations",
+  "full_name": "Full Name",
+  "identity_note": "Please upload a valid ID (passport, national ID, or driver's license)",
+  "request_type": "Request Type",
+  "identity_information": "Identity Information",
+  "id_card_type": "ID Card Type",
+  "national_id": "National ID Card",
+  "personal_id": "Personal ID Card",
+  "id_card_number": "ID Card Number",
+  "send_request": "Send Request",
+  "sending_request": "Sending request...",
+  "request_sent_success": "Request sent successfully",
+  "company_information": "Company Information",
+  "company_name": "Company Name",
+  "company_website": "Company Website",
+  "company_note": "Please provide your company details",
+  "company_website_required": "Company website is required",
+  "company_website_invalid_format": "Please enter a valid URL",
+  "company_name_required": "Company name is required",
+  "detailed_ratings": "Detailed Ratings",
+  "your_own_review": "Your Own Review",
+  "be_first_to_review": "Be the first to review this place",
+  "be_first": "Be the first to share your experience with this place",
+  "from": "from",
+  "confirm_delete_review": "Confirm Delete Review",
+  "confirm_delete_review_description": "Are you sure you want to delete this review? This action cannot be undone.",
+  "delete_review": "Delete Review",
+  "delete_review_warning": "The review will be permanently deleted and other users will not be able to see it."
 }

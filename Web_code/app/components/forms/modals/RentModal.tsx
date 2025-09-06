@@ -106,6 +106,15 @@ const RentModal = () => {
     });
   };
 
+  // إعادة ضبط العروض عند تغيير الفئة لتجنب خلط البيانات
+  useEffect(() => {
+    setValue("offers", [], {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [category, setValue]);
+
   // أضف صورة جديدة
   const addImage = (newImg: string) => {
     setLocalImages((imgs) => [...imgs, newImg]);
@@ -362,28 +371,30 @@ const RentModal = () => {
           />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[40vh] p-1">
-          {offers.map((item) => (
-            <CategoryInput
-              key={item.englishLabel}
-              onClick={() => {
-                const selected = Offers;
-                if (selected.includes(item.englishLabel)) {
-                  // remove from list
-                  setCustomValue(
-                    "offers",
-                    selected.filter((o: string) => o !== item.englishLabel)
-                  );
-                } else {
-                  // add to list
-                  setCustomValue("offers", [...selected, item.englishLabel]);
-                }
-              }}
-              selected={Offers.includes(item.englishLabel)}
-              label={t(`offers.${item.label}`)}
-              icon={item.icon}
-              type="offer"
-            />
-          ))}
+          {offers
+            .filter((item) => !category || item.categories?.includes(category))
+            .map((item) => (
+              <CategoryInput
+                key={item.englishLabel}
+                onClick={() => {
+                  const selected = Offers;
+                  if (selected.includes(item.englishLabel)) {
+                    // remove from list
+                    setCustomValue(
+                      "offers",
+                      selected.filter((o: string) => o !== item.englishLabel)
+                    );
+                  } else {
+                    // add to list
+                    setCustomValue("offers", [...selected, item.englishLabel]);
+                  }
+                }}
+                selected={Offers.includes(item.englishLabel)}
+                label={t(`offers.${item.label}`)}
+                icon={item.icon}
+                type="offer"
+              />
+            ))}
         </div>
         {Offers.length > 0 && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -437,7 +448,6 @@ const RentModal = () => {
             subtitle={t("rent_modal.info_subtitle")}
           />
         </div>
-
         <div className="space-y-4">
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <Counter

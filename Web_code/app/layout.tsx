@@ -22,7 +22,12 @@ import SessionProvider from "./Providers/SessionProvider";
 import I18NProvider from "./Providers/I18nProvider";
 import LanguageInitializer from "./components/layout/LanguageInitializer";
 
-const font = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const font = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap", // تحسين تحميل الخط
+  preload: true, // تحميل مسبق للخط
+});
 
 export const metadata: Metadata = {
   title: "Cozy",
@@ -54,7 +59,9 @@ export default async function RootLayout({
                 <ForgotPasswordModal />
                 <ResetPasswordModal />
                 <HostRequestModalProvider />
-                <NavbarWrapper currentUser={currentUser}>{children}</NavbarWrapper>
+                <NavbarWrapper currentUser={currentUser}>
+                  {children}
+                </NavbarWrapper>
               </ClientOnly>
             </HostModeProvider>
           </SessionProvider>

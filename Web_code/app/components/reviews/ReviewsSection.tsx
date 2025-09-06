@@ -10,6 +10,7 @@ import Button from "../ui/Button";
 import { SafeReview, SafeUser } from "@/app/types";
 import toast from "react-hot-toast";
 import axios from "axios";
+import ConfirmDeleteReviewModal from "../modals/confirmations/ConfirmDeleteReviewModal";
 
 interface ReviewsSectionProps {
   listingId: string;
@@ -29,6 +30,9 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   const [editingReview, setEditingReview] = useState<SafeReview | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedReviewForDelete, setSelectedReviewForDelete] =
+    useState<SafeReview | null>(null);
 
   const userReview = reviews.find(
     (review) => review.userId === currentUser?.id
@@ -92,7 +96,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
       setEditingReview(null);
     } catch (error: unknown) {
       console.error("Error submitting review:", error);
-      
+
       // تعريف واجهة للخطأ
       interface ApiError {
         response?: {
@@ -101,7 +105,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
           };
         };
       }
-      
+
       if (typeof error === "object" && error !== null && "response" in error) {
         const apiError = error as ApiError;
         console.error("Error details:", apiError.response?.data);
@@ -132,14 +136,17 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     setShowForm(true);
   };
 
-  const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm(t("delete_confirmation"))) {
-      return;
-    }
+  const handleDeleteReview = (review: SafeReview) => {
+    setSelectedReviewForDelete(review);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedReviewForDelete) return;
 
     try {
-      setDeletingId(reviewId);
-      await axios.delete(`/api/reviews/${reviewId}`);
+      setDeletingId(selectedReviewForDelete.id);
+      await axios.delete(`/api/reviews/${selectedReviewForDelete.id}`);
       toast.success(t("reviews.review_deleted"));
       await fetchReviews();
     } catch (error) {
@@ -147,7 +154,14 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
       toast.error(t("reviews.delete_error"));
     } finally {
       setDeletingId(null);
+      setIsDeleteModalOpen(false);
+      setSelectedReviewForDelete(null);
     }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedReviewForDelete(null);
   };
 
   const handleCancelForm = () => {
@@ -211,7 +225,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 </div>
               ) : (
                 <p className="text-xs text-gray-500 mt-1">
-                  كن أول من يكتب تقييماً
+                  {t("reviews.be_first")}
                 </p>
               )}
             </div>
@@ -273,7 +287,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 <h4 className="text-sm font-bold text-blue-900">
                   {t("your_review")}
                 </h4>
-                <p className="text-xs text-blue-700">تقييمك الخاص</p>
+                <p className="text-xs text-blue-700">{t("your_own_review")}</p>
               </div>
             </div>
             <div className="flex gap-1">
@@ -286,7 +300,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
               />
               <Button
                 label={t("reviews.delete_review")}
-                onClick={() => handleDeleteReview(userReview.id)}
+                onClick={() => handleDeleteReview(userReview)}
                 outline
                 small
                 className="bg-white hover:bg-red-50 border-red-300 text-red-600 hover:text-red-700 text-xs px-2 py-1"
@@ -312,7 +326,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 review={review}
                 currentUser={currentUser}
                 onEdit={() => handleEditReview(review)}
-                onDelete={() => handleDeleteReview(review.id)}
+                onDelete={() => handleDeleteReview(review)}
                 isDeleting={deletingId === review.id}
               />
             ))}
@@ -341,7 +355,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
             {t("reviews.no_reviews")}
           </h3>
           <p className="text-gray-500 mb-4 text-xs">
-            كن أول من يشارك تجربته مع هذا المكان
+            {t("be_first_to_review")}
           </p>
           {currentUser && !isOwner ? (
             <Button
@@ -358,6 +372,25 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
           ) : null}
         </div>
       )}
+
+      {/* Delete Review Modal */}
+      <ConfirmDeleteReviewModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        isLoading={deletingId === selectedReviewForDelete?.id}
+        reviewData={
+          selectedReviewForDelete
+            ? {
+                userName: selectedReviewForDelete.user.name || "Anonymous",
+                userImage: selectedReviewForDelete.user.image || undefined,
+                rating: selectedReviewForDelete.rating,
+                comment: selectedReviewForDelete.comment || "",
+                createdAt: selectedReviewForDelete.createdAt,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 };

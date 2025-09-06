@@ -35,6 +35,15 @@ export async function GET() {
             id: true,
             title: true,
             locationValue: true,
+            userId: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
           },
         },
         reservation: {

@@ -27,7 +27,7 @@ type SortColumn = "name" | "email" | "role" | "createdAt";
 const USERS_PER_PAGE = 10;
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const [localUsers, setLocalUsers] = useState(users);
 
   // Update local state when props change (dashboard refresh)
@@ -82,7 +82,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
   const handleRoleSelect = (userId: string, newRole: string) => {
     confirmModal(
       t("confirm_role_change_title"),
-      `${t("confirm_role_change_message")} ${newRole === "ADMIN" ? t("admin") : t("user")}؟`,
+      `${t("confirm_role_change_message")} ${
+        newRole === "ADMIN" ? t("admin") : t("user")
+      }؟`,
       () => handleConfirmRoleChange(userId, newRole)
     );
   };
@@ -183,11 +185,15 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
       });
   }, [search, sortAsc, sortBy, localUsers]);
 
-  const totalPages = limit ? Math.ceil(Math.min(filteredUsers.length, limit) / USERS_PER_PAGE) : Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+  const totalPages = limit
+    ? Math.ceil(Math.min(filteredUsers.length, limit) / USERS_PER_PAGE)
+    : Math.ceil(filteredUsers.length / USERS_PER_PAGE);
 
   const paginatedUsers = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
-    const end = limit ? Math.min(start + USERS_PER_PAGE, limit) : start + USERS_PER_PAGE;
+    const end = limit
+      ? Math.min(start + USERS_PER_PAGE, limit)
+      : start + USERS_PER_PAGE;
     return filteredUsers.slice(start, end);
   }, [filteredUsers, currentPage, limit]);
 
@@ -225,9 +231,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex-1 sm:flex-none">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                             <input
-                 type="text"
-                 placeholder="البحث في الاسم أو البريد الإلكتروني..."
+              <input
+                type="text"
+                placeholder="البحث في الاسم أو البريد الإلكتروني..."
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-80"
                 value={search}
                 onChange={(e) => {
@@ -322,20 +328,20 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onRefresh, limit }) => {
                         <Avatar src={user?.image} />
                       </div>
                       <div className="min-w-0">
-                                                 <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                           {user.name || "بدون اسم"}
-                         </div>
-                         <div className="text-xs sm:text-sm text-gray-500 truncate">
-                           ID: {user.id.slice(-8)}
-                         </div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                          {user.name || "بدون اسم"}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          ID: {user.id.slice(-8)}
+                        </div>
                       </div>
                     </div>
                   </td>
-                                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                     <div className="text-xs sm:text-sm text-gray-900 truncate max-w-xs">
-                       {user.email}
-                     </div>
-                   </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <div className="text-xs sm:text-sm text-gray-900 truncate max-w-xs">
+                      {user.email}
+                    </div>
+                  </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1 sm:gap-2">
                       <span className="text-base sm:text-lg">

@@ -7,6 +7,16 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminListingsPage() {
   const listings = await prisma.listing.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 

@@ -3,10 +3,14 @@
 import { format } from "date-fns";
 import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FiChevronDown, FiChevronUp, FiRefreshCw, FiSearch } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiRefreshCw,
+  FiSearch,
+} from "react-icons/fi";
 import Avatar from "@/app/components/ui/Avatar";
 import { useTranslation } from "react-i18next";
-
 
 interface Payment {
   id: string;
@@ -32,6 +36,13 @@ interface Payment {
     id: string;
     title: string;
     locationValue: string;
+    userId: string;
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    };
   };
   reservation: {
     id: string;
@@ -47,11 +58,22 @@ interface PaymentTableProps {
   limit?: number;
 }
 
-type SortColumn = "user" | "listing" | "amount" | "status" | "paymentMethod" | "createdAt";
+type SortColumn =
+  | "user"
+  | "listingOwner"
+  | "listing"
+  | "amount"
+  | "status"
+  | "paymentMethod"
+  | "createdAt";
 
 const PAYMENTS_PER_PAGE = 10;
 
-const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit }) => {
+const PaymentTable: React.FC<PaymentTableProps> = ({
+  payments,
+  onRefresh,
+  limit,
+}) => {
   const { t } = useTranslation("common");
   const [localPayments, setLocalPayments] = useState(payments);
 
@@ -65,8 +87,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
   const [sortBy, setSortBy] = useState<SortColumn>("createdAt");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-
-
 
   const fetchPayments = async () => {
     if (loading) return;
@@ -91,8 +111,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
       setLoading(false);
     }
   };
-
-
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -164,6 +182,10 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
             valA = a.user.name?.toLowerCase() || "";
             valB = b.user.name?.toLowerCase() || "";
             break;
+          case "listingOwner":
+            valA = a.listing.user?.name?.toLowerCase() || "";
+            valB = b.listing.user?.name?.toLowerCase() || "";
+            break;
           case "listing":
             valA = a.listing.title.toLowerCase();
             valB = b.listing.title.toLowerCase();
@@ -180,19 +202,25 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
             break;
           case "createdAt":
             return sortAsc
-              ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-              : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+              ? new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              : new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime();
         }
 
         return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
   }, [search, sortAsc, sortBy, localPayments]);
 
-  const totalPages = limit ? Math.ceil(Math.min(filteredPayments.length, limit) / PAYMENTS_PER_PAGE) : Math.ceil(filteredPayments.length / PAYMENTS_PER_PAGE);
+  const totalPages = limit
+    ? Math.ceil(Math.min(filteredPayments.length, limit) / PAYMENTS_PER_PAGE)
+    : Math.ceil(filteredPayments.length / PAYMENTS_PER_PAGE);
 
   const paginatedPayments = useMemo(() => {
     const start = (currentPage - 1) * PAYMENTS_PER_PAGE;
-    const end = limit ? Math.min(start + PAYMENTS_PER_PAGE, limit) : start + PAYMENTS_PER_PAGE;
+    const end = limit
+      ? Math.min(start + PAYMENTS_PER_PAGE, limit)
+      : start + PAYMENTS_PER_PAGE;
     return filteredPayments.slice(start, end);
   }, [filteredPayments, currentPage, limit]);
 
@@ -220,7 +248,9 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900">جدول المدفوعات</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              جدول المدفوعات
+            </h3>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">
               عرض وإدارة جميع معاملات الدفع في النظام
             </p>
@@ -250,7 +280,10 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
               title="تحديث البيانات"
               aria-label={t("refresh_data")}
             >
-              <FiRefreshCw size={18} className={loading ? "animate-spin" : ""} />
+              <FiRefreshCw
+                size={18}
+                className={loading ? "animate-spin" : ""}
+              />
             </button>
           </div>
         </div>
@@ -262,13 +295,23 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
           <thead className="bg-gray-50">
             <tr>
               <th
-                className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleSort("user")}
               >
                 <div className="flex items-center gap-1 sm:gap-2">
-                  <span className="hidden sm:inline">المستخدم</span>
+                  <span className="hidden sm:inline">من المضيف</span>
                   <span className="sm:hidden">👤</span>
                   {renderSortIcon("user")}
+                </div>
+              </th>
+              <th
+                className="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort("listingOwner")}
+              >
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="hidden sm:inline">إلى المستضيف</span>
+                  <span className="sm:hidden">🔄</span>
+                  {renderSortIcon("listingOwner")}
                 </div>
               </th>
               <th
@@ -321,6 +364,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                   {renderSortIcon("createdAt")}
                 </div>
               </th>
+
               <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <span className="hidden sm:inline">معرف المعاملة</span>
                 <span className="sm:hidden">🆔</span>
@@ -352,6 +396,22 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    {/* مالك العقار */}
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex-shrink-0">
+                        <Avatar src={payment.listing.user?.image} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs sm:text-sm font-medium text-rose-400 truncate">
+                          {payment.listing.user?.name || "بدون اسم"}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          {payment.listing.user?.email || ""}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="min-w-0">
                       <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-xs">
                         {payment.listing.title}
@@ -363,7 +423,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="text-xs sm:text-sm font-semibold text-gray-900">
-                      ${payment.amount.toLocaleString()}
+                      {payment.amount.toLocaleString()} د.ل
                     </div>
                     <div className="text-xs text-gray-500">
                       {payment.currency.toUpperCase()}
@@ -380,7 +440,9 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                   </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <span className="text-base sm:text-lg">{getPaymentMethodIcon(payment.paymentMethod)}</span>
+                      <span className="text-base sm:text-lg">
+                        {getPaymentMethodIcon(payment.paymentMethod)}
+                      </span>
                       <span className="text-xs sm:text-sm text-gray-900">
                         {getPaymentMethodText(payment.paymentMethod)}
                       </span>
@@ -396,12 +458,12 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                       </span>
                     </div>
                   </td>
+
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
                     <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-md text-xs font-mono bg-gray-100 text-gray-800">
-                      {payment.transactionId ? 
-                        payment.transactionId.slice(-12) : 
-                        "غير متوفر"
-                      }
+                      {payment.transactionId
+                        ? payment.transactionId.slice(-12)
+                        : "غير متوفر"}
                     </span>
                   </td>
                 </tr>
@@ -409,7 +471,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
             ) : (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="px-4 sm:px-6 py-8 sm:py-12 text-center"
                 >
                   <div className="flex flex-col items-center justify-center">
@@ -433,11 +495,20 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-              عرض <span className="font-medium">{(currentPage - 1) * PAYMENTS_PER_PAGE + 1}</span> إلى{" "}
+              عرض{" "}
               <span className="font-medium">
-                {Math.min(currentPage * PAYMENTS_PER_PAGE, filteredPayments.length)}
+                {(currentPage - 1) * PAYMENTS_PER_PAGE + 1}
               </span>{" "}
-              من أصل <span className="font-medium">{filteredPayments.length}</span> نتيجة
+              إلى{" "}
+              <span className="font-medium">
+                {Math.min(
+                  currentPage * PAYMENTS_PER_PAGE,
+                  filteredPayments.length
+                )}
+              </span>{" "}
+              من أصل{" "}
+              <span className="font-medium">{filteredPayments.length}</span>{" "}
+              نتيجة
             </div>
             <div className="flex items-center justify-center gap-1 sm:gap-2">
               <button
@@ -468,7 +539,9 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
                 );
               })}
               <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage === totalPages}
                 className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
                   currentPage === totalPages
@@ -482,8 +555,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({ payments, onRefresh, limit 
           </div>
         </div>
       )}
-
-
     </div>
   );
 };

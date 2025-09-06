@@ -3,8 +3,10 @@ import type { Listing, Reservation, User, Review } from "@prisma/client";
 export type SafeListing = Omit<Listing, "createdAt"> & {
   createdAt: string;
   user?: {
+    id: string;
     name: string | null;
     email: string | null;
+    image: string | null;
   };
   reviewStats?: {
     count: number;
@@ -63,7 +65,9 @@ export type PublicUser = Pick<
 };
 
 export const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("ar-LY", {
     style: "currency",
-    currency: "USD",
+    currency: "LYD",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
   }).format(amount);

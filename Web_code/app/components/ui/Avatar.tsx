@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AvatarProps {
   src: string | null | undefined;
@@ -9,7 +9,7 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ src, size = "md" }) => {
   const [imageError, setImageError] = useState(false);
-  
+
   const sizeClasses = {
     sm: "w-6 h-6 sm:w-7 sm:h-7",
     md: "w-7 h-7 sm:w-9 sm:h-9",
@@ -23,7 +23,13 @@ const Avatar: React.FC<AvatarProps> = ({ src, size = "md" }) => {
   };
 
   const fallbackImage = "/images/user.png";
-  const imageSrc = (src && !imageError) ? src : fallbackImage;
+
+  // إعادة تعيين imageError عند تغيير src
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  const imageSrc = src && !imageError ? src : fallbackImage;
 
   return (
     <Image

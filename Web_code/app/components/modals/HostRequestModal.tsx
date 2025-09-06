@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -42,7 +43,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
     watch,
     setValue,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       fullName: "",
@@ -53,7 +54,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
       companyWebsite: "",
       idCardNumber: "",
       idCardType: "",
-    }
+    },
   });
 
   const requestType = watch("requestType");
@@ -121,7 +122,10 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
           required: t("full_name_required"),
           minLength: { value: 2, message: t("full_name_min_length") },
           maxLength: { value: 50, message: t("full_name_max_length") },
-          pattern: { value: /^[a-zA-Z\u0600-\u06FF\s]+$/, message: t("full_name_invalid_chars") }
+          pattern: {
+            value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
+            message: t("full_name_invalid_chars"),
+          },
         }}
       />
 
@@ -135,7 +139,10 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
         errors={errors}
         validation={{
           required: t("email_required"),
-          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t("email_invalid_format") }
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: t("email_invalid_format"),
+          },
         }}
       />
 
@@ -149,7 +156,10 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
         errors={errors}
         validation={{
           required: t("phone_required"),
-          pattern: { value: /^[\+]?[0-9\s\-\(\)]{8,15}$/, message: t("phone_invalid_format") }
+          pattern: {
+            value: /^[\+]?[0-9\s\-\(\)]{8,15}$/,
+            message: t("phone_invalid_format"),
+          },
         }}
       />
 
@@ -183,15 +193,19 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
           </button>
         </div>
         {errors.requestType && (
-          <p className="text-red-500 text-xs mt-1">{errors.requestType.message}</p>
+          <p className="text-red-500 text-xs mt-1">
+            {errors.requestType.message}
+          </p>
         )}
       </div>
 
       {/* حقول الشركة */}
       {requestType === "business" && (
         <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h4 className="font-medium text-blue-900">{t("company_information")}</h4>
-          
+          <h4 className="font-medium text-blue-900">
+            {t("company_information")}
+          </h4>
+
           <Input
             id="companyName"
             label={t("company_name")}
@@ -202,7 +216,7 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
             validation={{
               required: t("company_name_required"),
               minLength: { value: 2, message: t("company_name_min_length") },
-              maxLength: { value: 100, message: t("company_name_max_length") }
+              maxLength: { value: 100, message: t("company_name_max_length") },
             }}
           />
 
@@ -216,9 +230,11 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
             errors={errors}
             validation={{
               required: t("company_website_required"),
-              pattern: { value: /^https?:\/\/.+/, message: t("company_website_invalid_format") }
+              pattern: {
+                value: /^https?:\/\/.+/,
+                message: t("company_website_invalid_format"),
+              },
             }}
-            placeholder={t("company_website_placeholder")}
           />
         </div>
       )}
@@ -226,8 +242,10 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
       {/* حقول الشخصي */}
       {requestType === "personal" && (
         <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-          <h4 className="font-medium text-green-900">{t("identity_information")}</h4>
-          
+          <h4 className="font-medium text-green-900">
+            {t("identity_information")}
+          </h4>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t("id_card_type")} *
@@ -257,7 +275,9 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
               </button>
             </div>
             {errors.idCardType && (
-              <p className="text-red-500 text-xs mt-1">{errors.idCardType.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.idCardType.message}
+              </p>
             )}
           </div>
 
@@ -272,9 +292,18 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
               errors={errors}
               validation={{
                 required: t("id_card_number_required"),
-                minLength: { value: 5, message: t("id_card_number_min_length") },
-                maxLength: { value: 20, message: t("id_card_number_max_length") },
-                pattern: { value: /^[0-9A-Za-z]+$/, message: t("id_card_number_invalid_chars") }
+                minLength: {
+                  value: 5,
+                  message: t("id_card_number_min_length"),
+                },
+                maxLength: {
+                  value: 20,
+                  message: t("id_card_number_max_length"),
+                },
+                pattern: {
+                  value: /^[0-9A-Za-z]+$/,
+                  message: t("id_card_number_invalid_chars"),
+                },
               }}
             />
           )}
@@ -284,11 +313,10 @@ const HostRequestModal: React.FC<HostRequestModalProps> = ({
       {/* ملاحظات */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <p className="text-sm text-gray-800">
-          <strong>{t("note")}:</strong> 
-          {requestType === "business" 
+          <strong>{t("note")}:</strong>
+          {requestType === "business"
             ? ` ${t("company_note")}`
-            : ` ${t("identity_note")}`
-          }
+            : ` ${t("identity_note")}`}
         </p>
       </div>
     </div>
