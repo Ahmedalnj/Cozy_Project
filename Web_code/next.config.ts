@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.stripe.com https://maps.googleapis.com wss:",
+              "connect-src 'self' https://api.stripe.com https://maps.googleapis.com https://sea1.ingest.uploadthing.com wss:",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
               "object-src 'none'",
               "base-uri 'self'",
@@ -61,6 +61,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
         pathname: "/**", // يمكن استخدام * للحصول على جميع المسارات
+      },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        pathname: "/**", // UploadThing domain
+      },
+      {
+        protocol: "https",
+        hostname: "sea1.ingest.uploadthing.com",
+        pathname: "/**", // UploadThing ingest domain
       },
     ],
     domains: ["images.unsplash.com"],
